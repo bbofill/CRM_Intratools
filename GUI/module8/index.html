@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Budgeting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/tom-select.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/intlTelInput.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/tutorialStyles.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+
+</head>
+<body>
+<!-- HEADER -->
+  <header class="bg-light">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a href="/main">
+        <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+      </a>
+      <a href="./configuration.html" id="configBtn" class="help-btn">⚙️</a>
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+      <a href="/main" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+    </div>
+  </header>
+  <main class="container d-flex justify-content-center align-items-start" style="min-height: 70vh;">
+    <div id="page-container" class="w-100">
+ 
+     <div class="row g-0">
+
+      <!-- SIDEBAR -->
+      <nav id="sidebar" class="col-md-3 col-lg-2 p-3">
+        <h5 class="mb-4 text-danger fw-bold">Budgeting</h5>
+
+        <div class="nav flex-column">
+          <a class="nav-link active" href="#" data-section="newRequest">New request</a>
+          <a class="nav-link" href="#" data-section="sentRequests">Sent requests</a>
+          <a class="nav-link d-none" href="#" data-section="viewRequests" id="managementAreaNav">Management area</a>
+          <a class="nav-link d-none" href="#" data-section="allRequests" id="allRequestsNav">All requests</a>
+          <a class="nav-link" href="#" data-section="attendanceCertificates" id="attendanceCertificatesNav">
+            Attendance certificates
+            <span id="attendanceCertificatesBadge" class="badge bg-danger ms-1 d-none">0</span>
+          </a>
+        </div>
+      </nav>
+
+      <!-- CONTENT AREA -->
+      <section id="content-area" class="col-md-9 col-lg-10 p-3">
+
+        <!-- NEW REQUEST -->
+        <div id="section-newRequest" class="content-section">
+          <h3 class="text-danger mb-3">New request</h3>
+
+          <!-- CATEGORY TICKS -->
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="fw-semibold mb-2">Category (select one or more)</div>
+
+                <div class="d-flex flex-wrap gap-4" id="category-ticks">
+                  <div class="form-check">
+                    <input class="form-check-input category-check" type="checkbox" id="cat-travel" value="travel">
+                    <label class="form-check-label" for="cat-travel">Travel</label>
+                  </div>
+
+                  <div class="form-check">
+                    <input class="form-check-input category-check" type="checkbox" id="cat-registration" value="registration">
+                    <label class="form-check-label" for="cat-registration">Registration</label>
+                  </div>
+
+                  <div class="form-check">
+                    <input class="form-check-input category-check" type="checkbox" id="cat-accommodation" value="accommodation">
+                    <label class="form-check-label" for="cat-accommodation">Accommodation</label>
+                  </div>
+
+                  <div class="form-check">
+                    <input class="form-check-input category-check" type="checkbox" id="cat-equipment" value="equipment">
+                    <label class="form-check-label" for="cat-equipment">Equipment</label>
+                  </div>
+
+                  <div class="form-check">
+                    <input class="form-check-input category-check" type="checkbox" id="cat-other" value="other">
+                    <label class="form-check-label" for="cat-other">Other</label>
+                  </div>
+                </div>
+
+                <div class="form-text mt-2">
+                  Equipment is mutually exclusive with the rest.
+                </div>
+              </div>
+            </div>
+
+            <!-- DYNAMIC DETAILS (accordion) -->
+            <div class="accordion" id="details-accordion"></div>
+
+            <div class="d-flex gap-2 mt-3">
+              <button id="submit-btn" class="btn btn-danger" type="button">Submit request</button>
+              <button id="reset-btn" class="btn btn-outline-secondary" type="button">Reset</button>
+            </div>
+       </div>
+
+        <!-- SENT REQUESTS (todos los usuarios) -->
+        <div id="section-sentRequests" class="content-section d-none">
+          <h3 class="text-danger mb-3">Sent requests</h3>
+          <p class="text-muted">List of all your submitted requests.</p>
+
+          <!-- Placeholder -->
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Request ID</th>
+                  <th id="sentRequestsProjectHeader" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Project <span id="sent-project-sort-indicator" class="ms-1 text-muted">↕</span>
+                  </th>
+                  <th>Request</th>
+                  <th id="sentRequestsStatusHeader" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Status <span id="sent-status-sort-indicator" class="ms-1 text-muted">↕</span>
+                  </th>
+                  <th id="sentRequestsLastUpdateHeader" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Last update <span id="sent-last-update-sort-indicator" class="ms-1 text-muted">↕</span>
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="sentRequestsBody">
+                <tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- MANAGEMENT AREA -->
+        <div id="section-viewRequests" class="content-section d-none">
+          <h3 class="text-danger mb-3">Management area</h3>
+          <p class="text-muted">Requests needing to be managed.</p>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Request ID</th>
+                  <th>Project</th>
+                  <th>Worker</th>
+                  <th>Last update</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="viewRequestsBody">
+                <tr><td colspan="5" class="text-center text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- ATTENDANCE CERTIFICATES -->
+        <div id="section-attendanceCertificates" class="content-section d-none">
+          <h3 class="text-danger mb-3">Attendance certificates</h3>
+          <p class="text-muted">
+            Upload pending attendance certificates for approved travel or registration requests whose end date has already passed.
+          </p>
+
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Request ID</th>
+                  <th>Project</th>
+                  <th>Request</th>
+                  <th>End date</th>
+                  <th>Last reminder</th>
+                  <th>Reminders</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceCertificatesBody">
+                <tr>
+                  <td colspan="7" class="text-center text-muted">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- ALL REQUESTS -->
+        <div id="section-allRequests" class="content-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h3 class="text-danger mb-1">All requests</h3>
+              <p class="text-muted mb-0">Administrator view of full list of requests.</p>
+            </div>
+
+            <button
+              id="exportAllRequestsBtn"
+              type="button"
+              class="btn btn-success"
+            >
+              Export full Excel
+            </button>
+          </div>
+          <div class="card mb-3">
+          <div class="card-body">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-8">
+                <label for="allRequestsInternalIdSearch" class="form-label">
+                  Search by Request ID
+                </label>
+                <input
+                  type="text"
+                  id="allRequestsInternalIdSearch"
+                  class="form-control"
+                  placeholder="Search by internal request ID..."
+                >
+              </div>
+
+              <div class="col-md-4 d-flex gap-2">
+                <button
+                  class="btn btn-outline-secondary w-100"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#allRequestsFiltersCollapse"
+                  aria-expanded="false"
+                  aria-controls="allRequestsFiltersCollapse"
+                >
+                  Filters
+                </button>
+
+                <button
+                  id="clearAllRequestsSearchBtn"
+                  type="button"
+                  class="btn btn-outline-danger"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+
+            <div class="collapse mt-3" id="allRequestsFiltersCollapse">
+              <div class="border rounded p-3 bg-light">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="filterCreationFrom" class="form-label">Creation date from</label>
+                    <input type="date" id="filterCreationFrom" class="form-control">
+                  </div>
+
+                  <div class="col-md-6">
+                    <label for="filterCreationTo" class="form-label">Creation date to</label>
+                    <input type="date" id="filterCreationTo" class="form-control">
+                  </div>
+
+                  <div class="col-md-6">
+                    <label for="filterCategories" class="form-label">Request category</label>
+                    <select id="filterCategories" class="form-select" multiple>
+                      <option value="travel">Travel</option>
+                      <option value="registration">Registration</option>
+                      <option value="accommodation">Accommodation</option>
+                      <option value="equipment">Equipment</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label for="filterTravelAreas" class="form-label">Travel area</label>
+                    <select id="filterTravelAreas" class="form-select" multiple>
+                      <option value="spain">Inside Spanish territory</option>
+                      <option value="eu">European Union</option>
+                      <option value="non_eu">Outside the European Union</option>
+                    </select>
+                    <div class="form-text">
+                      Available when Travel is selected, or when no category filter is applied.
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label for="filterProjects" class="form-label">Projects</label>
+                    <select id="filterProjects" class="form-select" multiple></select>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label for="filterResponsibles" class="form-label">Responsible / IP / Supervisor</label>
+                    <select id="filterResponsibles" class="form-select" multiple></select>
+                  </div>
+
+                  <div class="col-12 d-flex justify-content-end gap-2">
+                    <button
+                      id="resetAllRequestsFiltersBtn"
+                      type="button"
+                      class="btn btn-outline-secondary"
+                    >
+                      Reset filters
+                    </button>
+
+                    <button
+                      id="exportFilteredRequestsBtn"
+                      type="button"
+                      class="btn btn-success"
+                    >
+                      Export filtered Excel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Request ID</th>
+                  <th id="allRequestsProjectHeader" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Project <span id="all-project-sort-indicator" class="ms-1 text-muted">↕</span>
+                  </th>
+                  <th id="allRequestsWorkerHeader" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Worker <span id="all-worker-sort-indicator" class="ms-1 text-muted">↕</span>
+                  </th>
+                  <th>Request</th>
+                  <th id="allRequestsStatusHeader" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Status <span id="all-status-sort-indicator" class="ms-1 text-muted">↕</span>
+                  </th>
+                  <th id="allRequestsLastUpdateHeader" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Last update <span id="all-last-update-sort-indicator" class="ms-1 text-muted">↕</span>
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="allRequestsBody">
+                <tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        </section>
+
+        <!-- Modify Request Modal -->
+      <div class="modal fade" id="editRequestModal" tabindex="-1" aria-labelledby="editRequestModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title text-danger" id="editRequestModalLabel">Modify request</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <div class="fw-semibold mb-2">Category</div>
+
+                  <div class="d-flex flex-wrap gap-4" id="edit-category-ticks">
+                    <div class="form-check">
+                      <input class="form-check-input edit-category-check" type="checkbox" id="edit-cat-travel" value="travel">
+                      <label class="form-check-label" for="edit-cat-travel">Travel</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input edit-category-check" type="checkbox" id="edit-cat-registration" value="registration">
+                      <label class="form-check-label" for="edit-cat-registration">Registration</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input edit-category-check" type="checkbox" id="edit-cat-accommodation" value="accommodation">
+                      <label class="form-check-label" for="edit-cat-accommodation">Accommodation</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input edit-category-check" type="checkbox" id="edit-cat-equipment" value="equipment">
+                      <label class="form-check-label" for="edit-cat-equipment">Equipment</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input edit-category-check" type="checkbox" id="edit-cat-other" value="other">
+                      <label class="form-check-label" for="edit-cat-other">Other</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="view-rejection-box" class="alert alert-danger d-none mb-3">
+                <div class="fw-semibold mb-1">Reason</div>
+                <div id="view-rejection-text"></div>
+              </div>
+              <div class="accordion" id="edit-details-accordion"></div>
+            </div>
+            <div class="modal-footer flex-column align-items-stretch">
+              <div id="management-reject-box" class="w-100 mb-3 d-none">
+                <label for="management-reject-comment" class="form-label fw-semibold text-danger">
+                  Rejection comment
+                </label>
+                <p class="text-muted">Mandatory field if the request is rejected. This comment will be sent to the worker along with the rejection notification, so they can understand why their request was rejected and how to improve it.</p>
+                <textarea
+                  id="management-reject-comment"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Explain why this request is being rejected..."
+                ></textarea>
+              </div>
+
+              <div class="d-flex justify-content-between w-100">
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-outline-danger d-none" id="reject-manage-btn">
+                    Reject request
+                  </button>
+                  <button type="button" class="btn btn-success d-none" id="approve-manage-btn">
+                    Approve request
+                  </button>
+                  <button type="button" class="btn btn-danger" id="save-edit-btn">
+                    Save changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+      </div>
+    </main>
+
+<!-- FOOTER -->
+<footer class="bg-danger text-light py-3 mt-4">
+  <div class="container d-flex justify-content-between align-items-center small">
+    <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+    <span id="load-info">Calculating load time...</span>
+  </div>
+</footer>
+
+<script>
+    window.APP_VERSION = "{{.AppVersion}}";
+</script>
+<script type="module">
+  import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+
+  // Measure page load
+  measurePageLoadTime({
+    targetId: 'load-info',
+    precision: 6,
+    onComplete: (time) => console.log("Load Time:", time + "s")
+  });
+</script>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+ <script> 
+  window.addEventListener("DOMContentLoaded", () => {
+    
+    fetch('/module/proxy/module8/api?action=checkRole', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+      const userRole = data.role;
+      if (userRole !== "admin") {
+        document.getElementById("configBtn").style.display = "none";
+      }
+    });
+
+  });
+
+  
+  </script>
+
+<script src="/assets/js/intlTelInput.js?v={{.AppVersion}}"></script>
+<script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+<script src="/assets/js/tom-select.complete.min.js?v={{.AppVersion}}"></script>
+<script type="module" src="./assets/js/sidebarControl.js"></script>
+<script type="module" src="./assets/js/allRequests.js"></script>
+<script type="module" src="./assets/js/budgeting.js"></script>
+<script type="module" src="./assets/js/attendanceCertificates.js"></script>
+<script type="module" src="/assets/js/tutorials/tutorial_module8.js?v={{.AppVersion}}"></script>
+</body>
+</html>

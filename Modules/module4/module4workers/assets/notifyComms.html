@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>A new person has been added to Intranet</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 30px auto;
+            padding: 30px 25px;
+            max-width: 600px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        p {
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .status {
+            border-left: 5px solid;
+            padding: 12px 18px;
+            margin: 25px 0;
+            font-size: 1.05em;
+            border-radius: 6px;
+            background-color: #f3ecff;
+        }
+
+        /* Color morado (asignación) */
+        .assigned h1,
+        .assigned .status {
+            color: #6f42c1;
+            border-color: #6f42c1;
+            background-color: #f3ecff;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #6f42c1;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 22px;
+            border-radius: 6px;
+            margin-top: 25px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+        .btn:hover {
+            background-color: #563099;
+        }
+        .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            display: block;
+            max-width: 120px;
+            margin: 0 auto 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container {{.StatusClass}}">
+        <img src="https://issues.crm.cat/assets/images/crmlogo.jfif" alt="CRM Logo">
+        <h1>A new person has been added to Intranet</h1>
+
+        <p>Hello,</p>
+        <p>
+            A new person has been added to the Intranet system.  
+            Below are the details of the new user:
+        </p>
+
+        <div class="status">
+            <strong>Worker:</strong> {{.Worker}}<br>
+            <strong>Job category:</strong> {{.JobCategory}}<br>
+            <strong>Supervisor:</strong> {{.Supervisor}}
+        </div>
+
+
+        <p>
+            Make sure to add any missing information to Intranet, welcome them and provide any necessary support as they get familiar with our systems and processes. If you have any questions or need further information, please don't hesitate to reach out to the HR department.
+        </p>
+
+
+
+        <br>
+        <p style="font-size: 13px; color: #999; text-align: center;">
+            Please do not reply to this email — this inbox is not monitored.
+        </p>
+
+        <div class="footer">
+            Thank you for using <br>
+            <strong>CRM Intratools</strong>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Notifications</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+  <link rel="stylesheet" href="/assets/css/tom-select.css?v={{.AppVersion}}">
+  <script src="/assets/js/tom-select.complete.min.js?v={{.AppVersion}}"></script>
+</head>
+
+<body>
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+    </a>
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+    <a href="index.html" class="btn btn-outline-secondary">← Go back</a>
+  </div>
+  </div>
+</header>
+
+<div id="page-container">
+<div class="container">
+
+  <div class="container mt-4">
+
+    <h3>UsersHub Access Control</h3>
+    <p>Select which users are allowed to access Employee Data Extraction.</p>
+
+    <label for="allowedUsers" class="form-label">Authorized Users:</label>
+    <select id="allowedUsers" multiple placeholder="Select users..."></select>
+
+    <button id="saveAccess" class="btn btn-primary mt-3">Save Changes</button>
+
+  </div>
+  
+
+</div>
+</div>
+
+<footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+        <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+        <span id="load-info">Calculating load time...</span>
+    </div>
+    <script type="module">
+        import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+        measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+        onComplete: (time) => console.log("Load Time:", time + "s")
+        });
+    </script>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // 1) Check Role
+  fetch('/module/proxy/module5/api?action=checkRole')
+    .then(res => res.json())
+    .then(data => {
+      if (data.role !== "admin") {
+        window.location.href = "/main"; // bloqueo
+      }
+    });
+
+  // 2) Load user list with permissions
+  fetch('/module/proxy/module5/api?action=getUsersAccess')
+    .then(res => res.json())
+    .then(data => {
+      const select = new TomSelect("#allowedUsers", {
+        options: data.users.map(u => ({ value: u.username, text: u.username })),
+        items: data.allowed,  // usernames con permiso
+        plugins: ['remove_button'],
+        persist: false
+      });
+    });
+
+  // 3) Save updates
+  document.getElementById("saveAccess").addEventListener("click", () => {
+    const select = document.getElementById("allowedUsers").tomselect;
+    const allowedUsers = select.getValue();
+
+    fetch('/module/proxy/module5/api?action=setUsersAccess', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ users: allowedUsers })
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message))
+    .catch(err => console.error(err));
+  });
+
+});
+</script>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+</html>

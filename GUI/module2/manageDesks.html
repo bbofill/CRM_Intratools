@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools – Desk Management</title>
+
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/tutorialStyles.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+    </a>
+    <div class="d-flex align-items-center gap-4">
+      <a href="/module/gui/module3/notifications.html" class="position-relative">
+        <img src="/assets/images/bell.png" alt="Notifications" style="width:30px;">
+        <span id="notif-count"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+        </span>
+      </a>
+      <a href="index.html" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+  </div>
+</header>
+
+<!-- CONTENT -->
+<div id="page-container">
+  <div class="container">
+    <h1 class="text-danger mb-3">Desk Management</h1>
+    <p class="text-muted">
+      Manage desk positions, assignments and availability for hot desks.
+    </p>
+
+    <!-- FLOOR + LEGEND + AVAILABILITY TOOLBAR -->
+    <div class="desk-management-toolbar mb-3">
+      <div class="desk-toolbar-left">
+        <div class="floor-selector btn-group" role="group">
+          <button class="btn btn-outline-danger active" data-floor="0">Ground floor</button>
+          <button class="btn btn-outline-danger" data-floor="1">Floor 1</button>
+          <button class="btn btn-outline-danger" data-floor="2">Floor 2</button>
+        </div>
+
+        <div class="desk-legend">
+          <span class="badge bg-success">Available</span>
+          <span class="badge bg-info text-dark">Assigned</span>
+          <span class="badge bg-danger">Reserved</span>
+          <span class="badge bg-warning text-dark">Partial</span>
+          <span class="badge bg-secondary">Disabled</span>
+        </div>
+      </div>
+
+      <div class="availability-filter">
+        <div class="availability-field">
+          <label class="form-label" for="filterStart">Need desk from</label>
+          <input type="date" class="form-control" id="filterStart">
+        </div>
+
+        <div class="availability-field">
+          <label class="form-label" for="filterEnd">to</label>
+          <input type="date" class="form-control" id="filterEnd">
+        </div>
+
+        <div class="availability-actions">
+          <button class="btn btn-danger" id="applyFilter">Apply</button>
+          <button class="btn btn-outline-secondary" id="clearFilter">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CANVAS -->
+    <div id="floorCanvas">
+    </div>
+
+    <button class="btn btn-sm btn-outline-secondary mt-2" id="resetZoom">
+        Reset zoom
+      </button>
+      
+  </div>
+</div>
+
+<!-- DESK MODAL -->
+<div class="modal fade" id="deskModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Desk details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <p><strong>Desk:</strong> <span id="deskCode">—</span></p>
+        <p><strong>Room:</strong> <span id="roomUabCode">—</span></p>
+        <p><strong>Floor:</strong> <span id="deskFloor">—</span></p>
+
+        <hr>
+
+        <h6 class="mb-2">Occupancy in selected period</h6>
+        <div id="deskConflicts" class="small text-muted">—</div>
+
+        <hr>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-outline-info" id="assignPersonBtn">Assign person</button>
+          <button class="btn btn-outline-warning" id="pauseDeskBtn">Pause assignment</button>
+          <button class="btn btn-outline-success" id="reservableDeskBtn">Mark as reservable</button>
+          <button class="btn btn-outline-danger" id="freezeDeskBtn">Freeze desk</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ASSIGN DESK MODAL -->
+<div class="modal fade" id="assignDeskModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header bg-info text-dark">
+        <h5 class="modal-title">Assign person to desk</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- PERSON SELECT -->
+        <div class="mb-3 position-relative">
+          <label class="form-label">Person</label>
+          <input
+            type="text"
+            class="form-control"
+            id="personSearch"
+            placeholder="Search person"
+            autocomplete="off"
+          />
+        
+          <div
+            id="personResults"
+            class="list-group position-absolute w-100"
+            style="max-height: 200px; overflow-y: auto; z-index: 1056;"
+          ></div>
+        </div>
+        
+
+        <!-- GUEST OPTION -->
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="isGuest">
+          <label class="form-check-label" for="isGuest">
+            Assign as guest
+          </label>
+        </div>
+
+        <!-- CONTRACT OPTION -->
+        <div id="contractDetails" class="mb-3 d-none">
+          <label class="form-label" for="contractSelect">Related contract</label>
+          <select class="form-select" id="contractSelect">
+            <option value="">No related contract</option>
+          </select>
+        </div>
+
+        <!-- GUEST DETAILS -->
+        <div id="guestDetails" class="border rounded p-3 mb-3 d-none">
+          <h6 class="mb-3">Guest details</h6>
+
+          <div class="mb-2">
+            <label class="form-label" for="guestName">Name</label>
+            <input type="text" class="form-control" id="guestName" placeholder="Guest full name">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label" for="guestHost">Host</label>
+            <input type="text" class="form-control" id="guestHost" >
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label" for="guestRole">Role</label>
+            <select class="form-select" id="guestRole">
+              <option value="">Select role...</option>
+              <option value="visitor">Visitor</option>
+              <option value="speaker">Speaker</option>
+              <option value="lecturer">Lecturer</option>
+            </select>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label" for="guestProgram">Program</label>
+            <input type="text" class="form-control" id="guestProgram" >
+          </div>
+        </div>
+
+        <!-- DATES -->
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Start date</label>
+            <input type="date" class="form-control" id="assignStartDate" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">End date</label>
+            <input type="date" class="form-control" id="assignEndDate">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-info" id="confirmAssignBtn">
+          Assign desk
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="pauseDeskModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title">Pause assignment (Release desk)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <p class="text-muted small mb-3">
+          This creates a <strong>release</strong> period that temporarily frees the desk.
+        </p>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Release start date</label>
+            <input type="date" class="form-control" id="releaseStartDate" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Release end date</label>
+            <input type="date" class="form-control" id="releaseEndDate" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-warning" id="confirmReleaseBtn">Release desk</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- SCRIPTS -->
+<script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+<script type="module" src="./assets/js/showFloors.js?v={{.AppVersion}}"></script>
+<!-- FOOTER -->
+<footer class="bg-danger text-light py-3 mt-4">
+  <div class="container d-flex justify-content-between align-items-center small">
+    <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+    <span id="load-info">Calculating load time...</span>
+  </div>
+  <script type="module">  
+    import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+    
+    measurePageLoadTime({
+      targetId: 'load-info',
+      precision: 6,
+    onComplete: (time) => console.log("Load Time:", time + "s")
+    });
+  </script>
+</footer>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+
+</body>
+</html>

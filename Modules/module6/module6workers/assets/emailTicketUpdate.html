@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket Update Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 600px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+        }
+        p {
+            line-height: 1.6;
+        }
+        .status {
+            border-left: 4px solid;
+            padding: 10px 15px;
+            margin: 20px 0;
+            font-size: 1.1em;
+            border-radius: 4px;
+        }
+        /* Colores según el estado */
+        .in-progress h1,
+        .in-progress .status {
+            color: #0275d8;
+            border-color: #0275d8;
+            background-color: #eef5ff;
+        }
+        .closed h1,
+        .closed .status {
+            color: #28a745;
+            border-color: #28a745;
+            background-color: #e8f9ee;
+        }
+        .pending h1,
+        .pending .status {
+            color: #f0ad4e;
+            border-color: #f0ad4e;
+            background-color: #fff8e5;
+        }
+        a {
+            display: inline-block;
+            margin-top: 15px;
+            color: inherit;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            display: block;
+            max-width: 100px;
+            margin: 0 auto 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container {{.StatusClass}}">
+        <img src="https://issues.crm.cat/assets/images/crmlogo.jfif" alt="Logo CRM">
+        <h1>Ticket {{.Status}}</h1>
+
+        <p>Hello,</p>
+        <p>There has been an update to your ticket <strong>#{{.TicketID}}</strong>.</p>
+
+        <div class="status">
+            <strong>Status:</strong> {{.Status}}<br>
+            <strong>Updated:</strong> {{.UpdatedAt}}
+        </div>
+
+        <p>{{.Message}}</p>
+
+
+        <br>
+        <p style="font-size: 13px; color: #999; text-align: center;">
+            Please do not reply to this email — this inbox is not monitored.
+        </p>
+        <div class="footer">
+            Thank you for using <br>
+            <strong>CRM Ticketing</strong>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Public Procurement Procedure Required</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 30px auto;
+            padding: 30px 25px;
+            max-width: 650px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 10px;
+            color: #8a1c1c;
+        }
+        p {
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .alert {
+            border-left: 5px solid #b71c1c;
+            padding: 12px 18px;
+            margin: 25px 0;
+            font-size: 1.05em;
+            border-radius: 6px;
+            background-color: #fdecec;
+            color: #7a1616;
+        }
+        .summary {
+            margin: 20px 0;
+            padding: 14px 16px;
+            background-color: #f8f9fb;
+            border: 1px solid #d9e1ea;
+            border-radius: 6px;
+            color: #2f3b45;
+        }
+        .summary p {
+            margin: 8px 0;
+        }
+        .summary strong {
+            display: inline-block;
+            min-width: 170px;
+        }
+        .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+        }
+        .note {
+            font-size: 13px;
+            color: #999;
+            text-align: center;
+            margin-top: 20px;
+        }
+        img {
+            display: block;
+            max-width: 120px;
+            margin: 0 auto 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://issues.crm.cat/assets/images/crmlogo.jfif" alt="CRM Logo">
+
+        <h1>Public Procurement Procedure Required</h1>
+
+        <p>Hello <strong>{{.ManagementName}} </strong>,</p>
+
+        <p>
+            A budget request has reached a price range that requires starting a <strong>public procurement procedure</strong>.
+        </p>
+
+        <div class="alert">
+            Please review this request and initiate the corresponding procurement process.
+        </div>
+
+        <div class="summary">
+            <p><strong>Worker:</strong> {{.ResearcherName}} {{.ResearcherSurname}}</p>
+            <p><strong>Responsible:</strong> {{.PIName}} {{.PISurname}}</p>
+            <p><strong>Project:</strong> {{.ProjectName}}</p>
+            <p><strong>Accepted on:</strong> {{.UpdatedAt}}</p>
+            <p><strong>Category:</strong> {{.CategoryName}}</p>
+            <p><strong>Price range:</strong> {{.PriceRange}}</p>
+            <p><strong>Request summary:</strong> {{.RequestSummary}}</p>
+            {{if .Purpose}}<p><strong>Equipment:</strong> {{.Purpose}}</p>{{end}}
+            {{if .Observations}}<p><strong>Description:</strong> {{.Observations}}</p>{{end}}
+        </div>
+
+        <p>
+            You can review the full request in the <strong>Intratools Budgeting module</strong>.
+        </p>
+
+        <p class="note">
+            Please do not reply to this email — this inbox is not monitored.
+        </p>
+
+        <div class="footer">
+            Thank you for using <br>
+            <strong>CRM Intratools Budgeting</strong>
+        </div>
+    </div>
+</body>
+</html>

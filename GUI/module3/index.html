@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Your Profile</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}"> 
+  <link rel="stylesheet" href="/assets/css/cropper.min.css?v={{.AppVersion}}" />
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/bootstrap-icons.css?v={{.AppVersion}}"> 
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+    </a>
+    <div class="d-flex align-items-center gap-4 ms-3">
+      <a href="notifications.html" class="position-relative">
+        <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+        <span id="notif-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"></span>
+      </a>
+      <a href="/main" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+  </div>
+
+</header>
+
+<div id="page-container">
+  <div class="container">
+    <div id="profileContainer" class="row align-items-center mb-4">
+      <div class="col-md-3 text-center">
+        <img id="profile-img" src="" alt="User photo" class="img-thumbnail mb-2">
+      </div>
+      <div class="col-md-9 d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h2 id="fullname" class="mb-1"></h2>
+            <p id="categoria" class="text-muted mb-0"></p>
+          </div>
+          <button type="button" class="btn btn-outline-danger ms-3" id="change-password-btn">Change password</button>
+        </div>
+      </div>
+    </div>
+    <div class="row" id="profile-sections"></div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content change-password-modal-content">
+
+      <form id="changePasswordForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Change Password</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="currentPassword" class="form-label">Current password</label>
+            <input type="password" class="form-control" id="currentPassword" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="newPassword" class="form-label">New password</label>
+            <input type="password" class="form-control" id="newPassword" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="confirmNewPassword" class="form-label">Confirm new password</label>
+            <input type="password" class="form-control" id="confirmNewPassword" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Update password</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-danger text-light py-3 mt-4">
+  <div class="container d-flex justify-content-between align-items-center small">
+    <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+    <span id="load-info">Calculating load time...</span>
+  </div>
+  <script type="module">
+    import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+    measurePageLoadTime({
+      targetId: 'load-info',
+      precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+    });
+  </script>
+</footer>
+
+<script>
+    window.APP_VERSION = "{{.AppVersion}}";
+</script>
+
+<script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+
+<script type="module">
+  import { loadProfileSections } from "./assets/js/loadProfileData.js?v={{.AppVersion}}";
+  import { setupPasswordChange } from "./assets/js/changePasswordHandler.js?v={{.AppVersion}}";
+
+
+
+  let secciones = {};
+
+  function updateNotificationCount() {
+    fetch("/module/proxy/module3/api?action=notifications")
+      .then(res => res.json())
+      .then(notifs => {
+        const unseen = notifs.filter(n => n.seen === 0);
+        const badge = document.getElementById("notif-count");
+        if (unseen.length > 0) {
+          badge.textContent = unseen.length;
+          badge.style.display = "inline-block";
+        } else {
+          badge.style.display = "none";
+        }
+      })
+      .catch(err => console.error("Error updating notifications:", err));
+  }
+
+  updateNotificationCount();
+  setInterval(updateNotificationCount, 10000);
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const apiKey = sessionStorage.getItem("apiKey"); 
+    const secciones = {};
+    const container = document.getElementById("profile-sections");
+  loadProfileSections(secciones, container);
+
+    setupPasswordChange();
+
+  });
+
+</script>
+
+</body>
+</html>

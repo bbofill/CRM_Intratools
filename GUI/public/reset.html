@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>CRM - Reset password</title>
+   <link rel="icon" type="image/png" href="/public-assets/headerLogo.png">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image:
+        linear-gradient(
+          90deg,
+          rgba(10, 19, 35, 0.55) 0%,
+          rgba(10, 19, 35, 0.30) 35%,
+          rgba(10, 19, 35, 0.10) 55%,
+          rgba(10, 19, 35, 0.18) 100%
+        ),
+        url('/public-assets/crm-login-bg.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background-color: #1a1a1a;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(255, 0, 0, 0.2);
+    }
+
+    h2 {
+      font-size: 2rem;
+      color: #ff4d4d;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    p {
+      margin: 10px 0 20px;
+      color: #cccccc;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 6px;
+      border: 1px solid #550000;
+      background-color: #0f172a;
+      color: white;
+      font-size: 16px;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      border: 2px solid #ff4d4d;
+    }
+
+    button {
+      margin-top: 18px;
+      width: 100%;
+      padding: 12px;
+      background-color: #8b0000;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    button:hover {
+      background-color: #a30000;
+      transform: scale(1.03);
+    }
+
+    #msg {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #ff9999;
+    }
+
+    a {
+      color: #ff4d4d;
+      display: block;
+      margin-top: 20px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Reset password</h2>
+  <p>Enter your new password</p>
+
+  <input type="password" id="pwd1" placeholder="New password" required>
+  <input type="password" id="pwd2" placeholder="Confirm password" required>
+
+  <button onclick="submitReset()">Reset password</button>
+
+  <p id="msg"></p>
+
+  <a href="/">← Back to login</a>
+</div>
+<script>
+async function submitReset() {
+  const pwd1 = document.getElementById("pwd1").value;
+  const pwd2 = document.getElementById("pwd2").value;
+  const token = new URLSearchParams(window.location.search).get("token");
+
+  // Check if passwords match
+  if (pwd1 !== pwd2) {
+    document.getElementById("msg").innerText = "Passwords do not match";
+    return;
+  }
+
+  // Password strength check
+  const validationMessage = validatePassword(pwd1);
+  if (validationMessage !== "Password is valid") {
+    document.getElementById("msg").innerText = validationMessage;
+    return;
+  }
+
+  // SHA256 password hashing
+  const encoder = new TextEncoder();
+  const buf = await crypto.subtle.digest("SHA-256", encoder.encode(pwd1));
+  const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+
+  const res = await fetch("/api/resetPassword", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ token, password: hash })
+  });
+
+  const json = await res.json();
+  document.getElementById("msg").innerText = json.message;
+
+  if (json.status === "ok") {
+    setTimeout(() => window.location.href = "/", 3000);
+  }
+}
+
+// Password validation (minimum length, one lowercase, one uppercase, one number, allowed special chars !@#)
+function validatePassword(password) {
+  const minLength = 8;
+  const hasUpperCase = /[A-Z]/;
+  const hasLowerCase = /[a-z]/;
+  const hasNumbers = /\d/;
+  const hasSpecialChars = /[!@#]/;
+  const disallowedSpecialChars = /[^A-Za-z0-9!@#]/;  // Regex to check for any disallowed special characters
+
+  if (password.length < minLength) {
+    return "Password must be at least 8 characters long";
+  }
+  if (!hasUpperCase.test(password)) {
+    return "Password must contain at least one uppercase letter";
+  }
+  if (!hasLowerCase.test(password)) {
+    return "Password must contain at least one lowercase letter";
+  }
+  if (!hasNumbers.test(password)) {
+    return "Password must contain at least one number";
+  }
+  if (disallowedSpecialChars.test(password)) {
+    return "Password contains invalid special characters. Only !@# are allowed.";
+  }
+  if (!hasSpecialChars.test(password)) {
+    return "Password must contain at least one special character (!@#)";
+  }
+
+  return "Password is valid";
+}
+</script>
+
+
+</body>
+</html>

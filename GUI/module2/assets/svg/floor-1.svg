@@ -1,0 +1,238 @@
+<svg
+   version="1.1"
+   id="floor-1"
+   viewBox="0 0 694 497"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="g1">
+      <image
+         href="assets/images/PlanolPlanta1.png"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%"
+         preserveAspectRatio="xMidYMid meet"
+      />
+     
+  </g>
+  <g
+     id="layer5">
+    <rect
+       style="fill:none;stroke:none;stroke-width:2.549;stroke-opacity:1"
+       id="office_a2"
+       width="199.29515"
+       height="152.87547"
+       x="109.55044"
+       y="19.805729" />
+    <rect
+       style="fill:none;stroke:none;stroke-width:2.549;stroke-opacity:1"
+       id="office_23"
+       width="97.171852"
+       height="151.6376"
+       x="344.12454"
+       y="21.043587" />
+    <rect
+       style="fill:none;stroke:none;stroke-width:2.549;stroke-opacity:1"
+       id="office_22"
+       width="99.028641"
+       height="152.25653"
+       x="446.86676"
+       y="19.805729" />
+    <rect
+       style="fill:none;stroke:none;stroke-width:2.549;stroke-opacity:1"
+       id="office_21"
+       width="105.83686"
+       height="183.20299"
+       x="545.27649"
+       y="18.567871" />
+    <rect
+       style="fill:none;stroke:none;stroke-width:2.549;stroke-opacity:1"
+       id="office_20"
+       width="105.21793"
+       height="206.72229"
+       x="545.89539"
+       y="201.15193" />
+    <rect
+       style="fill:none;stroke:none;stroke-width:2.549;stroke-opacity:1"
+       id="office_19"
+       width="102.12329"
+       height="177.63263"
+       x="442.53424"
+       y="232.09839" />
+    <rect
+       style="fill:none;stroke:none;stroke-width:2.549;stroke-opacity:1"
+       id="office_18"
+       width="101.50436"
+       height="177.63263"
+       x="341.6488"
+       y="231.47945" />
+  </g>
+  <g
+     id="layer6">
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.549;stroke-opacity:1"
+       id="desk_A2.8"
+       width="26.696583"
+       height="45.296661"
+       x="144.64296"
+       y="45.73431" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.549;stroke-opacity:1"
+       id="desk_A2.5"
+       width="26.696583"
+       height="45.296661"
+       x="173.36624"
+       y="45.613262" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.549;stroke-opacity:1"
+       id="desk_A2.7"
+       width="26.696583"
+       height="45.296661"
+       x="144.77808"
+       y="92.957893" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.549;stroke-opacity:1"
+       id="desk_A2.6"
+       width="26.696583"
+       height="45.296661"
+       x="173.50136"
+       y="92.836845" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.549;stroke-opacity:1"
+       id="desk_23.1"
+       width="63.459091"
+       height="28.228354"
+       x="347.05557"
+       y="139.39117" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.549;stroke-opacity:1"
+       id="desk_21.3"
+       width="63.459091"
+       height="28.228354"
+       x="583.2157"
+       y="36.213345" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.27003;stroke-opacity:1"
+       id="desk_20.3"
+       width="49.883224"
+       height="28.480524"
+       x="600.1355"
+       y="359.68234" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.27003;stroke-opacity:1"
+       id="desk_20.4"
+       width="49.883224"
+       height="28.480524"
+       x="549.82056"
+       y="359.92398" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.549;stroke-opacity:1"
+       id="desk_23.2"
+       width="63.459091"
+       height="28.228354"
+       x="376.02988"
+       y="57.801514" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.549;stroke-opacity:1"
+       id="desk_A2.4"
+       width="26.696583"
+       height="45.296661"
+       x="227.30508"
+       y="45.176723" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.549;stroke-opacity:1"
+       id="desk_A2.1"
+       width="26.696583"
+       height="45.296661"
+       x="256.02835"
+       y="45.055676" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.82682;stroke-opacity:1"
+       id="desk_22.2"
+       width="26.419666"
+       height="56.292492"
+       x="500.04407"
+       y="29.159241" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.82682;stroke-opacity:1"
+       id="desk_22.1"
+       width="26.419666"
+       height="56.292492"
+       x="499.91135"
+       y="117.42449" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.82682;stroke-opacity:1"
+       id="desk_19.1"
+       width="26.419666"
+       height="56.292492"
+       x="490.41342"
+       y="243.41341" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.82682;stroke-opacity:1"
+       id="desk_18.1"
+       width="26.419666"
+       height="56.292492"
+       x="362.00684"
+       y="241.91466" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.82682;stroke-opacity:1"
+       id="desk_18.2"
+       width="26.419666"
+       height="56.292492"
+       x="363.17307"
+       y="353.2702" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.82682;stroke-opacity:1"
+       id="desk_19.2"
+       width="26.419666"
+       height="56.292492"
+       x="490.65128"
+       y="302.10394" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.82682;stroke-opacity:1"
+       id="desk_21.1"
+       width="26.419666"
+       height="56.292492"
+       x="585.60638"
+       y="147.28394" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.82682;stroke-opacity:1"
+       id="desk_20.1"
+       width="26.42"
+       height="56.292492"
+       x="585.41339"
+       y="210.41341" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.82682;stroke-opacity:1"
+       id="desk_20.2"
+       width="26.419666"
+       height="56.292492"
+       x="585.24713"
+       y="269.00928" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.82682;stroke-opacity:1"
+       id="desk_21.2"
+       width="26.419666"
+       height="56.292492"
+       x="620.72876"
+       y="76.777985" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.549;stroke-opacity:1"
+       id="desk_A2.3"
+       width="26.696583"
+       height="45.296661"
+       x="227.4402"
+       y="92.400307" />
+    <rect
+       style="fill:none;stroke:#8400b3;stroke-width:2.549;stroke-opacity:1"
+       id="desk_A2.2"
+       width="26.696583"
+       height="45.296661"
+       x="256.16348"
+       y="92.279259" />
+  </g>
+</svg>

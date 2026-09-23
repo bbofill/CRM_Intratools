@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Module 0 - ADMINISTRATOR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/tom-select.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/custom/modules/module0/users.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+
+  <style>
+
+
+</style>
+
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="bg-danger text-white py-3 shadow-sm">
+  <div class="container d-flex justify-content-between align-items-center">
+    <h1 class="h4 mb-0">M0 - Administrator - Users</h1>
+    <a href="/module/gui/module0/" class="btn btn-outline-light btn-sm">← Go Back</a>
+  </div>
+</header>
+
+  <!-- MAIN -->
+<div id="page-container">
+<div class="container">
+  <main class="container text-center">
+    <h1>User list</h1>
+    <div class="tab-content">
+      <div id="tab-users">
+        
+        <form id="user-form" class="mb-4">
+            <div class="row g-2">
+              <input type="hidden" id="user-id">
+
+              <div class="col-md">
+                <label for="worker" class="form-label small text-light">Worker</label>
+                <select id="worker" placeholder="Select worker..." autocomplete="off"></select>
+              </div>
+
+        
+              <div class="col-md">
+                <label for="username" class="form-label small text-light">Username</label>
+                <input type="text" class="form-control form-control-sm bg-dark text-light" id="username" required>
+              </div>
+          
+              <div class="col-md">
+                <label for="role" class="form-label small text-light">Role</label>
+                <select class="form-select form-select-sm bg-dark text-light" id="role" required>
+                  <option value="" disabled selected>Select role</option>
+                 <option value="admin">Administrator</option>
+                   <option value="manager">Manager</option>
+                   <option value="support">Support</option>
+                   <option value="user">User</option>
+                  <option value="user">Guest</option>
+                </select>
+              </div> 
+          
+              <div class="col-md">
+                <label for="password" class="form-label small text-light">Password</label>
+                <input type="text" class="form-control form-control-sm bg-dark text-light" id="password" required>
+              </div>
+          
+              <div class="col-md-auto d-flex align-items-end">
+                <button type="submit" class="btn btn-sm btn-success">ADD</button>
+              </div>
+            </div>
+          </form> 
+        
+          <div class="table-responsive mt-4">
+          <table class="table table-dark table-striped table-bordered table-sm mb-0">
+         <thead>
+              <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Surname</th>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th>Actions</th>
+              </tr>
+         </thead>
+      <tbody id="users-table-body">
+        <tr><td colspan="5" class="text-center text-muted">Loading Data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+<br>
+<br>
+      </div>
+    </div>
+  </main>
+</div>
+</div>
+
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form id="changePasswordForm" class="modal-content">
+      <div class="modal-header">
+        <h5 id="changePasswordModalTitle" class="modal-title text-danger">Change password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <label class="form-label">New password</label>
+        <input type="password" id="newPassword" class="form-control" required>
+
+        <label class="form-label mt-3">Confirm new password</label>
+        <input type="password" id="confirmNewPassword" class="form-control" required>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-danger">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <!-- FOOTER -->
+  <footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+      <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+      <span id="load-info">Calculating load time...</span>
+
+    </div>
+  </footer>
+  <script type="module">
+      import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+      measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+      });
+  </script>
+  <script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+  <script src="/assets/js/tom-select.complete.min.js?v={{.AppVersion}}"></script>
+  <script type="module">
+    import { loadUsersTable } from '/assets/js/modules/module0/users_fillUserTable.js?v={{.AppVersion}}';
+    import { initUserFormHandler } from './assets/js/users_formHandler.js?v={{.AppVersion}}'
+    loadUsersTable();
+    initUserFormHandler();
+  </script>
+</body>
+</html>

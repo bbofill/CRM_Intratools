@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Export data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a href="/main">
+        <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+      </a>
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+      <a href="index.html" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+    </div>
+  </header>
+
+<main class="container">
+  <div id="page-container">
+  <div class="container">
+  <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center
+  ">
+    
+    <div class="col">
+      <div class="card bg-dark text-light h-100 shadow">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title fs-4">Export Uneix Center Units (03)</h5>
+          <p class="card-text small">Verify data accuracy</p>
+          <a href="/module/gui/module5/uneixUnits.html" class="btn btn-outline-light mt-auto">Go</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card bg-dark text-light h-100 shadow">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title fs-4">Export Uneix Workers (46)</h5>
+          <p class="card-text small">Verify data accuracy</p>
+          <a href="/module/gui/module5/uneixUsers.html" class="btn btn-outline-light mt-auto">Go</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+        <div class="card bg-dark text-light h-100 shadow">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title fs-4">Export Uneix Groups (48)</h5>
+            <p class="card-text small">Verify data accuracy</p>
+            <a href="/module/gui/module5/uneixGroups.html" class="btn btn-outline-light mt-auto">Go</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card bg-dark text-light h-100 shadow">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title fs-4">Export Uneix Group Recognitions (50)</h5>
+            <p class="card-text small">Verify data accuracy</p>
+            <a href="/module/gui/module5/uneixReconeixements.html" class="btn btn-outline-light mt-auto">Go</a>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card bg-dark text-light h-100 shadow">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title fs-4">Export Uneix Group Members (52)</h5>
+            <p class="card-text small">Verify data accuracy</p>
+            <a href="/module/gui/module5/uneixMembers.html" class="btn btn-outline-light mt-auto">Go</a>    
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card bg-dark text-light h-100 shadow">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title fs-4">Export Uneix Spin Offs (64)</h5>
+            <p class="card-text small">Export table in format .csv</p>
+            <a id="downloadUneixSpinOffs" class="btn btn-outline-light mt-auto" href="#">Download</a>          
+          </div>
+        </div>
+      </div>
+  </div>
+  </div>
+  </div>
+</main>
+
+  <!-- FOOTER -->
+  <footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+      <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+      <span id="load-info">Calculating load time...</span>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script type="module">
+      import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+
+      measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+      });
+  </script>
+  <script>
+    function downloadCSV(action, filename) {
+      console.log(`Iniciando descarga CSV: ${action} -> ${filename}`);
+
+      fetch(`/module/proxy/module5/api?action=${action}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Error downloading file (HTTP " + response.status + ")");
+          }
+          const contentType = response.headers.get("Content-Type");
+          console.log("Content-Type:", contentType);
+          return response.blob();
+        })
+        .then(blob => {
+          if (blob.size === 0) {
+            throw new Error("Archivo vacío recibido.");
+          }
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          console.log("Descarga completada correctamente:", filename);
+        })
+        .catch(err => {
+          console.error("Error en la descarga:", err);
+          alert("Unable to download file: " + err.message);
+        });
+    }
+
+    // Asocia el botón al evento
+    document.addEventListener("DOMContentLoaded", () => {
+      const btnSpinOffs = document.getElementById("downloadUneixSpinOffs");
+      if (btnSpinOffs) {
+        btnSpinOffs.addEventListener("click", (e) => {
+          e.preventDefault();
+          const year = (new Date().getFullYear() - 1) % 100;
+          console.log("Año para el archivo:", year);
+          const filename = `RM${year}64.csv`;
+          console.log("Nombre del archivo generado:", filename);
+          downloadCSV("exportUneixSpinOffs", filename);
+        });
+      } else {
+        console.error("No se encontró el botón #downloadUneixSpinOffs en el DOM.");
+      }
+    });
+  </script>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+</html>

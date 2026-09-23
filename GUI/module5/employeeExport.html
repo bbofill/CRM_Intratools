@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Export data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a href="/main">
+        <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+      </a>
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+      <a href="index.html" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+    </div>
+  </header>
+
+<main class="container my-5">
+    <div id="page-container">
+  <h2 class="mb-4 text-center">Employee Data Extraction</h2>
+  <p class="text-muted text-center mb-5">Select the fields to export. Only records with data will be included.</p>
+
+  <div class="text-center mb-4">
+    <button type="button" id="selectAllBtn" class="btn btn-outline-dark btn-sm me-2">Select All</button>
+    <button type="button" id="deselectAllBtn" class="btn btn-outline-secondary btn-sm">Deselect All</button>
+  </div>
+
+  
+  <form id="exportForm" class="mb-5">
+
+    <!-- Sección PEOPLE -->
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-light d-flex justify-content-between align-items-center">
+            <span>General Information</span>
+            <div>
+              <button type="button" class="btn btn-sm btn-outline-light select-section">Select section</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary deselect-section">Deselect section</button>
+            </div>
+          </div>
+      <div class="card-body row">
+        <div class="col-md-3"><input type="checkbox" name="people_name"> Name</div>
+        <div class="col-md-3"><input type="checkbox" name="surname"> Surname</div>
+        <div class="col-md-3"><input type="checkbox" name="secondSurname"> Second surname</div>
+        <div class="col-md-3"><input type="checkbox" name="gender"> Gender</div>
+        <div class="col-md-3"><input type="checkbox" name="birth_date"> Birth date</div>
+        <div class="col-md-3"><input type="checkbox" name="nationality"> Nationality</div>
+        <div class="col-md-3"><input type="checkbox" name="birth_country"> Birth country</div>
+        <div class="col-md-3"><input type="checkbox" name="birth_province"> Birth province</div>
+        <div class="col-md-3"><input type="checkbox" name="birth_city"> Birth city</div>
+        <div class="col-md-3"><input type="checkbox" name="nif"> NIF</div>
+        <div class="col-md-3"><input type="checkbox" name="nif_extended"> NIF extended</div>
+        <div class="col-md-3"><input type="checkbox" name="academic_grade"> Maximum Academic Grade</div>
+        <div class="col-md-3"><input type="checkbox" name="user_phone"> User Phone</div>
+        <div class="col-md-3"><input type="checkbox" name="emergency_phone"> Emergency Contact Phone</div>
+        <div class="col-md-3"><input type="checkbox" name="user_email"> Personal Email</div>
+        <div class="col-md-3"><input type="checkbox" name="employee_email"> Employee Email</div>
+        <div class="col-md-3"><input type="checkbox" name="orcid"> Orcid</div>
+        <div class="col-md-3"><input type="checkbox" name="i3"> Certificat I3</div>
+        <div class="col-md-3"><input type="checkbox" name="people_id"> Intratools ID</div>
+        <div class="col-md-3"><input type="checkbox" name="people_idExternal"> People ID</div>
+        <div class="col-md-3"><input type="checkbox" name="webUser_ID"> Web ID</div>
+        <div class="col-md-3"><input type="checkbox" name="active"> Active employee?</div>
+        <div class="col-md-3"><input type="checkbox" name="agreesToUneix"> Agrees to Uneix?</div>
+      </div>
+    </div>
+
+    <!-- Sección RESIDENCE -->
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-light d-flex justify-content-between align-items-center">
+            <span>Residence</span>
+            <div>
+              <button type="button" class="btn btn-sm btn-outline-light select-section">Select section</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary deselect-section">Deselect section</button>
+            </div>
+          </div>
+      <div class="card-body row">
+        <div class="col-md-3"><input type="checkbox" name="residence_country"> Country</div>
+        <div class="col-md-3"><input type="checkbox" name="residence_province"> Province</div>
+        <div class="col-md-3"><input type="checkbox" name="residence_city"> City</div>
+        <div class="col-md-3"><input type="checkbox" name="address"> Address</div>
+        <div class="col-md-3"><input type="checkbox" name="postal_code"> Postal code</div>
+        <div class="col-md-3"><input type="checkbox" name="actual"> Actual residence?</div>
+
+      </div>
+    </div>
+
+    <!-- Sección CONTRACT -->
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-light d-flex justify-content-between align-items-center">
+            <span>Contract</span>
+            <div>
+              <button type="button" class="btn btn-sm btn-outline-light select-section">Select section</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary deselect-section">Deselect section</button>
+            </div>
+          </div>
+        <div class="card-body row">
+        <div class="col-md-3"><input type="checkbox" name="vinculation_type"> Vinculation</div>
+        <div class="col-md-3"><input type="checkbox" name="contracting_institution"> Contracting institution</div>
+        <div class="col-md-3"><input type="checkbox" name="trainee_type"> Trainee Type</div>
+        <div class="col-md-3"><input type="checkbox" name="trainee_studies"> Trainee Studies</div>
+        <div class="col-md-3"><input type="checkbox" name="internship"> Has Internship?</div>
+        <div class="col-md-3"><input type="checkbox" name="job_category"> Job category</div>
+        <div class="col-md-3"><input type="checkbox" name="contract_type"> Personal type</div>
+        <div class="col-md-3"><input type="checkbox" name="position"> Position</div>
+        <div class="col-md-3"><input type="checkbox" name="contract_start_date"> Contract start date</div>
+        <div class="col-md-3"><input type="checkbox" name="contract_end_date"> Contract end date</div>
+        <div class="col-md-3"><input type="checkbox" name="totalDedication_hours"> Working hours</div>
+        <div class="col-md-3"><input type="checkbox" name="supervisor"> Supervisor</div>
+        <div class="col-md-3"><input type="checkbox" name="office"> Office</div>
+        <div class="col-md-3"><input type="checkbox" name="funding"> Funding</div>
+        
+      </div>
+    </div>
+
+    <!-- Sección EDUCATION -->
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-light d-flex justify-content-between align-items-center">
+            <span>Education</span>
+            <div>
+              <button type="button" class="btn btn-sm btn-outline-light select-section">Select section</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary deselect-section">Deselect section</button>
+            </div>
+          </div>
+        <div class="card-body row">
+        <div class="col-md-3"><input type="checkbox" name="grade_master_doctorate"> Grade type</div>
+        <div class="col-md-3"><input type="checkbox" name="grade_code"> Grade</div>
+        <div class="col-md-3"><input type="checkbox" name="gradeName"> Grade (extra)</div>
+        <div class="col-md-3"><input type="checkbox" name="graduation_university"> University</div>
+        <div class="col-md-3"><input type="checkbox" name="universityName"> University (extra)</div>
+        <div class="col-md-3"><input type="checkbox" name="graduation_country"> Graduation country</div>
+        <div class="col-md-3"><input type="checkbox" name="graduation_year"> Graduation year</div>
+      </div>
+    </div>
+
+    <!-- Sección GROUP -->
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-light d-flex justify-content-between align-items-center">
+            <span>Group</span>
+            <div>
+              <button type="button" class="btn btn-sm btn-outline-light select-section">Select section</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary deselect-section">Deselect section</button>
+            </div>
+          </div>
+        <div class="card-body row">
+          <div class="col-md-3"><input type="checkbox" name="group_intern_code"> Group</div>
+          <div class="col-md-3"><input type="checkbox" name="group_start_date"> Group start date</div>
+          <div class="col-md-3"><input type="checkbox" name="group_end_date"> Group end date</div>
+          <div class="col-md-3"><input type="checkbox" name="ip"> Is IP?</div>
+
+        </div>
+      </div>
+
+    <!-- Sección PHD -->
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-light d-flex justify-content-between align-items-center">
+            <span>PhD</span>
+            <div>
+              <button type="button" class="btn btn-sm btn-outline-light select-section">Select section</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary deselect-section">Deselect section</button>
+            </div>
+          </div>
+      <div class="card-body row">
+        <div class="col-md-3"><input type="checkbox" name="phd_program"> Program</div>
+        <div class="col-md-3"><input type="checkbox" name="phd_tesisTitle"> Thesis title</div>
+        <div class="col-md-3"><input type="checkbox" name="phd_startYear"> Start year</div>
+        <div class="col-md-3"><input type="checkbox" name="phd_tesisDirector"> Thesis director</div>
+        <div class="col-md-3"><input type="checkbox" name="phd_university"> University</div>
+        <div class="col-md-3"><input type="checkbox" name="phd_plannedPresentationDate"> Planned presentation date</div>
+        <div class="col-md-3"><input type="checkbox" name="phd_presentationDate"> Presentation date</div>
+        <div class="col-md-3"><input type="checkbox" name="phd_link"> Phd link</div>
+        <div class="col-md-3"><input type="checkbox" name="phd_centerResponsible"> Center responsible</div>
+        <div class="col-md-3"><input type="checkbox" name="phd_externalResponsible"> External responsible</div>
+        <div class="col-md-3"><input type="checkbox" name="phd_IP"> IP or tutor?</div>
+      </div>
+    </div>
+
+    <!-- Sección FORMACIONS -->
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-light d-flex justify-content-between align-items-center">
+            <span>Trainings</span>
+            <div>
+              <button type="button" class="btn btn-sm btn-outline-light select-section">Select section</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary deselect-section">Deselect section</button>
+            </div>
+          </div>
+        <div class="card-body row">
+            <div class="col-md-3"><input type="checkbox" name="training_name"> Training name</div>
+            <div class="col-md-3"><input type="checkbox" name="training_date"> Training date</div>
+        </div>
+        </div>
+
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-danger px-4">Export to Excel</button>
+      <button id="exportCSV" type="button" class="btn btn-danger px-4">Export to CSV</button>
+    </div>
+
+  </form>
+
+  <div id="status" class="text-center text-muted"></div>
+</div>
+</main>
+
+<footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+        <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+        <span id="load-info">Calculating load time...</span>
+    </div>
+    <script type="module">
+        import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+        measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+        onComplete: (time) => console.log("Load Time:", time + "s")
+        });
+    </script>
+</footer>
+
+<script>
+
+function downloadBlobWithTimestamp(blob, baseName, extension) {
+  const now = new Date();
+  const timestamp = now.toISOString().replace(/[:T]/g, "-").split(".")[0];
+  const fileName = `${baseName}_${timestamp}.${extension}`;
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  return fileName;
+}
+
+document.getElementById('exportForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const selectedFields = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+    .map(cb => cb.name);
+
+  if (selectedFields.length === 0) {
+    document.getElementById('status').textContent = "Please select at least one field.";
+    return;
+  }
+
+  document.getElementById('status').textContent = "Generating Excel file...";
+
+  const res = await fetch('/module/proxy/module5/api?action=employeeExport', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ fields: selectedFields })
+  });
+
+  if (!res.ok) {
+    document.getElementById('status').textContent = "Error exporting data.";
+    return;
+  }
+
+  const now = new Date();
+  const timestamp = now.toISOString().replace(/[:T]/g, "").split(".")[0];
+
+  // Obtener blob y descargar
+  const blob = await res.blob();
+  const fileName = downloadBlobWithTimestamp(blob, "employee_data", "xlsx");
+  document.getElementById('status').textContent = "File downloaded successfully.";
+});
+
+document.getElementById("exportCSV").addEventListener("click", async () => {
+  const selectedFields = Array.from(
+    document.querySelectorAll('input[type="checkbox"]:checked')
+  ).map(cb => cb.name);
+
+  if (selectedFields.length === 0) {
+    document.getElementById("status").textContent = "Please select at least one field.";
+    return;
+  }
+
+  document.getElementById("status").textContent = "Generating CSV file...";
+
+  const res = await fetch("/module/proxy/module5/api?action=exportCSV", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fields: selectedFields })
+  });
+
+  if (!res.ok) {
+    alert("CSV export failed.");
+    return;
+  }
+
+  const blob = await res.blob();
+  const fileName = downloadBlobWithTimestamp(blob, "employee_data", "csv");
+
+  document.getElementById("status").textContent =
+    `File ${fileName} downloaded successfully.`;
+});
+
+
+
+// Select/Deselect All
+document.getElementById('selectAllBtn').addEventListener('click', () => {
+  document.querySelectorAll('#exportForm input[type="checkbox"]').forEach(cb => cb.checked = true);
+});
+document.getElementById('deselectAllBtn').addEventListener('click', () => {
+  document.querySelectorAll('#exportForm input[type="checkbox"]').forEach(cb => cb.checked = false);
+});
+
+// Select/Deselect por sección
+document.querySelectorAll('.select-section').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const card = btn.closest('.card');
+    card.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+  });
+});
+
+document.querySelectorAll('.deselect-section').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const card = btn.closest('.card');
+    card.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  });
+});
+</script>
+
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  fetch('/module/proxy/module5/api?action=checkAccess')
+    .then(res => res.json())
+    .then(data => {
+      if (!data.can_access_userhub) {   
+        alert("You do not have permission to access Employee data extraction.");
+        window.location.href = "./index.html";
+      }
+    });
+});
+</script>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+</html>

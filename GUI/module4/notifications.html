@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Notifications</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+  <link rel="stylesheet" href="/assets/css/tom-select.css?v={{.AppVersion}}">
+  <script src="/assets/js/tom-select.complete.min.js?v={{.AppVersion}}"></script>
+</head>
+
+<body>
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+    </a>
+          <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+    <a href="index.html" class="btn btn-outline-secondary">← Go back</a>
+  </div>
+  </div>
+</header>
+
+<div id="page-container">
+<div>
+
+  <div class="container">
+    <h2 class="mb-4">Make an Announcement</h2>
+    <form id="announcement-form" enctype="multipart/form-data">
+  
+      <div class="mb-3">
+        <label for="title" class="form-label fw-semibold">Title</label>
+        <input type="text" id="title" name="title" class="form-control" required>
+      </div>
+  
+      <div class="mb-3">
+        <label for="content" class="form-label fw-semibold">Content</label>
+        <textarea id="content" name="content" class="form-control" rows="4" required></textarea>
+      </div>
+  
+      <div class="mb-3">
+        <label for="file" class="form-label fw-semibold">Attach File (optional)</label>
+        <input type="file" id="file" name="file" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label for="specificUsers" class="form-label fw-semibold">Send to:</label>
+        <select id="specificUsers" name="specificUsers[]" multiple class="form-control"></select>
+      </div>
+      
+      <div class="mb-3">
+        <label for="exceptUsers" class="form-label fw-semibold">All except (optional)</label>
+        <select id="exceptUsers" name="exceptUsers[]" multiple class="form-control"></select>
+      </div>
+      <div class="mb-3 form-check">
+        <input type="checkbox" id="sendToAll" name="sendToAll" class="form-check-input">
+        <label for="sendToAll" class="form-check-label">Send to all users</label>
+      </div>
+  
+      <button type="submit" class="btn btn-primary">Send Notification</button>
+    </form>
+  </div>
+  
+
+</div>
+</div>
+
+<footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+        <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+        <span id="load-info">Calculating load time...</span>
+    </div>
+    <script type="module">
+        import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+        measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+        onComplete: (time) => console.log("Load Time:", time + "s")
+        });
+    </script>
+</footer>
+<script>
+    window.APP_VERSION = "{{.AppVersion}}";
+</script>
+<script>
+  async function fetchUsers() {
+    const response = await fetch('/module/proxy/module4/api?action=get-users');
+    const users = await response.json();
+
+    const options = users.map(u => {
+      const fullName = [u.name, u.surname, u.secondSurname].filter(Boolean).join(" ");
+      return {
+        value: u.id,
+        text: fullName
+      };
+    });
+    new TomSelect("#specificUsers", {
+      options,
+      valueField: "value",
+      labelField: "text",
+      searchField: "text",
+      plugins: ['remove_button']
+    });
+
+    new TomSelect("#exceptUsers", {
+      options,
+      valueField: "value",
+      labelField: "text",
+      searchField: "text",
+      plugins: ['remove_button']
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    fetchUsers();
+
+    document.getElementById("announcement-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const specific = document.getElementById("specificUsers").tomselect.getValue();
+      const except = document.getElementById("exceptUsers").tomselect.getValue();
+      const sendToAll = document.getElementById("sendToAll").checked;
+
+      // --- Validación: debe haber al menos 1 opción elegida ---
+      if (!sendToAll && specific.length === 0 && except.length === 0) {
+        alert("You must choose at least one target option: specific users, except, or send to all.");
+        return;
+      }
+
+      const form = e.target;
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch("/module/proxy/module4/api?action=notification", {
+          method: "POST",
+          body: formData
+        });
+
+        if (response.ok) {
+          alert("Notification sent successfully.");
+          form.reset();
+          document.querySelectorAll(".ts-control").forEach(el => el.innerHTML = ""); 
+          setTimeout(() => {
+            location.reload();
+          }, 300);
+        } else {
+          const errorText = await response.text();
+          alert("Error: " + errorText);
+        }
+      } catch (err) {
+        console.error("Submission failed:", err);
+        alert("Network error while sending notification.");
+      }
+    });
+  });
+</script>
+
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+</html>

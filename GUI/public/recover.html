@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CRM - Recover Password</title>
+  <link rel="icon" type="image/png" href="/public-assets/headerLogo.png">
+    <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background-image:
+        linear-gradient(
+          90deg,
+          rgba(10, 19, 35, 0.55) 0%,
+          rgba(10, 19, 35, 0.30) 35%,
+          rgba(10, 19, 35, 0.10) 55%,
+          rgba(10, 19, 35, 0.18) 100%
+        ),
+        url('/public-assets/crm-login-bg.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background-color: #1a1a1a;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0px 0px 20px rgba(255, 0, 0, 0.25);
+    }
+
+    h2 {
+      color: #ff4d4d;
+      margin-bottom: 10px;
+    }
+
+    input, button {
+      width: 100%;
+      box-sizing: border-box; 
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 6px;
+      border: 1px solid #550000;
+      background-color: #0f172a;
+      color: white;
+      font-size: 16px;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      border: 2px solid #ff4d4d;
+    }
+
+    button {
+      margin-top: 18px;
+      width: 100%;
+      padding: 12px;
+      background-color: #8b0000;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background .2s ease, transform .2s ease;
+      box-sizing: border-box;
+    }
+
+    button:hover {
+      background-color: #a30000;
+      transform: scale(1.03);
+    }
+
+    #msg {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #ff9999;
+    }
+
+    a {
+      color: #ff4d4d;
+      display: block;
+      margin-top: 20px;
+      text-decoration: none;
+    }
+
+  </style>
+
+</head>
+<body>
+
+<div class="container">
+  <h2>Password recovery</h2>
+  <p>Enter your username to request a reset link.</p>
+
+  <form id="recover-form">
+    <input type="text" id="username" placeholder="Username" required>
+    <button type="submit">Send reset request</button>
+  </form>
+
+  <p id="msg"></p>
+
+  <a href="/">← Back to login</a>
+
+  <div id="email-step" style="display:none; margin-top:20px;">
+    <p>Enter the full email matching <b id="emailMasked"></b></p>
+    <input id="realEmail" placeholder="Enter full email" />
+    <button id="verifyBtn" disabled>Verify email</button>
+  </div>
+</div>
+
+
+
+<script>
+document.getElementById("recover-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const username = document.getElementById("username").value;
+
+  const res = await fetch("/api/requestReset", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ step: "start", username })
+  });
+
+  const json = await res.json();
+
+  if (json.masked && json.masked.trim() !== "") {
+    // Ocultar primera sección
+    document.querySelector("p").style.display = "none";                // texto "Enter your username..."
+    document.getElementById("recover-form").style.display = "none";   // form completo
+    document.getElementById("msg").innerText = "Verify your email:";  // mensaje claro
+
+    // Mostrar email-step
+    document.getElementById("email-step").style.display = "block";
+    document.getElementById("emailMasked").innerText = json.masked;
+    document.getElementById("verifyBtn").disabled = false;
+  } else {
+    document.getElementById("msg").innerText = json.message;
+  }
+});
+
+
+document.getElementById("verifyBtn").addEventListener("click", async () => {
+  const username = document.getElementById("username").value;
+  const entered = document.getElementById("realEmail").value.trim();
+
+  const res = await fetch("/api/requestReset", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ step: "verify", username, email: entered })
+  });
+
+  const json = await res.json();
+
+  if (json.status === "ok") {
+    document.querySelector(".container").innerHTML = `
+      <h2>Password reset</h2>
+      <p style="margin-top:20px;">
+        A recovery link has been sent to your email.<br><br>
+        If you don't receive anything, please refer to IT.
+      </p>
+      <a href="/" style="margin-top:30px; display:inline-block;">← Back to login</a>
+    `;
+  } else {
+    document.getElementById("msg").innerText = json.message;
+  }
+});
+
+</script>
+
+
+
+</body>
+</html>

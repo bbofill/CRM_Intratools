@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Service Commission Rejected</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #fbf6f5;
+            color: #2f3033;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 30px auto;
+            padding: 30px 26px;
+            max-width: 650px;
+            background-color: #ffffff;
+            border: 1px solid #efd7d3;
+            border-radius: 10px;
+            box-shadow: 0 2px 7px rgba(72, 31, 24, 0.07);
+        }
+        img {
+            display: block;
+            max-width: 120px;
+            margin: 0 auto 16px;
+        }
+        h1 {
+            margin: 8px 0 14px;
+            text-align: center;
+            color: #9f2f24;
+            font-size: 24px;
+        }
+        p {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .status {
+            margin: 24px 0;
+            padding: 13px 18px;
+            border-left: 5px solid #c24132;
+            background-color: #fff0ee;
+            border-radius: 6px;
+            color: #6f2119;
+            font-size: 15px;
+        }
+        .summary {
+            margin: 20px 0;
+            padding: 14px 16px;
+            background-color: #fffafa;
+            border: 1px solid #ecd8d5;
+            border-radius: 6px;
+        }
+        .summary p {
+            margin: 8px 0;
+        }
+        .summary strong {
+            display: inline-block;
+            min-width: 140px;
+            color: #5a3834;
+        }
+        .note {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 13px;
+            color: #8b7471;
+        }
+        .footer {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 13px;
+            color: #7d5e5a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{.LogoURL}}" alt="CRM Logo">
+        <h1>{{.Title}}</h1>
+
+        <p>Hello <strong>{{.Recipient}}</strong>,</p>
+        <p>{{.Intro}}</p>
+
+        <div class="status">
+            Please open the Service Commissions module to review the rejected request before creating or resubmitting any related documentation.
+        </div>
+
+        <div class="summary">
+            <p><strong>Request:</strong> {{.RequestCode}}</p>
+            <p><strong>Applicant:</strong> {{.Applicant}}</p>
+            <p><strong>Project:</strong> {{.Project}}</p>
+            <p><strong>Destination:</strong> {{.Destination}}</p>
+            <p><strong>Purpose:</strong> {{.Purpose}}</p>
+            <p><strong>Travel dates:</strong> {{.TravelDates}}</p>
+            <p><strong>Notice sent:</strong> {{.GeneratedAt}}</p>
+        </div>
+
+        <p class="note">Please do not reply to this email — this inbox is not monitored.</p>
+
+        <div class="footer">
+            Thank you for using<br>
+            <strong>{{.ModuleName}}</strong>
+        </div>
+    </div>
+</body>
+</html>

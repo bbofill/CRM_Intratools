@@ -1,0 +1,1558 @@
+:root {
+  --crm-red: #c62828;
+  --crm-red-dark: #a61e1e;
+  --crm-red-soft: rgba(198, 40, 40, 0.08);
+  --crm-red-soft-2: rgba(198, 40, 40, 0.14);
+
+  --crm-text: #172033;
+  --crm-muted: #667085;
+
+  --crm-border: rgba(15, 23, 42, 0.1);
+  --crm-border-strong: rgba(15, 23, 42, 0.16);
+
+  --crm-surface: rgba(255, 255, 255, 0.9);
+  --crm-surface-soft: rgba(255, 255, 255, 0.72);
+  --crm-surface-strong: rgba(255, 255, 255, 0.97);
+
+  --crm-shadow-sm: 0 8px 20px rgba(15, 23, 42, 0.06);
+  --crm-shadow-md: 0 14px 34px rgba(15, 23, 42, 0.1);
+  --crm-shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.16);
+
+  --crm-radius: 18px;
+  --crm-radius-sm: 12px;
+
+  --header-height: 64px;
+  --footer-height: 0px;
+
+  --shell-width: 1320px;
+  --shell-gutter: 24px;
+}
+
+/* =========================
+   BASE
+   ========================= */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--crm-text);
+  background-image: url(images/fonsClar.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body.is-loading {
+  cursor: wait !important;
+}
+
+body.is-loading * {
+  cursor: wait !important;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+header {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(var(--shell-width), calc(100% - var(--shell-gutter)));
+  z-index: 1050;
+  min-height: var(--header-height);
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(23, 32, 51, 0.08);
+}
+
+header .container {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+#logo {
+  max-height: 48px;
+  width: auto;
+  display: block;
+  padding: 0;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.06));
+}
+
+#logo:hover {
+  transform: scale(1.01);
+}
+
+header a.position-relative,
+header .btn-outline-secondary {
+  min-height: 42px;
+  padding: 0.5rem 1rem;
+  border-radius: 14px;
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+  color: #111827;
+  font-weight: 600;
+}
+
+header a.position-relative {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+header a.position-relative:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(23, 32, 51, 0.1);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+header a.position-relative img {
+  width: 22px !important;
+  height: 22px;
+  object-fit: contain;
+}
+
+header .btn-outline-secondary {
+  border-color: rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--crm-text);
+}
+
+header .btn-outline-secondary:hover,
+header .btn-outline-secondary:focus {
+  background: #ffffff;
+  color: #111827;
+  border-color: rgba(15, 23, 42, 0.14);
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+
+footer {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(var(--shell-width), calc(100% - var(--shell-gutter)));
+  min-height: var(--footer-height);
+  z-index: 1000;
+  border-radius: 18px;
+  box-shadow: 0 14px 30px rgba(166, 30, 30, 0.18);
+  overflow: hidden;
+}
+
+footer.bg-danger {
+  background: linear-gradient(135deg, #c62828, #a61e1e) !important;
+}
+
+footer .container {
+  min-height: var(--footer-height);
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+footer,
+footer span,
+footer small,
+footer div,
+footer p,
+footer a,
+footer #load-info {
+  color: #ffffff !important;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+footer a:hover {
+  opacity: 0.92;
+}
+
+#load-info {
+  white-space: nowrap;
+}
+
+/* =========================
+   PAGE LAYOUT
+   ========================= */
+
+#page-container {
+  padding-top: calc(var(--header-height) + 48px);
+  padding-bottom: calc(var(--footer-height) + 56px);
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+#page-container > .container {
+  max-width: min(var(--shell-width), calc(100% - var(--shell-gutter)));
+}
+
+/* Only functional blocks get card styling.
+   The full page should not become one giant white capsule.
+*/
+
+.resumen-box,
+#form,
+#editForm,
+.filters-panel,
+.table-responsive,
+.desk-filter-panel,
+.desk-grid-container,
+#floorCanvas {
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow-md);
+
+}
+
+#form,
+#editForm,
+.filters-panel,
+.table-responsive,
+.desk-filter-panel,
+.desk-grid-container,
+#floorCanvas {
+  background: var(--crm-surface);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow-md);
+  backdrop-filter: blur(8px);
+}
+
+.resumen-box {
+  padding: 1.5rem;
+}
+
+#form,
+#editForm {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto 1.25rem;
+  padding: 1rem;
+}
+
+.filters-panel {
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* =========================
+   TYPOGRAPHY
+   ========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  letter-spacing: -0.015em;
+}
+
+h1.text-danger,
+h2.text-danger,
+h3.text-danger {
+  color: var(--crm-red) !important;
+  font-weight: 700;
+}
+
+p {
+  color: var(--crm-muted);
+}
+
+.text-muted,
+.small {
+  color: var(--crm-muted) !important;
+}
+
+label,
+.form-label,
+.form-group {
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+}
+
+/* =========================
+   FORMS
+   ========================= */
+
+.form-control,
+.form-select,
+.input-group-text,
+textarea {
+  min-height: 44px;
+  border-radius: 12px !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  box-shadow: none;
+}
+
+textarea.form-control {
+  min-height: 110px;
+}
+
+.form-control:focus,
+.form-select:focus,
+.btn:focus,
+.btn-close:focus {
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.18) !important;
+  border-color: rgba(220, 53, 69, 0.32) !important;
+}
+
+.input-group-text {
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--crm-muted);
+}
+
+input[type="date"],
+input[type="time"] {
+  cursor: pointer;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: rgba(108, 117, 125, 0.12) !important;
+  color: #667085 !important;
+  cursor: not-allowed;
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+
+.btn {
+  border-radius: 12px;
+  font-weight: 600;
+  min-height: 44px;
+  padding-inline: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  text-align: center;
+  line-height: 1.2;
+  vertical-align: middle;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--crm-shadow-sm);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-danger,
+.btn-success,
+.btn-primary,
+.btn-info,
+.btn-warning {
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1);
+}
+
+.btn-danger {
+  background: var(--crm-red) !important;
+  border-color: var(--crm-red) !important;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+  background: var(--crm-red-dark) !important;
+  border-color: var(--crm-red-dark) !important;
+}
+
+.btn-outline-danger {
+  color: var(--crm-red);
+  border-color: rgba(198, 40, 40, 0.45);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.btn-outline-danger:hover {
+  color: #ffffff;
+  background: var(--crm-red);
+  border-color: var(--crm-red);
+}
+
+.btn.btn-sm {
+  min-height: 34px;
+  padding: 0.35rem 0.7rem;
+  line-height: 1.2;
+}
+
+.table .btn {
+  min-height: 36px;
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  white-space: nowrap;
+}
+
+.btn:disabled,
+.btn.disabled {
+  box-shadow: none !important;
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================
+   MAIN ACTION BUTTONS
+   ========================= */
+
+.action-button-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.action-button-row a,
+#viewAllReservationsBtn,
+#manageDesksBtn {
+  flex: 1;
+  min-width: 160px;
+  min-height: 44px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.2;
+  padding: 0.55rem 1rem;
+  white-space: nowrap;
+}
+
+/* =========================
+   TABLES
+   ========================= */
+
+.table-responsive {
+  overflow: hidden;
+  background: var(--crm-surface-strong);
+  box-shadow: var(--crm-shadow-sm);
+  margin-top: 1rem;
+}
+
+.table {
+  margin-bottom: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.table td,
+.table th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table thead th {
+  border-bottom-width: 1px;
+  background: rgba(248, 249, 250, 0.96) !important;
+  color: #495057;
+  font-size: 0.94rem;
+  font-weight: 700;
+  padding: 0.95rem 0.9rem;
+  vertical-align: middle;
+}
+
+.table-danger th,
+thead.table-danger th {
+  background: rgba(220, 53, 69, 0.08) !important;
+  color: #842029 !important;
+}
+
+.table tbody td {
+  padding: 0.95rem 0.9rem;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background: rgba(220, 53, 69, 0.03);
+}
+
+.table-active {
+  --bs-table-bg: rgba(255, 255, 255, 0.72);
+}
+
+/* =========================
+   SUMMARY LISTS
+   ========================= */
+
+.list-group {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--crm-shadow-sm);
+}
+
+.list-group-item {
+  border-color: var(--crm-border);
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.9rem 1rem;
+}
+
+#personResults {
+  background: #fff;
+  border: 1px solid var(--crm-border);
+  border-radius: 8px;
+  box-shadow: var(--crm-shadow-md);
+}
+
+#personResults .list-group-item {
+  background: #fff;
+}
+
+#personResults .list-group-item:hover,
+#personResults .list-group-item:focus {
+  background: #f8f9fa;
+}
+
+/* =========================
+   ALERTS / BADGES / CARDS
+   ========================= */
+
+.alert {
+  border-radius: 14px;
+  border-width: 1px;
+}
+
+.alert-info {
+  color: #055160;
+  background: rgba(13, 202, 240, 0.12);
+  border-color: rgba(13, 202, 240, 0.22);
+}
+
+.card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 0.45rem 0.65rem;
+  font-weight: 700;
+}
+
+/* =========================
+   MODALS
+   ========================= */
+
+.modal-content {
+  background: var(--crm-surface);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow-lg);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+.modal-header,
+.modal-footer {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+.modal-header.bg-danger {
+  background: linear-gradient(135deg, #c62828, #a61e1e) !important;
+}
+
+.modal-header.bg-info {
+  background: rgba(13, 202, 240, 0.18) !important;
+}
+
+.modal-header.bg-warning {
+  background: rgba(255, 193, 7, 0.24) !important;
+}
+
+.modal-title {
+  font-weight: 700;
+}
+
+.modal-body {
+  background: rgba(250, 250, 250, 0.72);
+}
+
+#deskModal button:disabled {
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+  background-color: rgba(108, 117, 125, 0.18) !important;
+  border-color: rgba(108, 117, 125, 0.28) !important;
+  color: #667085 !important;
+  box-shadow: none !important;
+}
+
+#deskConflicts .border.rounded,
+#guestDetails {
+  background-color: rgba(255, 255, 255, 0.78);
+  border-color: var(--crm-border) !important;
+  border-radius: 14px !important;
+}
+
+#deskConflicts .occ-edit-area .form-control-sm {
+  max-width: 150px;
+}
+
+/* =========================
+   CALENDAR ICON
+   ========================= */
+
+.calendar-icon {
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  padding: 0.55rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.calendar-icon:hover {
+  transform: translateY(-1px) scale(1.03);
+  opacity: 0.92;
+  box-shadow: var(--crm-shadow-sm);
+}
+
+/* =========================
+   HOT DESK FLOOR MAP
+   ========================= */
+
+.floor-selector {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.floor-selector button {
+  min-width: 120px;
+}
+
+.floor-selector .btn.active {
+  color: #ffffff !important;
+  background: var(--crm-red) !important;
+  border-color: var(--crm-red) !important;
+  box-shadow: 0 10px 22px rgba(198, 40, 40, 0.16);
+}
+
+#floorCanvas {
+  position: relative;
+  overflow: hidden;
+  max-width: 1300px;
+  height: 600px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.72)),
+    radial-gradient(circle at 12% 18%, rgba(198, 40, 40, 0.08), transparent 22%),
+    radial-gradient(circle at 86% 18%, rgba(13, 110, 253, 0.08), transparent 20%);
+  border: 1px dashed rgba(198, 40, 40, 0.35);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow-md);
+}
+
+#floorCanvas svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#floor-0 {
+  width: 100%;
+  height: auto;
+  display: block;
+  transform-origin: 0 0;
+}
+
+.desk {
+  cursor: pointer;
+  pointer-events: all;
+  transition: fill 0.18s ease, stroke 0.18s ease, opacity 0.18s ease, filter 0.18s ease;
+}
+
+.desk:hover {
+  opacity: 0.88;
+  filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.16));
+}
+
+.desk.available {
+  fill: rgba(25, 135, 84, 0.2) !important;
+  stroke: #198754 !important;
+  stroke-width: 2;
+}
+
+.desk.reserved {
+  fill: rgba(220, 53, 69, 0.22) !important;
+  stroke: #dc3545 !important;
+  stroke-width: 2;
+}
+
+.desk.assigned {
+  fill: rgba(13, 202, 240, 0.22) !important;
+  stroke: #0dcaf0 !important;
+  stroke-width: 2;
+}
+
+.desk.disabled {
+  fill: rgba(108, 117, 125, 0.2) !important;
+  stroke: #6c757d !important;
+  stroke-width: 2;
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
+.desk.partial {
+  fill: rgba(255, 193, 7, 0.32) !important;
+  stroke: #c05600 !important;
+  stroke-width: 2;
+}
+
+.office {
+  fill: rgba(13, 110, 253, 0.12);
+  pointer-events: all;
+  stroke-width: 2;
+  cursor: pointer;
+  transition: fill 0.16s ease, opacity 0.16s ease;
+}
+
+.office:hover {
+  fill: rgba(13, 110, 253, 0.22);
+}
+
+/* =========================
+   DESK CALENDAR GRID
+   ========================= */
+
+.grid-wrapper {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  align-items: stretch;
+}
+
+.desk-filter-panel {
+  width: 250px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 0.85rem;
+  background: var(--crm-surface);
+  font-size: 0.85rem;
+}
+
+.desk-filter-panel h5 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.desk-filter-panel .desk-filter-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.3rem;
+  cursor: pointer;
+}
+
+.desk-filter-panel input[type="checkbox"] {
+  margin: 0;
+  accent-color: var(--crm-red);
+}
+
+.desk-filter-panel .btn-sm-block {
+  width: 100%;
+  margin-bottom: 0.3rem;
+}
+
+.desk-filter-panel .sticky-top {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-radius: 12px;
+  padding: 0.5rem;
+  z-index: 5;
+}
+
+.desk-grid-container {
+  flex: 1;
+  max-height: 80vh;
+  overflow: auto;
+  background: var(--crm-surface-strong);
+}
+
+table.desk-grid {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+  table-layout: auto;
+  font-size: 0.82rem;
+}
+
+.desk-grid th,
+.desk-grid td {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 0.45rem 0.7rem;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.desk-grid thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: rgba(220, 53, 69, 0.1);
+  color: #842029;
+  font-weight: 700;
+}
+
+.desk-grid .date-col {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: rgba(248, 249, 250, 0.98);
+  min-width: 120px;
+  width: 120px;
+  max-width: 120px;
+  font-weight: 700;
+}
+
+.desk-grid thead .date-col {
+  z-index: 4;
+}
+
+.cell-occupied {
+  background-color: rgba(220, 53, 69, 0.18);
+  font-weight: 600;
+}
+
+.row-today {
+  background-color: rgba(255, 193, 7, 0.16);
+}
+
+.d-none {
+  display: none !important;
+}
+
+/* =========================
+   CONFIRMATION PAGE
+   ========================= */
+
+.image-container {
+  border-radius: var(--crm-radius);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--crm-border);
+  box-shadow: var(--crm-shadow-sm);
+}
+
+.image-container img,
+#floorImage {
+  border-radius: var(--crm-radius-sm);
+}
+
+#pointer {
+  animation: crmPointerPulse 2s infinite;
+  box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.7);
+}
+
+@keyframes crmPointerPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.65);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(198, 40, 40, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(198, 40, 40, 0);
+  }
+}
+/* =========================
+   COMPACT DATE / TIME FORMS
+   ========================= */
+
+/* Main booking form in index.html */
+#form,
+#editForm {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto 1.25rem;
+  padding: 0.85rem 1rem;
+}
+
+/* Make form rows compact instead of full-width */
+#form > .row,
+#editForm .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+#form > .row > .col {
+  flex: 0 0 auto;
+  width: 170px;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+#form > .row > .col:last-child {
+  width: 145px;
+}
+
+#editForm .row > .col {
+  flex: 0 0 auto;
+  width: 220px;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+#form input[type="submit"].btn {
+  width: 100%;
+  margin-top: 0;
+}
+
+#form .form-label,
+#form .form-group,
+#editForm .form-label,
+#editForm .form-group {
+  min-height: auto;
+  margin-bottom: 0.3rem;
+}
+
+/* Inputs */
+#form input[type="date"],
+#form input[type="time"],
+#editForm input[type="date"],
+#editForm input[type="time"] {
+  width: 100%;
+  min-width: 160px;
+}
+
+/* ManageDesks / DeskCalendar filter cards become slim toolbars */
+.card:has(input[type="date"]),
+.card:has(input[type="time"]) {
+  width: auto;
+  max-width: fit-content;
+  margin: 0.5rem auto 0.75rem;
+  padding: 0.45rem 0.55rem !important;
+
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+  backdrop-filter: blur(8px);
+}
+
+/* If the card has Bootstrap padding classes, neutralize them */
+.card:has(input[type="date"]).p-3,
+.card:has(input[type="time"]).p-3 {
+  padding: 0.45rem 0.55rem !important;
+}
+
+.card:has(input[type="date"]) .card-body,
+.card:has(input[type="time"]) .card-body {
+  padding: 0 !important;
+}
+
+.card:has(input[type="date"]) .row,
+.card:has(input[type="time"]) .row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: center;
+  gap: 0.45rem;
+  margin: 0;
+  width: auto;
+}
+
+/* Override Bootstrap col widths inside these filter toolbars */
+.card:has(input[type="date"]) .row > [class*="col-"],
+.card:has(input[type="time"]) .row > [class*="col-"] {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 145px;
+  padding-left: 0;
+  padding-right: 0;
+  margin-bottom: 0;
+}
+
+.card:has(input[type="date"]) .form-label,
+.card:has(input[type="time"]) .form-label {
+  margin-bottom: 0.2rem;
+  font-size: 0.78rem;
+  color: var(--crm-muted);
+  font-weight: 700;
+}
+
+.card:has(input[type="date"]) .form-control,
+.card:has(input[type="time"]) .form-control {
+  min-height: 38px;
+  height: 38px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.9rem;
+}
+
+.card:has(input[type="date"]) .btn,
+.card:has(input[type="time"]) .btn {
+  min-height: 38px;
+  height: 38px;
+  padding: 0.35rem 0.8rem;
+  white-space: nowrap;
+  width: auto;
+}
+
+/* The button column should not become a big block */
+.card:has(input[type="date"]) .row > [class*="col-"]:last-child,
+.card:has(input[type="time"]) .row > [class*="col-"]:last-child {
+  min-width: auto;
+  display: flex;
+  gap: 0.45rem;
+  align-items: end;
+}
+
+/* Mobile: only then let filters take full width */
+@media (max-width: 767.98px) {
+  #form,
+  #editForm,
+  .card:has(input[type="date"]),
+  .card:has(input[type="time"]) {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #form > .row,
+  #editForm .row,
+  .card:has(input[type="date"]) .row,
+  .card:has(input[type="time"]) .row {
+    display: flex;
+    justify-content: stretch;
+  }
+
+  #form > .row > .col,
+  #form > .row > .col:last-child,
+  #editForm .row > .col,
+  .card:has(input[type="date"]) .row > [class*="col-"],
+  .card:has(input[type="time"]) .row > [class*="col-"],
+  .card:has(input[type="date"]) .row > [class*="col-"]:last-child,
+  .card:has(input[type="time"]) .row > [class*="col-"]:last-child {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 991.98px) {
+  header .container {
+    flex-wrap: wrap;
+    justify-content: center !important;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+  }
+
+  #page-container {
+    padding-top: calc(var(--header-height) + 68px);
+  }
+
+  .grid-wrapper {
+    flex-direction: column;
+  }
+
+  .desk-filter-panel {
+    width: 100%;
+    max-height: 260px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  :root {
+    --header-height: 116px;
+    --footer-height: 72px;
+  }
+
+  header {
+    top: 10px;
+    width: calc(100% - 16px);
+  }
+
+  footer {
+    bottom: 10px;
+    width: calc(100% - 16px);
+  }
+
+  footer .container {
+    gap: 0.35rem;
+    flex-direction: column;
+    justify-content: center !important;
+    text-align: center;
+  }
+
+  #page-container {
+    padding-top: calc(var(--header-height) + 34px);
+    padding-bottom: calc(var(--footer-height) + 24px);
+  }
+
+  .action-button-row a {
+    min-width: 100%;
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: 0.8rem 0.7rem;
+  }
+
+  .filters-panel .col-md-2,
+  .filters-panel .col-md-3,
+  .filters-panel .col-md-4 {
+    margin-bottom: 0.75rem;
+  }
+
+  #floorCanvas {
+    height: 460px;
+  }
+
+  .resumen-box {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 575.98px) {
+  header .d-flex.align-items-center.gap-4.ms-3,
+  header .d-flex.align-items-center.gap-4 {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0 !important;
+  }
+
+  #logo {
+    max-height: 40px;
+  }
+
+  #floorCanvas {
+    height: 360px;
+  }
+}
+
+/* =========================
+   RESERVATION SUMMARY LAYOUT
+   ========================= */
+
+.reservation-summary-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
+  gap: 1.5rem;
+  align-items: start;
+
+}
+
+.reservation-summary-content {
+  min-width: 0;
+}
+
+.reservation-summary-content h2 {
+  margin-bottom: 1rem;
+}
+
+.reservation-summary-content .list-group {
+  margin-bottom: 1rem;
+}
+
+.reservation-map-container {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.reservation-map-container img,
+#floorImage {
+  display: block;
+  width: 100%;
+  max-width: 620px;
+  height: auto;
+  max-height: 520px;
+  object-fit: contain;
+}
+
+#pointer {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: var(--crm-red);
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  z-index: 2;
+}
+
+/* Mobile/tablet: stack image below summary */
+@media (max-width: 991.98px) {
+  .reservation-summary-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .reservation-map-container {
+    min-height: 260px;
+  }
+}
+
+/* =========================
+   EDIT RESERVATION VIEW
+   ========================= */
+
+.edit-reservation-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.85fr) minmax(380px, 1.15fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.edit-reservation-form {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+.edit-reservation-form .row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.edit-reservation-form .row > .col {
+  width: auto !important;
+  max-width: none !important;
+  flex: unset !important;
+}
+
+.edit-reservation-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.edit-reservation-actions .btn {
+  flex: 1;
+}
+
+.edit-reservation-map {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.edit-reservation-map img,
+#floorImage {
+  display: block;
+  width: 100%;
+  max-width: 680px;
+  height: auto;
+  max-height: 540px;
+  object-fit: contain;
+}
+
+#pointer {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: var(--crm-red);
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  z-index: 2;
+}
+
+@media (max-width: 991.98px) {
+  .edit-reservation-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .edit-reservation-map {
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .edit-reservation-form .row {
+    grid-template-columns: 1fr;
+  }
+
+  .edit-reservation-actions {
+    flex-direction: column;
+  }
+
+  .edit-reservation-actions .btn {
+    width: 100%;
+  }
+}
+/* =========================
+   RESERVATION HISTORY FILTERS
+   ========================= */
+
+.reservation-history-filters {
+  display: grid;
+  grid-template-columns: 1.25fr 1.25fr 1fr 1.15fr 0.9fr 1.15fr 0.95fr 0.95fr auto;
+  align-items: end;
+  gap: 0.6rem;
+
+  width: 100%;
+  margin: 0.75rem 0 1rem;
+  padding: 0.65rem 0.75rem;
+
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+  backdrop-filter: blur(8px);
+}
+
+.reservation-history-filters > [class*="col-"] {
+  width: auto;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+
+.reservation-history-filters label {
+  margin-bottom: 0.2rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--crm-muted);
+  white-space: nowrap;
+}
+
+.reservation-history-filters .form-control,
+.reservation-history-filters .form-select {
+  width: 100%;
+  min-height: 38px;
+  height: 38px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.88rem;
+}
+
+.reservation-history-filters #resetFilters {
+  min-height: 38px;
+  height: 38px;
+  padding: 0.35rem 0.8rem;
+  white-space: nowrap;
+}
+
+.reservation-history-filters > .d-flex {
+  align-items: end !important;
+}
+
+/* Medium screens: balanced two-row layout */
+@media (max-width: 1199.98px) {
+  .reservation-history-filters {
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+  }
+
+  .reservation-history-filters > .d-flex {
+    grid-column: span 2;
+  }
+}
+
+/* Smaller tablets: three fields per row */
+@media (max-width: 991.98px) {
+  .reservation-history-filters {
+    grid-template-columns: repeat(3, minmax(150px, 1fr));
+  }
+
+  .reservation-history-filters > .d-flex {
+    grid-column: span 1;
+  }
+}
+
+/* Mobile: one field per row */
+@media (max-width: 575.98px) {
+  .reservation-history-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .reservation-history-filters > .d-flex,
+  .reservation-history-filters #resetFilters {
+    width: 100%;
+  }
+}
+/* =========================
+   DESK MANAGEMENT TOOLBAR
+   ========================= */
+
+.desk-management-toolbar {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.desk-toolbar-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.65rem;
+  flex: 0 1 auto;
+}
+
+.desk-management-toolbar .floor-selector {
+  margin: 0 !important;
+  flex: 0 0 auto;
+}
+
+.desk-management-toolbar .floor-selector .btn {
+  min-height: 40px;
+}
+
+.desk-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.desk-legend .badge {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.availability-filter {
+  display: inline-flex;
+  align-items: end;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-left: auto;
+  padding: 0.5rem 0.6rem;
+
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+  backdrop-filter: blur(8px);
+}
+
+.availability-field {
+  width: 145px;
+}
+
+.availability-field .form-label {
+  margin-bottom: 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--crm-muted);
+  white-space: nowrap;
+}
+
+.availability-field .form-control {
+  min-height: 38px;
+  height: 38px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.9rem;
+}
+
+.availability-actions {
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.availability-actions .btn {
+  min-height: 38px;
+  height: 38px;
+  padding: 0.35rem 0.8rem;
+  white-space: nowrap;
+}
+
+/* Tablet/mobile fallback */
+@media (max-width: 991.98px) {
+  .desk-management-toolbar {
+    align-items: stretch;
+  }
+
+  .desk-toolbar-left,
+  .availability-filter {
+    width: 100%;
+  }
+
+  .availability-filter {
+    margin-left: 0;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .desk-management-toolbar .floor-selector,
+  .desk-management-toolbar .floor-selector .btn {
+    width: 100%;
+  }
+
+  .desk-management-toolbar .floor-selector {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .availability-field,
+  .availability-actions,
+  .availability-actions .btn {
+    width: 100%;
+  }
+
+  .availability-actions {
+    flex-direction: column;
+  }
+}

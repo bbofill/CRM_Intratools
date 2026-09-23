@@ -1,0 +1,44 @@
+#tutorialOverlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0,0,0,0.6) !important;
+  backdrop-filter: blur(3px) !important;
+  z-index: 999999 !important;
+}
+
+#tutorialTooltip {
+  position: fixed !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  padding: 18px 22px !important;
+  border-radius: 12px !important;
+  z-index: 2000002 !important;
+  width: min(350px, calc(100vw - 32px)) !important;
+  max-width: 350px !important;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5) !important;
+}
+
+
+.tutorial-btns {
+  display: flex !important;
+  gap: 10px !important;
+  justify-content: center !important;
+  margin-top: 10px !important;
+}
+
+.tutorial-close {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #000;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1000001;
+}
+
+.tutorial-close:hover {
+  opacity: 0.6;
+}

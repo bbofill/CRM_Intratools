@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Budgeting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/tom-select.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+  <link rel="stylesheet" href="/assets/css/tom-select.css?v={{.AppVersion}}">
+</head>
+<body>
+<!-- HEADER -->
+  <header class="bg-light">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a href="/main">
+        <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+      </a>
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+      <a href="javascript:history.back()" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+    </div>
+  </header>
+  <main class="container d-flex justify-content-center align-items-start" style="min-height: 70vh;">
+    <div id="page-container" class="w-100">
+ 
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Budgeting Configuration</h2>
+
+            <!-- Project Users Section -->
+            <div class="mb-4">
+                <p class="text-muted small mb-2">Select which user has to manage projects.</p>
+                <label for="projectUsers" class="form-label fw-bold">Project Users:</label>
+                <select id="projectUsers" multiple placeholder="Select users..." class="form-control"></select>
+            </div>
+
+            <!-- Finance Users Section -->
+            <div class="mb-4">
+                <p class="text-muted small mb-2">Select which user has to manage finances.</p>
+                <label for="financeUsers" class="form-label fw-bold">Accounting Users:</label>
+                <select id="financeUsers" multiple placeholder="Select users..." class="form-control"></select>
+            </div>
+
+            <!-- Gerencia Users Section -->
+            <div class="mb-4">
+                <p class="text-muted small mb-2">Select which user is manager (gerència).</p>
+                <label for="gerenciaUsers" class="form-label fw-bold">Gerència Users:</label>
+                <select id="gerenciaUsers" multiple placeholder="Select users..." class="form-control"></select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2">
+                <button id="saveAccess" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Save Changes
+                </button>
+                <button onclick="location.reload()" class="btn btn-secondary">
+                    <i class="bi bi-arrow-clockwise"></i> Reset
+                </button>
+            </div>
+        </div>
+    </div>
+    </main>
+
+<!-- FOOTER -->
+<footer class="bg-danger text-light py-3 mt-4">
+  <div class="container d-flex justify-content-between align-items-center small">
+    <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+    <span id="load-info">Calculating load time...</span>
+  </div>
+</footer>
+
+
+<script type="module">
+  import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+
+  // Measure page load
+  measurePageLoadTime({
+    targetId: 'load-info',
+    precision: 6,
+    onComplete: (time) => console.log("Load Time:", time + "s")
+  });
+</script>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+
+
+<script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+<script src="/assets/js/tom-select.complete.min.js?v={{.AppVersion}}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // 1) Check Role
+  fetch('/module/proxy/module8/api?action=checkRole')
+    .then(res => res.json())
+    .then(data => {
+      if (data.role !== "admin") {
+        window.location.href = "/main"; // bloqueo
+      }
+    });
+
+  // 2) Load user list with permissions
+  fetch('/module/proxy/module8/api?action=getUsersAccess')
+    .then(res => res.json())
+    .then(data => {
+        console.log("Users Access Data:", data); // Debug log
+      const select = new TomSelect("#projectUsers", {
+        options: data.users.map(u => ({ value: u.username, text: u.name + " " + u.surname })),
+        items: data.projects,  // usernames con permiso
+        plugins: ['remove_button'],
+        persist: false
+      });
+      const select2 = new TomSelect("#financeUsers", {
+        options: data.users.map(u => ({ value: u.username, text: u.name + " " + u.surname })),
+        items: data.finances,  // usernames con permiso
+        plugins: ['remove_button'],
+        persist: false
+      });
+      const select3 = new TomSelect("#gerenciaUsers", {
+        options: data.users.map(u => ({ value: u.username, text: u.name + " " + u.surname })),
+        items: data.gerencia,  // usernames con permiso
+        plugins: ['remove_button'],
+        persist: false
+      });
+    });
+
+  // 3) Save updates
+  document.getElementById("saveAccess").addEventListener("click", () => {
+    const select = document.getElementById("projectUsers").tomselect;
+    const projectUsers = select.getValue();
+    const select2 = document.getElementById("financeUsers").tomselect;
+    const financeUsers = select2.getValue();
+    const select3 = document.getElementById("gerenciaUsers").tomselect;
+    const gerenciaUsers = select3.getValue();
+
+    fetch('/module/proxy/module8/api?action=setUsersAccess', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ projectUsers: projectUsers, financeUsers: financeUsers, gerenciaUsers: gerenciaUsers })
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message))
+    .catch(err => console.error(err));
+  });
+
+});
+</script>
+</body>
+</html>

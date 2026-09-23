@@ -1,0 +1,205 @@
+<!-- html to send confirmation email and post reservation -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Room reservation</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}"> 
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools" >
+    </a>
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+    <a href="index.html" class="btn btn-outline-secondary">← Go back</a>
+  </div>
+  </div>
+</header>
+
+<div id="page-container">
+  <div class="container">
+    <div class="resumen-box">
+
+            <h2 class="text-danger">Reservation Summary</h2>
+            <br>
+            <p><strong>Please note:</strong> all reservations will be reviewed and must have a justified reason.</p>
+            <div  id="resumen"></div>
+            <div id="form-concept" class="mt-4"></div>
+            <div class="form-group">
+                <label for="text" class="form-label"><strong>Please specify the purpose for which you intend to use the room:</strong></label>
+                <textarea
+                class="form-control"
+                id="text"
+                rows="6"
+                maxlength="500"
+                placeholder="Indicate your name, who will use the room, why it is needed..."
+                required
+              ></textarea>
+              <small id="charCount" class="text-muted">0 / 500 characters</small>
+              </div>
+            <br>
+            <div class="form-group">
+                <label for="email" class="form-label"><strong>Enter your email to receive confirmation:</strong></label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <br>
+            <button id="confirmarBtn" class="btn btn-danger">Confirm Reservation</button>
+            
+    </div>
+  </div>
+</div>
+
+  <script src="./assets/js/getUserEmail.js?v={{.AppVersion}}"></script>
+  <script>
+    // Character counter
+    const textarea = document.getElementById("text");
+    const counter = document.getElementById("charCount");
+    textarea.addEventListener("input", () => {
+      counter.textContent = `${textarea.value.length} / 500 characters`;
+      if (textarea.value.length > 480) {
+        counter.style.color = "red";
+      } else {
+        counter.style.color = "inherit";
+      }
+    });
+
+    // Basic sanitization
+    function sanitizeInput(str) {
+      const dangerous = /(script|drop|insert|delete|update|select|\<|\>|--|;)/gi;
+      return str
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/&/g, "&amp;")
+        .replace(dangerous, "");
+    }
+    //reads reservation from index page
+    const reserva = JSON.parse(sessionStorage.getItem("reservaSeleccionada"));
+    document.getElementById("resumen").innerHTML = `
+      <ul class="list-group">
+        <li class="list-group-item"><strong>Room:</strong> ${reserva.name}</li>
+        <li class="list-group-item"><strong>Code:</strong> ${reserva.code}</li>
+        <li class="list-group-item"><strong>From:</strong> ${reserva.startTime.replace("T", " ")}</li>
+        <li class="list-group-item"><strong>Until:</strong> ${reserva.endTime.replace("T", " ")}</li>
+      </ul>
+    `;
+    //checks correct user email
+    const emailInput = document.getElementById("email");
+    emailInput.addEventListener("input", () => {
+      if (emailInput.validity.patternMismatch) {
+        emailInput.setCustomValidity("Indicate an email with an accepted domain.");
+      } else {
+        emailInput.setCustomValidity("");
+      }
+    });
+    //save reservation
+    let isSubmitting = false;
+
+    document.getElementById("confirmarBtn").addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+
+      //avoid multiple submissions
+      if (isSubmitting) return;
+      isSubmitting = true;
+
+      const originalBtnHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        Processing...
+      `;
+      document.body.classList.add("is-loading");
+
+      try {
+      const email = document.getElementById("email").value.trim();
+      let concept = document.getElementById("text").value;
+      if (!email) {
+        alert("Please, indicate an email.");
+        return;
+      }
+      if (!emailInput.checkValidity()) {
+        emailInput.reportValidity();
+        return;
+      }
+      if (concept.length < 10) {
+      alert("Please provide a more detailed purpose (minimum 10 characters).");
+      return;
+    }
+
+
+      // sanitize purpose
+      concept = sanitizeInput(concept);
+      //let asistentes = []; old code for attendees
+      const payload = {
+        room_id: reserva.id,
+        start_date: reserva.startTime.replace("T", " "),
+        end_date: reserva.endTime.replace("T", " "),
+        concept: concept,
+        email: email,
+      };
+      const response = await fetch("/module/proxy/module1/api?action=postReservation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (response.ok) {
+        alert("Successful reservation.");
+        window.location.href = "index.html";
+      } else {
+        // another reservation done while trying to book
+          if (response.status === 409) {
+            msg =
+              `This time slot is no longer available.\n\n` +
+              `Someone else has reserved the room in the meantime.\n\n` +
+              `Please go back and choose another time or room.`;
+            alert(msg);
+            } else
+              alert("Error booking."); 
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network error while booking. Please try again.");
+    } finally {
+      document.body.classList.remove("is-loading");
+      btn.disabled = false;
+      btn.innerHTML = originalBtnHtml;
+      isSubmitting = false;
+    }
+  });
+  </script>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+  <!-- FOOTER -->
+  <footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+      <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+      <span id="load-info">Calculating load time...</span>
+    </div>
+
+    <script type="module">
+      import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+      
+      measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+      });
+    </script>
+  </footer>
+</html>

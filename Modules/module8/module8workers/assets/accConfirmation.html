@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Budget Request Accepted by Projects</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 30px auto;
+            padding: 30px 25px;
+            max-width: 600px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 10px;
+            color: #2e7d32;
+        }
+        p {
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .status {
+            border-left: 5px solid #2e7d32;
+            padding: 12px 18px;
+            margin: 25px 0;
+            font-size: 1.05em;
+            border-radius: 6px;
+            background-color: #edf7ed;
+            color: #1e5c24;
+        }
+        .summary {
+            margin: 20px 0;
+            padding: 14px 16px;
+            background-color: #f8f9fb;
+            border: 1px solid #d9e1ea;
+            border-radius: 6px;
+            color: #2f3b45;
+        }
+        .summary p {
+            margin: 8px 0;
+        }
+        .summary strong {
+            display: inline-block;
+            min-width: 150px;
+        }
+        .highlight {
+            margin-top: 10px;
+            padding: 12px 14px;
+            background-color: #f6fbf6;
+            border: 1px solid #cfe8d1;
+            border-radius: 6px;
+            color: #2d4f2f;
+        }
+
+        .approval-trace {
+            margin: 20px 0;
+            padding: 14px 16px;
+            background-color: #fffaf0;
+            border: 1px solid #ead6a4;
+            border-radius: 6px;
+            color: #3f3420;
+        }
+        .approval-trace-title {
+            margin: 0 0 10px;
+            font-weight: 600;
+            color: #5a4216;
+        }
+        .approval-trace-row {
+            margin: 7px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .approval-trace-row strong {
+            display: inline-block;
+            min-width: 145px;
+        }
+        .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            display: block;
+            max-width: 120px;
+            margin: 0 auto 15px;
+        }
+        .note {
+            font-size: 13px;
+            color: #999;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://issues.crm.cat/assets/images/crmlogo.jfif" alt="CRM Logo">
+
+        <h1>Budget Request Accepted by Projects</h1>
+
+        <p>Hello <strong>{{.Name}} {{.Surname}}</strong>,</p>
+
+        <p>
+            We would like to inform you that a budget request has been <strong>accepted by Projects</strong> and is now pending your management.
+        </p>
+
+        <div class="highlight">
+            The request submitted by <strong>{{.ResearcherName}} {{.ResearcherSurname}}</strong> for the project <strong>{{.ProjectName}}</strong> has been reviewed and accepted by Projects.
+        </div>
+
+        <div class="summary">
+            <p><strong>Worker:</strong> {{.ResearcherName}} {{.ResearcherSurname}}</p>
+            <p><strong>Responsible:</strong> {{.PIName}} {{.PISurname}}</p>
+            <p><strong>Project:</strong> {{.ProjectName}}</p>
+            <p><strong>Accepted by Projects on:</strong> {{.UpdatedAt}}</p>
+            <p><strong>Request summary:</strong> {{.RequestSummary}}</p>
+        </div>
+
+
+        {{if .ApprovalTrace}}
+        <div class="approval-trace">
+            <p class="approval-trace-title">Approval trace</p>
+            {{range .ApprovalTrace}}
+            <div class="approval-trace-row">
+                <strong>{{.Step}}:</strong> {{.Name}}{{if .Date}} — {{.Date}}{{end}}
+            </div>
+            {{end}}
+        </div>
+        {{end}}
+
+        <div class="status">
+            Please manage this request in the <strong>Intratools Budgeting module</strong>.
+        </div>
+
+        <p>
+            There you will be able to review the request details and continue with the corresponding processing.
+        </p>
+
+        <p class="note">
+            Please do not reply to this email — this inbox is not monitored.
+        </p>
+
+        <div class="footer">
+            Thank you for using <br>
+            <strong>CRM Intratools Budgeting</strong>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+#logo {
+    width: 40%;
+    height: auto;
+    padding: 0.5%;
+  }
+  header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+  }
+  footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 3.5rem; 
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  #page-container {
+    padding-top: 100px; 
+    padding-bottom: 3.5rem; 
+    min-height: 100%;
+    box-sizing: border-box;
+  }
+  .container {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  body {
+    background-image: url(images/fonsClar.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+  }

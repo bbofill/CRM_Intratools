@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Project Members</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}"> 
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+  <style>
+    .modal-body {
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+
+<body>
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+    </a>
+    <div class="d-flex align-items-center gap-4 ms-3">
+      <a href="/module/gui/module3/notifications.html" class="position-relative">
+        <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+        <span id="notif-count"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+        </span>
+      </a>
+      <a href="projects.html" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+  </div>
+</header>
+
+<div id="page-container">
+  <div class="container">
+    <main class="container mt-4">
+      <h2 id="projectHubTitle">Project Members</h2>
+      <div class="d-flex justify-content-end mb-3">
+        <button id="openAddUserModalBtn" class="btn btn-success">
+          + Add Member
+        </button>
+      </div>
+      <div class="project-toolbar row g-2 align-items-end mb-3">
+        <div class="col-12 col-lg-7">
+          <label for="memberSearchInput" class="form-label">Search members</label>
+          <input
+            type="search"
+            id="memberSearchInput"
+            class="form-control"
+            placeholder="Search by name, surname, role or dates"
+            autocomplete="off">
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <label for="projectMemberStatusFilter" class="form-label">Relationship status</label>
+          <select id="projectMemberStatusFilter" class="form-select">
+            <option value="all">All members</option>
+            <option value="active">Active</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="ended">Ended</option>
+            <option value="no-dates">No dates</option>
+          </select>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-2">
+          <button type="button" id="clearMemberFiltersBtn" class="btn btn-outline-secondary w-100">
+            Clear
+          </button>
+        </div>
+      </div>
+      <div id="memberResultSummary" class="text-muted small"></div>
+      <div id="user-list" class="row row-cols-1 row-cols-md-2 g-4 mt-3"></div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal Edit Member -->
+<div class="modal fade" id="editProjectInfoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title">Edit Project Member</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="projectInfoForm" novalidate>
+        <div class="modal-body row g-3">
+          <input type="hidden" id="projectUserId" name="people_id">
+          <input type="hidden" id="projectId">
+
+          <div class="col-md-6">
+            <label for="projectStartDate" class="form-label">Start Date</label>
+            <input type="date" class="form-control" id="projectStartDate">
+          </div>
+
+          <div class="col-md-6">
+            <label for="projectEndDate" class="form-label">End Date</label>
+            <input type="date" class="form-control" id="projectEndDate">
+          </div>
+
+          <div class="col-md-12">
+            <label for="projectRole" class="form-label">Role</label>
+            <select class="form-select" id="projectRole">
+              <option value="">-- Select role --</option>
+              <option value="INVESTIGADOR COLABORADOR">INVESTIGADOR COLABORADOR</option>
+              <option value="INVESTIGADOR PRINCIPAL">INVESTIGADOR PRINCIPAL</option>
+              <option value="INVESTIGADOR PREDOCTORAL">INVESTIGADOR PREDOCTORAL</option>
+              <option value="INVESTIGADOR POSTDOCTORAL">INVESTIGADOR POSTDOCTORAL</option>
+              <option value="TECNICO DE INVESTIGACIÓN">TECNICO DE INVESTIGACIÓN</option>
+              <option value="PERSONAL FUNDACIÓN ADMINISTRACIÓN">PERSONAL FUNDACIÓN ADMINISTRACIÓN</option>
+              <option value="COORDINADOR">COORDINADOR</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Add Member -->
+<div class="modal fade" id="addUserToProjectModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title">Add Member to Project</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="addUserToProjectForm" novalidate>
+        <div class="modal-body row g-3">
+          <div class="col-12">
+            <label for="newUserInput" class="form-label">User</label>
+            <input list="userOptions" class="form-control" id="newUserInput" placeholder="Type user name...">
+            <datalist id="userOptions"></datalist>
+            <input type="hidden" id="newUserId">
+            <input type="hidden" id="newUserName">
+            <input type="hidden" id="newUserSurname">
+          </div>
+
+          <div class="col-md-6">
+            <label for="newProjectStartDate" class="form-label">Start Date</label>
+            <input type="date" class="form-control" id="newProjectStartDate">
+          </div>
+
+          <div class="col-md-6">
+            <label for="newProjectEndDate" class="form-label">End Date</label>
+            <input type="date" class="form-control" id="newProjectEndDate">
+          </div>
+
+          <div class="col-md-12">
+            <label for="newProjectRole" class="form-label">Role</label>
+            <select class="form-select" id="newProjectRole">
+              <option value="">-- Select role --</option>
+              <option value="INVESTIGADOR COLABORADOR">INVESTIGADOR COLABORADOR</option>
+              <option value="INVESTIGADOR PRINCIPAL">INVESTIGADOR PRINCIPAL</option>
+              <option value="INVESTIGADOR PREDOCTORAL">INVESTIGADOR PREDOCTORAL</option>
+              <option value="INVESTIGADOR POSTDOCTORAL">INVESTIGADOR POSTDOCTORAL</option>
+              <option value="TECNICO DE INVESTIGACIÓN">TECNICO DE INVESTIGACIÓN</option>
+              <option value="PERSONAL FUNDACIÓN ADMINISTRACIÓN">PERSONAL FUNDACIÓN ADMINISTRACIÓN</option>
+              <option value="COORDINADOR">COORDINADOR</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+    window.APP_VERSION = "{{.AppVersion}}";
+</script>
+<script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+<script type="module" src="./assets/js/projectMembers.js?v={{.AppVersion}}"></script>
+
+<footer class="bg-danger text-light py-3 mt-4">
+  <div class="container d-flex justify-content-between align-items-center small">
+    <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+    <span id="load-info">Calculating load time...</span>
+  </div>
+  <script type="module">
+    import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+    measurePageLoadTime({
+      targetId: 'load-info',
+      precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+    });
+  </script>
+</footer>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+</html>

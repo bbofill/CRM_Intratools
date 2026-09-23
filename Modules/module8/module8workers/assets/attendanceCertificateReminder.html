@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Attendance Certificate Required</title>
+  <style>
+    img {
+        display: block;
+        max-width: 120px;
+        margin: 0 auto 15px;
+    }
+  </style>
+</head>
+<body style="font-family: Arial, sans-serif; color: #172033; line-height: 1.5;">
+    
+    <img src="https://issues.crm.cat/assets/images/crmlogo.jfif" alt="CRM Logo">
+  
+    <h2 style="color: #c62828;">Attendance certificate required</h2>
+
+  <p>Hello {{.Name}} {{.Surname}},</p>
+
+  <p>
+    Your travel / registration request has already finished and the attendance certificate is still pending.
+  </p>
+
+  <table style="border-collapse: collapse; margin: 16px 0; width: 100%; max-width: 720px;">
+    <tr>
+      <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">Request ID</td>
+      <td style="border: 1px solid #ddd; padding: 8px;">{{.InternalID}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">Project</td>
+      <td style="border: 1px solid #ddd; padding: 8px;">{{.ProjectName}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">Request</td>
+      <td style="border: 1px solid #ddd; padding: 8px;">{{.RequestSummary}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">End date</td>
+      <td style="border: 1px solid #ddd; padding: 8px;">{{.EndDate}}</td>
+    </tr>
+  </table>
+
+  <p>
+    Please access the Budgeting module and upload the attendance certificate from the popup shown in your sent requests area.
+  </p>
+
+  <p style="color: #667085; font-size: 13px;">
+    This reminder will be sent every 10 days until the certificate is uploaded.
+  </p>
+</body>
+</html>

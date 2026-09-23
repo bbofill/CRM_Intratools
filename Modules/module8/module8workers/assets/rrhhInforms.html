@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Request Accepted by Accounting</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 30px auto;
+            padding: 30px 25px;
+            max-width: 600px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 10px;
+            color: #2e7d32;
+        }
+        p {
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .status {
+            border-left: 5px solid #2e7d32;
+            padding: 12px 18px;
+            margin: 25px 0;
+            font-size: 1.05em;
+            border-radius: 6px;
+            background-color: #edf7ed;
+            color: #1e5c24;
+        }
+        .summary {
+            margin: 20px 0;
+            padding: 14px 16px;
+            background-color: #f8f9fb;
+            border: 1px solid #d9e1ea;
+            border-radius: 6px;
+            color: #2f3b45;
+        }
+        .summary p {
+            margin: 8px 0;
+        }
+        .summary strong {
+            display: inline-block;
+            min-width: 155px;
+        }
+        .highlight {
+            margin-top: 10px;
+            padding: 12px 14px;
+            background-color: #f6fbf6;
+            border: 1px solid #cfe8d1;
+            border-radius: 6px;
+            color: #2d4f2f;
+        }
+        .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            display: block;
+            max-width: 120px;
+            margin: 0 auto 15px;
+        }
+        .note {
+            font-size: 13px;
+            color: #999;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .details {
+            margin-top: 20px;
+            padding: 14px 16px;
+            background-color: #fcfcfc;
+            border: 1px solid #e3e6ea;
+            border-radius: 6px;
+            color: #2f3b45;
+        }
+        .details h2 {
+            font-size: 17px;
+            margin: 0 0 12px 0;
+            color: #444;
+        }
+        .details p {
+            margin: 8px 0;
+        }
+        .details strong {
+            display: inline-block;
+            min-width: 155px;
+        }
+        .attachment {
+            margin-top: 20px;
+            padding: 12px 14px;
+            background-color: #fff8e1;
+            border: 1px solid #f0d98a;
+            border-radius: 6px;
+            color: #6b5b00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://issues.crm.cat/assets/images/crmlogo.jfif" alt="CRM Logo">
+
+        <h1>Travel Request Accepted by Accounting</h1>
+
+        <p>Hello <strong>RRHH</strong>,</p>
+
+        <p>
+            We would like to inform you that a travel request has been <strong>accepted by Accounting</strong> and may require your corresponding management.
+        </p>
+
+        <div class="highlight">
+            The travel request submitted by <strong>{{.ResearcherName}} {{.ResearcherSurname}}</strong> for the project <strong>{{.ProjectName}}</strong> has completed the accounting review.
+        </div>
+
+        <div class="summary">
+            <p><strong>Worker:</strong> {{.ResearcherName}} {{.ResearcherSurname}}</p>
+            <p><strong>Responsible:</strong> {{.PIName}} {{.PISurname}}</p>
+            <p><strong>Project:</strong> {{.ProjectName}}</p>
+            <p><strong>Accepted on:</strong> {{.UpdatedAt}}</p>
+        </div>
+
+        <div class="details">
+            <h2>Travel details</h2>
+            <p><strong>Travel purpose:</strong> {{.TravelPurpose}}</p>
+            <p><strong>Destination:</strong> {{.Destination}}</p>
+            <p><strong>Institution:</strong> {{.Institution}}</p>
+            <p><strong>Departure date:</strong> {{.DepartureDate}}</p>
+            <p><strong>Return date:</strong> {{.ReturnDate}}</p>
+        </div>
+
+        {{if .HasInvitation}}
+        <div class="attachment">
+            An invitation file is attached to this email for your reference.
+        </div>
+        {{end}}
+
+        <div class="status">
+            This email contains the relevant information related to the travel request{{if .HasInvitation}} and includes the invitation as an attachment{{end}}.
+        </div>
+
+        <p>
+            Please use the information above for any internal processing related to this travel.
+        </p>
+
+        <p class="note">
+            Please do not reply to this email — this inbox is not monitored.
+        </p>
+
+        <div class="footer">
+            Thank you for using <br>
+            <strong>CRM Intratools Budgeting</strong>
+        </div>
+    </div>
+</body>
+</html>

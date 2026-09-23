@@ -1,0 +1,26 @@
+/* assets/css/custom.css */
+
+.module-card {
+    border: 1px solid #6c1313;
+    background-color: #2c0a0a;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(255, 0, 0, 0.2);
+  }
+  
+  .module-title {
+    color: #ff4d4d;
+  }
+  
+  .btn-module {
+    background-color: #8b0000;
+    border: none;
+  }
+  
+  .btn-module:hover {
+    background-color: #a30000;
+  }
+  
