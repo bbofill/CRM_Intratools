@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/public-assets/headerLogo.png">
+  <title>CRMIntratools</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 40px;
+      overflow: hidden;
+
+      background-image:
+        linear-gradient(
+          90deg,
+          rgba(10, 19, 35, 0.55) 0%,
+          rgba(10, 19, 35, 0.30) 35%,
+          rgba(10, 19, 35, 0.10) 55%,
+          rgba(10, 19, 35, 0.18) 100%
+        ),
+        url('/public-assets/crm-login-bg.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .hero-copy {
+      position: absolute;
+      left: 60px;
+      top: 40%;
+      transform: translateY(-50%);
+      max-width: 480px;
+      z-index: 1;
+    }
+
+    .hero-copy .brand {
+      font-size: 3.3rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin: 0 0 18px 0;
+      line-height: 1.05;
+    }
+
+    .hero-copy .brand span {
+      font-weight: 300;
+      opacity: 0.95;
+    }
+
+    .hero-copy .accent-line {
+      width: 4px;
+      height: 120px;
+      background: #2f80ed;
+      border-radius: 999px;
+      margin-bottom: 24px;
+    }
+
+    .hero-copy h2 {
+      margin: 0 0 16px 0;
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.88);
+      max-width: 420px;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 430px;
+      padding: 42px 36px;
+      border-radius: 24px;
+      text-align: left;
+      margin-right: 10%;
+
+      background: rgba(255, 255, 255, 0.92);
+      color: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.22);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      margin: 0 0 8px 0;
+      color: #0f2747;
+      letter-spacing: 0.2px;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0 0 24px 0;
+      font-size: 1rem;
+      color: #64748b;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+    }
+
+    label {
+      font-weight: 600;
+      text-align: left;
+      font-size: 0.95rem;
+      color: #334155;
+      margin-bottom: -4px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 1px solid #dbe3ee;
+      border-radius: 12px;
+      background-color: #f8fafc;
+      color: #0f172a;
+      outline: none;
+      transition: border 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder {
+      color: #94a3b8;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border: 1px solid #2f80ed;
+      box-shadow: 0 0 0 4px rgba(47, 128, 237, 0.12);
+      background-color: #ffffff;
+    }
+
+    button[type="submit"] {
+      margin-top: 12px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      background: #0f2747;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+      box-shadow: 0 10px 24px rgba(15, 39, 71, 0.20);
+    }
+
+    button[type="submit"]:hover {
+      background: #163761;
+    }
+
+    button[type="submit"]:active {
+      transform: scale(0.99);
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper input {
+      width: 100%;
+      padding-right: 48px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      box-shadow: none;
+    }
+
+    .toggle-password img {
+      width: 20px;
+      height: 20px;
+      opacity: 0.75;
+    }
+
+    .forgot-link {
+      margin-top: 2px;
+      font-size: 0.95rem;
+    }
+
+    .forgot-link a {
+      color: #2f80ed;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .forgot-link a:hover {
+      text-decoration: underline;
+    }
+
+    .login-footer {
+      margin-top: 22px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        justify-content: center;
+        padding: 24px;
+        background-position: center left;
+      }
+
+      .hero-copy {
+        display: none;
+      }
+
+      .container {
+        max-width: 440px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 16px;
+      }
+
+      .container {
+        padding: 30px 22px;
+        border-radius: 18px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+
+  <script>
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function validateForm(event) {
+      event.preventDefault();
+
+      const inputpassword = document.getElementById('password');
+      const inputuser = document.getElementById('username');
+      const regex = /^[a-zA-Z0-9@#!]+$/;
+
+      if (!regex.test(inputpassword.value)) {
+        alert('Password can only contain letters, numbers, and #@!.');
+        return false;
+      }
+
+      const hashedPassword = await hashPassword(inputpassword.value);
+      const hashedUsername = await hashPassword(inputuser.value);
+      window.location.href = `?hashedPwd=${encodeURIComponent(hashedPassword)}&hashedUsername=${encodeURIComponent(hashedUsername)}`;
+    }
+  </script>
+</head>
+<body>
+  <div class="hero-copy">
+    <div style="display: flex; gap: 20px; align-items: flex-start;">
+      <div class="accent-line"></div>
+      <div>
+        <div class="brand">CRM<span>Intratools</span></div>
+        <h2>Your internal tools, in one place.</h2>
+        <p>
+          Secure access to the applications and resources that support your daily work.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1>Sign in</h1>
+    <p>Access your CRMIntratools workspace</p>
+
+    <form id="login-form" onsubmit="validateForm(event)">
+      <label for="username">Username</label>
+      <input
+        type="text"
+        id="username"
+        name="username"
+        placeholder="Enter your username"
+        required
+      >
+
+      <label for="password">Password</label>
+
+      <div class="password-wrapper">
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+        >
+
+        <button
+          type="button"
+          onclick="togglePassword()"
+          class="toggle-password"
+          aria-label="Show or hide password"
+        >
+          <img src="/public-assets/hide-password.png" alt="Toggle password visibility" />
+        </button>
+      </div>
+
+      <p class="forgot-link">
+        <a href="/public/recover.html">Forgot your password?</a>
+      </p>
+
+      <button type="submit">Sign in</button>
+    </form>
+
+    <div class="login-footer">
+      © 2026 CRM. 
+    </div>
+  </div>
+</body>
+</html>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const hasError = params.get("error") === "invalid_credentials";
+
+    if (hasError) {
+      const errBox = document.createElement("p");
+      errBox.textContent = "Incorrect username or password.";
+      errBox.style.color = "#dc2626";
+      errBox.style.fontWeight = "600";
+      errBox.style.marginTop = "10px";
+      errBox.style.marginBottom = "0";
+
+      document.querySelector("#login-form").appendChild(errBox);
+
+      const pwd = document.getElementById("password");
+      pwd.animate(
+        [
+          { transform: "translateX(0px)" },
+          { transform: "translateX(-6px)" },
+          { transform: "translateX(6px)" },
+          { transform: "translateX(0px)" }
+        ],
+        { duration: 250 }
+      );
+
+      // Limpia la URL para que no vuelva a salir al recargar
+      window.history.replaceState({}, document.title, "/");
+    }
+  });
+
+  function togglePassword() {
+    var x = document.getElementById("password");
+    if (x.type === "password") {
+      x.type = "text";
+    } else {
+      x.type = "password";
+    }
+  }
+</script>

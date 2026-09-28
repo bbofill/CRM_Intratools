@@ -27,4 +27,4 @@ GUI/assets/js/pdfjs-dist/
 vendor/
 venv/
 .DS_Store
-EOF
+EOFGUI/templates/auth.html
