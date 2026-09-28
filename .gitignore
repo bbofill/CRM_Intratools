@@ -28,3 +28,4 @@ vendor/
 venv/
 .DS_Store
 EOFGUI/templates/auth.html
+GUI/templates/auth.html
