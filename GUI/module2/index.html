@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Hot Desks</title>
+  <link rel="stylesheet" href="/assets/css/tutorialStyles.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}"> 
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools" >
+    </a>
+          <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+    <a href="/main" class="btn btn-outline-secondary">← Go back</a>
+  </div>
+  </div>
+</header>
+<div id="page-container">
+  <div class="container">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <h1 class="text-danger mb-0">Hot Desks Service</h1>
+      <a href="deskCalendar.html" id="openDeskCalendar">
+        <img
+          src="assets/images/calendar.png"
+          alt="View reservations calendar"
+          title="View reservations calendar"
+          class="calendar-icon"
+        />
+      </a>
+
+    </div>
+    <div class="action-button-row">
+      <a href="modifyReservation.html" class="btn btn-outline-danger">Modify Reservation</a>
+      <a href="checkReservations.html" class="btn btn-outline-danger">Check your Reservations</a>
+      <a id="viewAllReservationsBtn" href="viewAllReservations.html" class="btn btn-danger" style="display: none;">View All Reservations</a>
+      <a id="manageDesksBtn" href="manageDesks.html" class="btn btn-outline-secondary" style="display: none;">
+        Manage desks
+      </a>
+    </div>
+    <h3>Book an available table.</h3>
+
+    <div class="alert alert-info" role="alert">
+      Postdoctoral researchers are allowed to book any available table when needed. 
+      Please submit your preferred time range using the form below.
+    </div>
+
+
+    <h3> Fill this form with your preferences </h3>
+    <form method="POST" action="/module/proxy/module2/api" id="form" autocomplete="off">
+      <div class="row">
+        <div class="col">
+          <label for="StartDate" class="form-group">From:</label>
+          <input type="date" id="StartDate" name="StartDate" class="form-control">
+        </div>
+        <div class="col">
+          <label for="StartTime" class="form-label">Start time:</label>
+          <input type="time" id="StartTime" name="StartTime" class="form-control">
+        </div>
+        <div class="col">
+          <label for="EndDate" class="form-group">Until: </label>
+          <input type="date" id="EndDate" name="EndDate" class="form-control">
+        </div>
+        <div class="col">
+          <label for="EndTime" class="form-label">End time:</label>
+          <input type="time" id="EndTime" name="EndTime" class="form-control">
+        </div>
+        <!--
+        <div class="col">
+          <label for="Capacity" class="form-group">Capacity:</label>
+          <select id="Capacity" name="Capacity" class="form-control">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>-->
+        <div class="col">
+          <input type="submit" value="Submit" class="btn btn-danger">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <script>
+
+    /*
+    // función auxiliar para que la reserva rápida se haga en bloques fijos de media hora
+    function roundToNextHalfHour(date) {
+    const minutes = date.getMinutes();
+    if (minutes < 30) {
+      date.setMinutes(30);
+    } else {
+      date.setHours(date.getHours() + 1);
+      date.setMinutes(0);
+    }
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    return date;
+  }
+  */
+    window.addEventListener("DOMContentLoaded", () => {
+      
+      
+      const today = new Date();
+      const twoWeeksLater = new Date();
+      twoWeeksLater.setDate(today.getDate() + 14);
+
+      function formatDate(date) {
+        const year = date.getFullYear();
+        const month = `${date.getMonth() + 1}`.padStart(2, "0");
+        const day = `${date.getDate()}`.padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      const minDate = formatDate(today);
+      const maxDate = formatDate(twoWeeksLater);
+      const startDateInput = document.getElementById("StartDate");
+      const endDateInput = document.getElementById("EndDate");
+      const startTimeInput = document.getElementById("StartTime");
+
+      /*
+      // Limitar fecha de reserva hasta 14 días después
+      startDateInput.setAttribute("min", minDate);
+      startDateInput.setAttribute("max", maxDate);
+      endDateInput.setAttribute("min", minDate);
+      endDateInput.setAttribute("max", maxDate);
+      */
+      // Bloquear horas pasadas si se elige hoy
+      startDateInput.addEventListener("change", () => {
+        const selected = new Date(startDateInput.value);
+        const now = new Date();
+
+        if (
+          selected.getFullYear() === now.getFullYear() &&
+          selected.getMonth() === now.getMonth() &&
+          selected.getDate() === now.getDate()
+        ) {
+          const hour = String(now.getHours()).padStart(2, "0");
+          const minute = String(now.getMinutes()).padStart(2, "0");
+          const minTime = `${hour}:${minute}`;
+          startTimeInput.setAttribute("min", minTime);
+        } else {
+          startTimeInput.removeAttribute("min");
+        }
+      });
+        fetch('/module/proxy/module2/api?action=checkRole', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.role === 'admin' || data.role === 'manager' || data.role === 'support' || data.id === '160') {
+            console.log(data)
+            document.getElementById('manageDesksBtn').style.display = 'inline-block';
+            document.getElementById('viewAllReservationsBtn').style.display = 'inline-block';
+          }
+        })
+        .catch(error => console.error('Error verificando rol:', error));
+    });
+
+
+    // Filtrado por formulario
+      document.getElementById("form").addEventListener("submit", async function (e) {
+        e.preventDefault(); 
+
+        // enviar datos
+        const startDate = document.getElementById("StartDate").value;
+        const endDate = document.getElementById("EndDate").value;
+        const startHour = document.getElementById("StartTime").value;
+        const endHour = document.getElementById("EndTime").value;
+        // const capacity = parseInt(document.getElementById("Capacity").value, 10);
+        if (!startDate || !endDate || !startHour || !endHour) {
+          alert("Please fill in all fields.");
+          return;
+        }
+        const startTime = `${startDate} ${startHour}`;
+        const endTime = `${endDate} ${endHour}`;
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+        if (start >= end) {
+          alert("Start time must be before end time.");
+          return;
+        }
+        const response = await fetch('/module/proxy/module2/api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            startTime,
+            endTime,
+            capacity: 1,
+            is_hot: true,
+            floor: 4
+          })
+        });
+        if (!response.ok) {
+          const res = await response.json();
+          alert(res.error); 
+          return;
+        }
+        // Redirigir vista
+        const mesas = await response.json();
+        const capacidad = 1;
+        sessionStorage.setItem("mesasDisponibles", JSON.stringify({...mesas, capacitySolicitada: capacidad,}));
+        window.location.href = "showTables.html";
+      });
+
+
+      /*INUTILIZADO
+    // Filtrado por planta
+      document.querySelectorAll(".image-row img").forEach(img => {
+        img.addEventListener("click", async function () {
+          const floor = parseInt(this.dataset.floor, 10);
+          console.log("Floor:", floor);
+
+          const now = new Date();
+          const roundedStart = roundToNextHalfHour(new Date(now));
+          const twoHoursLater = new Date(roundedStart.getTime() + 2 * 60 * 60 * 1000);
+
+          const startTime = formatDateTime(now);
+          const endTime = formatDateTime(twoHoursLater);
+
+          function formatDateTime(date) {
+            const year = date.getFullYear();
+            const month = `${date.getMonth() + 1}`.padStart(2, "0");
+            const day = `${date.getDate()}`.padStart(2, "0");
+            const hours = `${date.getHours()}`.padStart(2, "0");
+            const minutes = `${date.getMinutes()}`.padStart(2, "0");
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+          }
+          console.log(startTime, endTime);
+
+          const response = await fetch('/module/proxy/module2/api', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              startTime,
+              endTime,
+              floor,
+              is_hot: true,
+              capacity: 1
+            })
+          });
+
+          console.log(response);
+
+          if (!response.ok) {
+            const res = await response.json();
+            alert(res.error); 
+            return;
+          }
+
+          const mesas = await response.json();
+          
+          const capacidad = 1;
+          sessionStorage.setItem("mesasDisponibles", JSON.stringify({...mesas, capacitySolicitada: capacidad,}));
+          window.location.href = "showTables.html";
+        });
+      });
+*/
+  </script>
+    <!-- FOOTER -->
+    <footer class="bg-danger text-light py-3 mt-4">
+      <div class="container d-flex justify-content-between align-items-center small">
+        <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+        <span id="load-info">Calculating load time...</span>
+      </div>
+      <script type="module">  
+        import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+        
+        measurePageLoadTime({
+          targetId: 'load-info',
+          precision: 6,
+        onComplete: (time) => console.log("Load Time:", time + "s")
+        });
+      </script>
+    </footer>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+<script type="module" src="/assets/js/tutorials/tutorial_module2.js?v={{.AppVersion}}"></script>
+
+</body>
+</html>

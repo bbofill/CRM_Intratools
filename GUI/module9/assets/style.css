@@ -1,0 +1,1156 @@
+:root {
+  --crm-red: #c62828;
+  --crm-red-dark: #a61e1e;
+  --crm-red-soft: rgba(198, 40, 40, 0.08);
+  --crm-red-soft-2: rgba(198, 40, 40, 0.14);
+
+  --crm-text: #172033;
+  --crm-muted: #667085;
+
+  --crm-border: rgba(15, 23, 42, 0.1);
+  --crm-border-strong: rgba(15, 23, 42, 0.16);
+
+  --crm-surface: rgba(255, 255, 255, 0.9);
+  --crm-surface-soft: rgba(255, 255, 255, 0.72);
+  --crm-surface-strong: rgba(255, 255, 255, 0.97);
+
+  --crm-shadow-sm: 0 8px 20px rgba(15, 23, 42, 0.06);
+  --crm-shadow-md: 0 14px 34px rgba(15, 23, 42, 0.1);
+  --crm-shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.16);
+
+  --crm-radius: 18px;
+  --crm-radius-sm: 12px;
+
+  --header-height: 64px;
+  --footer-height: 0px;
+
+  --shell-width: 1320px;
+  --shell-gutter: 24px;
+}
+
+/* =========================
+   BASE
+   ========================= */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--crm-text);
+  background-image: url(images/fonsClar.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+header {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(var(--shell-width), calc(100% - var(--shell-gutter)));
+  min-height: var(--header-height);
+  z-index: 1050;
+
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(23, 32, 51, 0.08);
+}
+
+header .container {
+  max-width: 100%;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+#logo {
+  width: auto;
+  max-height: 48px;
+  height: auto;
+  display: block;
+  padding: 0;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.06));
+}
+
+#logo:hover {
+  transform: scale(1.01);
+}
+
+header a.position-relative,
+header .btn,
+header .btn-outline-secondary {
+  min-height: 42px;
+  padding: 0.5rem 1rem;
+  border-radius: 14px;
+  font-weight: 600;
+}
+
+header a.position-relative {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+}
+
+header a.position-relative:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--crm-shadow-sm);
+}
+
+header a.position-relative img {
+  width: 22px !important;
+  height: 22px;
+  object-fit: contain;
+}
+
+header .btn-outline-secondary {
+  color: var(--crm-text);
+  background: rgba(255, 255, 255, 0.84);
+  border-color: rgba(15, 23, 42, 0.1);
+}
+
+header .btn-outline-secondary:hover,
+header .btn-outline-secondary:focus {
+  color: #111827;
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.16);
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+
+footer {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: min(var(--shell-width), calc(100% - var(--shell-gutter)));
+  min-height: var(--footer-height);
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  padding: 0;
+  box-sizing: border-box;
+
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 14px 30px rgba(166, 30, 30, 0.18);
+}
+
+footer.bg-danger {
+  background: linear-gradient(135deg, var(--crm-red), var(--crm-red-dark)) !important;
+}
+
+footer .container {
+  max-width: 100%;
+  min-height: var(--footer-height);
+  padding-top: 0;
+  padding-bottom: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+footer,
+footer span,
+footer small,
+footer div,
+footer p,
+footer a,
+footer #load-info {
+  color: #ffffff !important;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+footer a {
+  text-decoration: none;
+}
+
+footer a:hover {
+  opacity: 0.92;
+}
+
+#load-info {
+  white-space: nowrap;
+}
+
+/* =========================
+   PAGE LAYOUT
+   ========================= */
+
+main.container {
+  width: min(var(--shell-width), calc(100% - var(--shell-gutter)));
+  max-width: none;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+#page-container {
+  width: 100%;
+  padding-top: calc(var(--header-height) + 48px);
+  padding-bottom: calc(var(--footer-height) + 72px);
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+#page-container > .container,
+main > .container,
+main.container > #page-container {
+  max-width: min(var(--shell-width), calc(100% - var(--shell-gutter)));
+}
+
+.container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* Remove the old inline centering feeling from this module */
+main.container.d-flex {
+  min-height: auto !important;
+  display: block !important;
+}
+
+/* =========================
+   TYPOGRAPHY
+   ========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  color: var(--crm-text);
+  letter-spacing: -0.015em;
+}
+
+h2 {
+  font-weight: 750;
+}
+
+h5,
+.card-title {
+  font-weight: 700;
+}
+
+p {
+  color: var(--crm-muted);
+}
+
+.text-muted,
+.small,
+.form-text,
+.muted {
+  color: var(--crm-muted) !important;
+}
+
+label,
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+
+.btn {
+  border-radius: 12px;
+  font-weight: 600;
+  min-height: 44px;
+  padding-inline: 1rem;
+
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+
+  text-align: center;
+  line-height: 1.2;
+  vertical-align: middle;
+
+  transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--crm-shadow-sm);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-danger {
+  background: var(--crm-red) !important;
+  border-color: var(--crm-red) !important;
+  box-shadow: 0 10px 22px rgba(198, 40, 40, 0.14);
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+  background: var(--crm-red-dark) !important;
+  border-color: var(--crm-red-dark) !important;
+}
+
+.btn-outline-secondary,
+.btn-secondary {
+  border-radius: 12px;
+}
+
+.btn-outline-secondary {
+  border-color: rgba(15, 23, 42, 0.14);
+  color: var(--crm-text);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  background: #ffffff;
+  color: #111827;
+  border-color: rgba(15, 23, 42, 0.2);
+}
+
+.btn-light {
+  border-color: rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.btn.btn-sm {
+  min-height: 34px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.84rem;
+  line-height: 1.2;
+}
+
+.btn:disabled,
+.btn.disabled,
+button:disabled {
+  background: rgba(108, 117, 125, 0.18) !important;
+  border-color: rgba(108, 117, 125, 0.32) !important;
+  color: #667085 !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* =========================
+   FORMS
+   ========================= */
+
+.form-control,
+.form-select,
+.input-group-text,
+textarea {
+  min-height: 44px;
+  border-radius: 12px !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.94);
+  box-shadow: none;
+}
+
+.form-select-sm {
+  min-height: 38px;
+  height: 38px;
+  font-size: 0.9rem;
+}
+
+textarea.form-control {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.form-control:focus,
+.form-select:focus,
+.btn:focus,
+.btn-close:focus,
+textarea:focus {
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.18) !important;
+  border-color: rgba(220, 53, 69, 0.32) !important;
+}
+
+.input-group-text {
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--crm-muted);
+}
+
+/* =========================
+   SHARED CARDS / TOOLBARS
+   ========================= */
+
+.card,
+.modal-content {
+  background: var(--crm-surface);
+  border: 1px solid var(--crm-border) !important;
+  border-radius: var(--crm-radius) !important;
+  box-shadow: var(--crm-shadow-md) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.card {
+  overflow: visible;
+}
+
+.card.border-0 {
+  border: 1px solid var(--crm-border) !important;
+}
+
+.card-body {
+  padding: 1rem 1.1rem;
+}
+
+#admin-actions .btn {
+  white-space: nowrap;
+}
+
+/* Top toolbar used by index.html and documents.html */
+#searchInput {
+  min-height: 42px;
+}
+
+.filter-pill {
+  min-height: 36px !important;
+  padding: 0.35rem 0.75rem !important;
+  border-radius: 999px !important;
+  font-size: 0.86rem;
+}
+
+.filter-pill.active {
+  color: #842029 !important;
+  background: var(--crm-red-soft-2) !important;
+  border-color: rgba(198, 40, 40, 0.3) !important;
+  box-shadow: inset 0 0 0 1px rgba(198, 40, 40, 0.08);
+}
+
+/* =========================
+   MODALITY CARDS
+   ========================= */
+
+.modality-link {
+  color: inherit;
+}
+
+.dv-card {
+  min-height: 210px;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+}
+
+.dv-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--crm-shadow-md) !important;
+  border-color: rgba(198, 40, 40, 0.22) !important;
+}
+
+.dv-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(198, 40, 40, 0.08);
+  color: var(--crm-red);
+  font-size: 1.35rem;
+}
+
+.dv-badge {
+  border-radius: 999px;
+  padding: 0.42rem 0.62rem;
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+.dv-desc {
+  font-size: 0.92rem;
+  line-height: 1.4;
+  margin-top: 0.35rem;
+}
+
+.dv-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #842029;
+  background: var(--crm-red-soft);
+  font-weight: 800;
+}
+
+/* =========================
+   PDF DOCUMENT CARDS
+   ========================= */
+
+.pdf-card {
+  position: relative;
+  min-height: 230px;
+
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  overflow: hidden;
+
+  background: var(--crm-surface);
+  box-shadow: var(--crm-shadow-sm);
+
+  transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+}
+
+.pdf-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--crm-shadow-md);
+  border-color: rgba(198, 40, 40, 0.22);
+}
+
+.pdf-cover {
+  position: relative;
+  height: 230px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(circle at 20% 15%, rgba(198, 40, 40, 0.08), transparent 25%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(248, 250, 252, 0.92));
+}
+
+.pdf-sheet {
+  width: 72%;
+  height: 72%;
+
+  position: relative;
+  overflow: hidden;
+
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 14px;
+  box-shadow: var(--crm-shadow-sm);
+}
+
+.pdf-sheet::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  width: 42px;
+  height: 42px;
+
+  background: linear-gradient(135deg, rgba(230, 230, 230, 0.8), rgba(255, 255, 255, 1));
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  border-left: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.pdf-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Bottom overlay */
+.pdf-titlebar {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+
+  padding: 0.75rem 0.85rem;
+  border-radius: 14px;
+
+  background: rgba(23, 32, 51, 0.78);
+  color: #ffffff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+}
+
+.pdf-titlebar .title {
+  color: #ffffff;
+  font-weight: 750;
+  font-size: 0.96rem;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.pdf-titlebar .meta {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+}
+
+.pdf-chip {
+  font-size: 0.72rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 2px 8px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  margin-left: 8px;
+  opacity: 0.95;
+}
+
+/* Admin edit/delete actions */
+.doc-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  display: flex;
+  gap: 0.45rem;
+  z-index: 5;
+}
+
+.doc-actions--modality {
+  right: 12px;
+}
+
+.doc-actions .action-btn {
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+
+  border-radius: 999px;
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--crm-shadow-sm);
+}
+
+.doc-actions .action-btn:hover {
+  transform: translateY(-1px);
+  background: #ffffff;
+}
+
+/* =========================
+   PDF VIEWER
+   ========================= */
+
+.viewer-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.sidebar {
+  width: 100%;
+  height: calc(100vh - 230px);
+
+  background: var(--crm-surface);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  overflow: hidden;
+
+  box-shadow: var(--crm-shadow-md);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  position: sticky;
+  top: calc(var(--header-height) + 42px);
+}
+
+.sidebar .fw-semibold {
+  color: var(--crm-text);
+  font-weight: 750;
+}
+
+.thumbs {
+  overflow: auto;
+  height: 100%;
+  padding: 0.7rem;
+}
+
+.thumb {
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.86);
+
+  padding: 0.5rem;
+  margin-bottom: 0.65rem;
+
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+}
+
+.thumb:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--crm-shadow-sm);
+  border-color: rgba(198, 40, 40, 0.2);
+}
+
+.thumb.active {
+  border-color: rgba(198, 40, 40, 0.45);
+  box-shadow: inset 0 0 0 2px rgba(198, 40, 40, 0.16);
+}
+
+.thumb canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+}
+
+.thumb .tlabel {
+  font-size: 0.8rem;
+  color: var(--crm-muted);
+  margin-top: 0.45rem;
+}
+
+.stage {
+  min-width: 0;
+  min-height: calc(100vh - 230px);
+
+  background: var(--crm-surface);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  overflow: hidden;
+
+  box-shadow: var(--crm-shadow-md);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--crm-border);
+
+  background: rgba(255, 255, 255, 0.88);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.toolbar .spacer {
+  flex: 1;
+}
+
+.toolbar .btn {
+  min-width: 38px;
+}
+
+.toolbar .input-group {
+  flex: 0 0 auto;
+}
+
+#zoomLabel {
+  color: var(--crm-muted);
+  font-size: 0.88rem;
+}
+
+.pagewrap {
+  overflow: auto;
+  height: calc(100vh - 230px - 60px);
+
+  padding: 1.15rem;
+  display: flex;
+  justify-content: center;
+
+  background:
+    radial-gradient(circle at 15% 10%, rgba(198, 40, 40, 0.06), transparent 24%),
+    linear-gradient(180deg, rgba(246, 247, 249, 0.88), rgba(255, 255, 255, 0.7));
+}
+
+.pagecard {
+  position: relative;
+  display: inline-block;
+  max-width: none !important;
+  min-height: 60vh;
+
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: var(--crm-shadow-md);
+}
+
+#pdfCanvas {
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  display: block;
+}
+
+.pdf-canvas.is-hidden {
+  visibility: hidden;
+}
+
+.pdf-loading {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.92);
+  z-index: 2;
+}
+
+/* =========================
+   MODALS
+   ========================= */
+
+.modal-content {
+  overflow: hidden;
+}
+
+.modal-header,
+.modal-footer {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+.modal-title {
+  font-weight: 800;
+}
+
+.modal-body {
+  background: rgba(250, 250, 250, 0.72);
+}
+
+.alert {
+  border-radius: 14px;
+  border-width: 1px;
+}
+
+/* =========================
+   BADGES
+   ========================= */
+
+.badge {
+  border-radius: 999px;
+  padding: 0.45rem 0.65rem;
+  font-weight: 700;
+}
+
+#notif-count {
+  min-width: 1.2rem;
+  min-height: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 991.98px) {
+  header .container {
+    flex-wrap: wrap;
+    justify-content: center !important;
+    gap: 0.75rem;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+  }
+
+  #page-container {
+    padding-top: calc(var(--header-height) + 68px);
+  }
+
+  .viewer-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .stage {
+    min-height: 560px;
+  }
+
+  .pagewrap {
+    height: 520px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  :root {
+    --header-height: 116px;
+    --footer-height: 72px;
+  }
+
+  header {
+    top: 10px;
+    width: calc(100% - 16px);
+  }
+
+  footer {
+    bottom: 10px;
+    width: calc(100% - 16px);
+  }
+
+  footer .container {
+    gap: 0.35rem;
+    flex-direction: column;
+    justify-content: center !important;
+    text-align: center;
+  }
+
+  #page-container {
+    padding-top: calc(var(--header-height) + 34px);
+    padding-bottom: calc(var(--footer-height) + 48px);
+  }
+
+  .card-body {
+    padding: 0.9rem;
+  }
+
+  .filter-pill {
+    flex: 1 1 auto;
+  }
+
+  .pdf-cover {
+    height: 210px;
+  }
+
+  .toolbar {
+    flex-wrap: wrap;
+  }
+
+  .toolbar .spacer {
+    display: none;
+  }
+
+  .pagewrap {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 575.98px) {
+  header .d-flex.align-items-center.gap-4.ms-3,
+  header .d-flex.align-items-center.gap-3 {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0 !important;
+    gap: 0.75rem !important;
+  }
+
+  #logo {
+    max-height: 40px;
+  }
+
+  .pdf-titlebar {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+  }
+
+  .doc-actions {
+    top: 10px;
+    right: 10px;
+  }
+}
+
+/* =========================
+   DOCUMENT VIEWER TOOLBAR
+   ========================= */
+
+/* Keep search + modality filters in one row on desktop */
+.card .row.g-2.align-items-center {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Search column becomes smaller */
+.card .row.g-2.align-items-center > .col-12.col-md-6:first-child {
+  flex: 0 0 500px;
+  max-width: 500px;
+  width: 500px;
+}
+
+/* Filter column takes the remaining space */
+.card .row.g-2.align-items-center > .col-12.col-md-6:last-child {
+  flex: 1 1 auto;
+  max-width: none;
+  width: auto;
+}
+
+/* Filters stay in one line */
+.card .row.g-2.align-items-center .d-flex.flex-wrap {
+  flex-wrap: nowrap !important;
+  justify-content: flex-end;
+  gap: 0.45rem !important;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+}
+
+/* Make pills slightly more compact */
+.filter-pill {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  min-height: 34px !important;
+  padding: 0.32rem 0.65rem !important;
+  font-size: 0.82rem;
+}
+
+
+
+/* Tablet/mobile: allow wrapping again */
+@media (max-width: 991.98px) {
+  .card .row.g-2.align-items-center {
+    flex-wrap: wrap;
+  }
+
+  .card .row.g-2.align-items-center > .col-12.col-md-6:first-child,
+  .card .row.g-2.align-items-center > .col-12.col-md-6:last-child {
+    flex: 1 1 100%;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .card .row.g-2.align-items-center .d-flex.flex-wrap {
+    flex-wrap: wrap !important;
+    justify-content: flex-start;
+    overflow-x: visible;
+  }
+}
+
+/* =========================
+   FINAL ALIGNMENT + CARD ACTION FIX
+   ========================= */
+
+/* Align page content exactly with header/footer width */
+#page-container > .container,
+body > .container,
+main.container {
+  width: min(var(--shell-width), calc(100% - var(--shell-gutter))) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-right: 0 !important;
+}
+
+/* Avoid Bootstrap .container inner width fighting with the fixed header/footer */
+#page-container .container {
+  max-width: none;
+}
+
+/* Keep normal inner spacing only for real content blocks */
+#page-container > .container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* The toolbar/card should fill the aligned content width */
+#page-container > .container > .card,
+main.container > .card {
+  width: 100%;
+}
+
+/* =========================
+   PDF / MODALITY CARD ACTIONS
+   ========================= */
+
+/* Give modality cards enough top-right space for edit/delete buttons */
+.dv-card {
+  position: relative;
+  min-height: 210px;
+}
+
+.dv-card .card-body {
+  padding-top: 1.1rem;
+}
+
+/* If the card has admin actions, reserve space so the category tag does not go underneath */
+.dv-card:has(.doc-actions) .card-body {
+  padding-right: 5.8rem;
+}
+
+/* Keep the edit/delete buttons clearly separated from the tag */
+.doc-actions {
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+}
+
+/* Make the category badge stay readable and not stretch behind the buttons */
+.dv-badge,
+.dv-card .badge {
+  max-width: calc(100% - 5.8rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Better layout for modality card headers */
+.dv-card .d-flex.justify-content-between,
+.dv-card .d-flex.align-items-start {
+  gap: 0.75rem;
+  align-items: flex-start !important;
+}
+
+/* On small screens, put actions in normal flow instead of floating over content */
+@media (max-width: 575.98px) {
+  .dv-card:has(.doc-actions) .card-body {
+    padding-right: 1rem;
+    padding-top: 3.4rem;
+  }
+
+  .dv-badge,
+  .dv-card .badge {
+    max-width: 100%;
+  }
+}

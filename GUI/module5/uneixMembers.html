@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Export data</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a href="/main">
+        <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+      </a>
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+      <a href="uneixIndex.html" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+    </div>
+  </header>
+
+
+  <div id="page-container">
+    <div>
+      <main class="container">
+        <h2 id="Title">Uneix Group Members Data Extraction</h2>
+        <div class="alert alert-warning text-center mt-4" role="alert">
+          <strong>Please, verify from module 4 if all the groups have their correct data before exporting.</strong>
+        </div>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="mb-0">The following workers are currently excluded from the Uneix data list due to missing mandatory fields.</h5>
+          <button id="exportCsvBtn" class="btn btn-success ms-3" disabled>
+            ⬇️ Export data (.csv)
+          </button>
+        </div>
+        <div id="groups-container" class="row row-cols-1 row-cols-md-2 g-4">
+          <!-- Cards go here -->
+        </div>
+      </main>
+    </div>
+  </div>
+<script>
+    window.APP_VERSION = "{{.AppVersion}}";
+</script>
+  <script type="module" src="./assets/js/groupMembersMissingFields.js?v={{.AppVersion}}"></script>
+  <script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+  <!-- FOOTER -->
+  <footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+      <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+      <span id="load-info">Calculating load time...</span>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script type="module">
+      import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+
+      measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+      });
+  </script>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Hot Desks – Desk Grid</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+<body>
+<!-- HEADER (igual que otras vistas) -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+    </a>
+    <div class="d-flex align-items-center gap-4 ms-3">
+      <a href="/module/gui/module3/notifications.html" class="position-relative">
+        <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+        <span id="notif-count"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+        </span>
+      </a>
+      <a href="index.html" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+  </div>
+</header>
+
+<div id="page-container">
+  <div class="container">
+    <h2 class="text-danger">Desk Occupancy Grid</h2>
+    <p>Historical reservations displayed as days (vertical) × desks (horizontal).</p>
+
+    <div class="alert alert-info py-2">
+      Days are treated as full days. If a desk is reserved at any time during a day, that day is marked as occupied.
+    </div>
+
+    <div class="card p-3 mt-3 mb-3">
+      <div class="row g-3 align-items-end">
+        <div class="col-3">
+          <label class="form-label">Start date</label>
+          <input type="date" id="filterStart" class="form-control">
+        </div>
+
+        <div class="col-3">
+          <label class="form-label">End date</label>
+          <input type="date" id="filterEnd" class="form-control">
+        </div>
+
+        <div class="col-3">
+          <button id="applyDateFilter" class="btn btn-danger w-100">Load Grid</button>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="grid-wrapper">
+      <!-- Panel de selección de desks -->
+      <div class="desk-filter-panel">
+        <div class="sticky-top bg-white pb-2 mb-2 border-bottom">
+          <h5>Desks</h5>
+          <button id="selectAllDesks" class="btn btn-sm btn-outline-secondary btn-sm-block">Select all</button>
+          <button id="deselectAllDesks" class="btn btn-sm btn-outline-secondary btn-sm-block">Deselect all</button>
+        </div>
+        <div id="deskFilterList"></div>
+      </div>
+
+      <!-- Tabla principal -->
+      <div class="desk-grid-container">
+        <table class="desk-grid" id="deskGridTable">
+          <thead>
+            <tr id="deskGridHeaderRow">
+              <th class="date-col">Date</th>
+              <!-- Th de desks aquí -->
+            </tr>
+          </thead>
+          <tbody id="deskGridBody">
+            <!-- Filas por día aquí -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="bg-danger text-light py-3 mt-4">
+  <div class="container d-flex justify-content-between align-items-center small">
+    <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+    <span id="load-info">Calculating load time...</span>
+  </div>
+  <script type="module">
+    import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+    measurePageLoadTime({
+      targetId: 'load-info',
+      precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+    });
+  </script>
+</footer>
+
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+
+<script>
+  let allDesksData = [];
+  let allDesksMeta = [];
+  let deskNamesAll = [];
+  let deskNames = [];
+  let occupancyByDesk = {};
+  let minDate = null;
+  let maxDate = null;
+  let deskFilterWired = false;
+
+
+  // --- Helpers de fechas ---
+
+  function toDateOnly(dateLike) {
+    const d = new Date(dateLike);
+    d.setHours(0,0,0,0);
+    return d;
+  }
+
+  function formatISO(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function formatDisplay(d) {
+    // DD-MM-YYYY
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${day}-${m}-${y}`;
+  }
+
+  function getPersonFromOcc(occ) {
+
+    const personName = occ.person_name 
+    const guestName = occ.guest_name
+
+    if (personName && personName.trim().length > 0) return personName;
+    if (guestName && guestName.trim().length > 0) return guestName;
+
+    return "—";
+  }
+
+
+  function deriveOfficeFromName(name) {
+    if (!name) return "Unknown";
+    const parts = name.split(".");
+    return parts[0] || name; 
+  }
+
+  // --- Construcción de la matriz de ocupación --- 
+  function buildOccupancyMatrixFromDesks(desks, rangeStartISO, rangeEndISO) {
+    occupancyByDesk = {};
+
+    const rangeStart = toDateOnly(rangeStartISO);
+    const rangeEnd   = toDateOnly(rangeEndISO);
+
+    minDate = new Date(rangeStart);
+    maxDate = new Date(rangeEnd);
+
+    // Inicializamos mapa vacío para las mesas conocidas
+    deskNames = deskNamesAll.slice();
+    deskNames.forEach(name => {
+      occupancyByDesk[name] = {};
+    });
+
+    desks.forEach(desk => {
+      const deskName = desk.name || desk.desk_name;
+      if (!deskName) return;
+
+      if (!occupancyByDesk[deskName]) {
+        occupancyByDesk[deskName] = {};
+      }
+
+      const assignments  = desk.assignments  || desk.Assignments  || [];
+      const reservations = desk.reservations || desk.Reservations || [];
+      // releases no marcan ocupación
+
+      const pushOccList = (list) => {
+        list.forEach(occ => {
+          const startStr = occ.start_date || occ.StartDate;
+          const endStr   = occ.end_date   || occ.EndDate;
+
+          if (!startStr) return;
+
+          const resStart = toDateOnly(startStr);
+          const resEnd   = endStr ? toDateOnly(endStr) : rangeEnd; 
+
+          // Recortamos la reserva al rango seleccionado
+          const s = resStart < rangeStart ? rangeStart : resStart;
+          const e = resEnd   > rangeEnd   ? rangeEnd   : resEnd;
+
+          if (e < rangeStart || s > rangeEnd) return;
+
+          const who = getPersonFromOcc(occ);
+          const cur = new Date(s);
+          while (cur <= e) {
+            const iso = formatISO(cur);
+            occupancyByDesk[deskName][iso] = who;
+            cur.setDate(cur.getDate() + 1);
+          }
+        });
+      };
+
+      pushOccList(assignments);
+      pushOccList(reservations);
+    });
+  }
+
+
+  // --- Panel de filtros ---
+  function renderDeskFilterPanel() {
+    const listEl = document.getElementById("deskFilterList");
+    listEl.innerHTML = "";
+
+    // Agrupamos por floor y office
+    const floorsMap = new Map(); 
+
+    allDesksMeta.forEach(d => {
+      const floor = d.floor ?? 0;
+      const office = d.office || deriveOfficeFromName(d.name);
+      const name = d.name;
+
+      if (!floorsMap.has(floor)) {
+        floorsMap.set(floor, new Map());
+      }
+      const officeMap = floorsMap.get(floor);
+      if (!officeMap.has(office)) {
+        officeMap.set(office, []);
+      }
+      officeMap.get(office).push(name);
+    });
+
+    const sortedFloors = Array.from(floorsMap.keys())
+      .sort((a, b) => Number(a) - Number(b));
+
+    sortedFloors.forEach(floor => {
+      const officeMap = floorsMap.get(floor);
+
+      const floorGroup = document.createElement("div");
+      floorGroup.className = "mb-2";
+      floorGroup.dataset.floor = floor;
+
+      // Checkbox de planta
+      const floorLabel = document.createElement("label");
+      floorLabel.className = "desk-filter-item fw-bold";
+
+      const floorChk = document.createElement("input");
+      floorChk.type = "checkbox";
+      floorChk.className = "floor-checkbox me-1";
+      floorChk.dataset.floor = floor;
+
+      const floorSpan = document.createElement("span");
+      floorSpan.textContent = `Floor ${floor}`;
+
+      floorLabel.appendChild(floorChk);
+      floorLabel.appendChild(floorSpan);
+      floorGroup.appendChild(floorLabel);
+
+      // Contenedor de oficinas de esa planta
+      const officesContainer = document.createElement("div");
+      officesContainer.className = "ms-3";
+
+      const sortedOffices = Array.from(officeMap.keys())
+        .sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
+
+      sortedOffices.forEach(office => {
+        const officeGroup = document.createElement("div");
+        officeGroup.className = "mb-1";
+        officeGroup.dataset.office = office;
+        officeGroup.dataset.floor = floor;
+
+        // Checkbox de oficina
+        const officeLabel = document.createElement("label");
+        officeLabel.className = "desk-filter-item";
+
+        const officeChk = document.createElement("input");
+        officeChk.type = "checkbox";
+        officeChk.className = "office-checkbox me-1";
+        officeChk.dataset.office = office;
+        officeChk.dataset.floor = floor;
+
+        const officeSpan = document.createElement("span");
+        officeSpan.textContent = `Office ${office}`;
+
+        officeLabel.appendChild(officeChk);
+        officeLabel.appendChild(officeSpan);
+        officeGroup.appendChild(officeLabel);
+
+        // Lista de mesas
+        const desksContainer = document.createElement("div");
+        desksContainer.className = "ms-3";
+
+        const deskList = officeMap.get(office)
+          .slice()
+          .sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
+
+        deskList.forEach(name => {
+          const deskLabel = document.createElement("label");
+          deskLabel.className = "desk-filter-item";
+
+          const deskChk = document.createElement("input");
+          deskChk.type = "checkbox";
+          deskChk.dataset.deskName = name;
+          deskChk.dataset.floor    = String(floor);   
+          deskChk.dataset.office   = String(office);  
+          deskChk.checked = false; // por defecto no visible
+
+          const deskSpan = document.createElement("span");
+          deskSpan.textContent = name;
+
+          deskLabel.appendChild(deskChk);
+          deskLabel.appendChild(deskSpan);
+          desksContainer.appendChild(deskLabel);
+        });
+
+
+        officeGroup.appendChild(desksContainer);
+        officesContainer.appendChild(officeGroup);
+      });
+
+      floorGroup.appendChild(officesContainer);
+      listEl.appendChild(floorGroup);
+    });
+  }
+
+  // --- Tabla principal (grid) ---
+
+  function renderDeskGrid() {
+    const headerRow = document.getElementById("deskGridHeaderRow");
+    const body = document.getElementById("deskGridBody");
+
+    headerRow.innerHTML = '<th class="date-col">Date</th>';
+    body.innerHTML = "";
+
+    // Cabecera: una columna por mesa, todas ocultas al inicio
+    deskNames = deskNamesAll.slice();
+    deskNames.forEach(name => {
+      const th = document.createElement("th");
+      th.textContent = name;
+      th.dataset.deskName = name;
+      th.classList.add("desk-col", "d-none"); 
+      headerRow.appendChild(th);
+    });
+
+    if (!minDate || !maxDate) {
+      body.innerHTML = '<tr><td class="date-col">No reservations</td></tr>';
+      return;
+    }
+
+    const todayISO = formatISO(new Date());
+    let todayRowEl = null;
+
+    const lastWhoByDesk = {};
+    deskNames.forEach(name => { lastWhoByDesk[name] = null; });
+
+    const cur = new Date(minDate);
+    while (cur <= maxDate) {
+      const iso = formatISO(cur);
+      const display = formatDisplay(cur);
+
+      const tr = document.createElement("tr");
+      tr.dataset.dateIso = iso;
+
+      if (iso === todayISO) {
+        tr.classList.add("row-today");
+        todayRowEl = tr;
+      }
+
+      const dateTd = document.createElement("td");
+      dateTd.className = "date-col";
+      dateTd.textContent = display;
+      tr.appendChild(dateTd);
+
+      deskNames.forEach(name => {
+        const td = document.createElement("td");
+        td.dataset.deskName = name;
+        td.classList.add("d-none"); 
+
+        const occMap = occupancyByDesk[name] || {};
+        const who = occMap[iso];
+
+        if (who) {
+          td.classList.add("cell-occupied");
+          if (lastWhoByDesk[name] !== who) {
+            td.textContent = who;
+            td.title = `${name} – ${who}`;
+          } else {
+            td.textContent = "";
+          }
+          lastWhoByDesk[name] = who;
+        } else {
+          td.textContent = "";
+          lastWhoByDesk[name] = null;
+        }
+
+        tr.appendChild(td);
+      });
+
+      body.appendChild(tr);
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    if (todayRowEl) {
+      todayRowEl.scrollIntoView({ block: "center" });
+    }
+  }
+
+  // --- Mostrar / ocultar columnas según checkbox ---
+
+  function toggleDeskVisibility(deskName, visible) {
+    document.querySelectorAll(`th[data-desk-name="${deskName}"], td[data-desk-name="${deskName}"]`)
+      .forEach(el => {
+        if (visible) el.classList.remove("d-none");
+        else el.classList.add("d-none");
+      });
+  }
+
+  function wireDeskFilterInteractions() {
+    if (deskFilterWired) return;
+    deskFilterWired = true;
+
+    const listEl = document.getElementById("deskFilterList");
+
+    listEl.addEventListener("change", (e) => {
+      const target = e.target;
+
+      // Mesa individual
+      if (target.matches("input[data-desk-name]")) {
+        const deskName = target.dataset.deskName;
+        const visible = target.checked;
+        toggleDeskVisibility(deskName, visible);
+        return;
+      }
+
+      // Oficina
+      if (target.classList.contains("office-checkbox")) {
+        const office  = target.dataset.office;
+        const floor   = target.dataset.floor;
+        const checked = target.checked;
+
+        // marcar/desmarcar todas las mesas de esa office en esa planta
+        listEl.querySelectorAll(
+          `input[data-desk-name][data-floor="${floor}"][data-office="${office}"]`
+        ).forEach(chk => {
+          chk.checked = checked;
+          toggleDeskVisibility(chk.dataset.deskName, checked);
+        });
+
+        return;
+      }
+
+      // Planta
+      if (target.classList.contains("floor-checkbox")) {
+        const floor   = target.dataset.floor;
+        const checked = target.checked;
+
+        // marcar/desmarcar todas las offices de esa planta
+        listEl.querySelectorAll(`.office-checkbox[data-floor="${floor}"]`)
+          .forEach(chk => {
+            chk.checked = checked;
+          });
+
+        // marcar/desmarcar todas las mesas de esa planta
+        listEl.querySelectorAll(`input[data-desk-name][data-floor="${floor}"]`)
+          .forEach(chk => {
+            chk.checked = checked;
+            toggleDeskVisibility(chk.dataset.deskName, checked);
+          });
+
+        return;
+      }
+
+
+    });
+
+    document.getElementById("selectAllDesks").addEventListener("click", () => {
+      const listEl = document.getElementById("deskFilterList");
+      listEl.querySelectorAll("input[type=checkbox]").forEach(chk => {
+        chk.checked = true;
+      });
+      deskNames.forEach(name => toggleDeskVisibility(name, true));
+    });
+
+    document.getElementById("deselectAllDesks").addEventListener("click", () => {
+      const listEl = document.getElementById("deskFilterList");
+      listEl.querySelectorAll("input[type=checkbox]").forEach(chk => {
+        chk.checked = false;
+      });
+      deskNames.forEach(name => toggleDeskVisibility(name, false));
+    });
+
+  }
+
+  async function fetchDesksRange(startISO, endISO) {
+    const params = new URLSearchParams({
+      action: "desks",
+      start_date: startISO,
+      end_date: endISO
+    });
+
+    const response = await fetch(`/module/proxy/module2/api?${params.toString()}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    if (!response.ok) {
+      console.error("Unable to load desks");
+      return [];
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+  }
+
+
+  // --- Construir grid para un rango concreto ---
+  async function initGridForRange(startISO, endISO) {
+    const desks = await fetchDesksRange(startISO, endISO);
+    allDesksData = desks;
+
+    if (!desks.length) {
+      // sin mesas o sin datos
+      deskNamesAll = [];
+      allDesksMeta = [];
+      occupancyByDesk = {};
+      minDate = null;
+      maxDate = null;
+      renderDeskFilterPanel();
+      renderDeskGrid();
+      wireDeskFilterInteractions();
+      return;
+    }
+
+    allDesksMeta = desks
+      .map(d => {
+        const name  = d.name || d.desk_name;
+        if (!name) return null;
+
+        // floor puede venir como d.floor o d.desk_floor
+        const floorRaw = (d.floor !== undefined && d.floor !== null)
+          ? d.floor
+          : (d.desk_floor !== undefined && d.desk_floor !== null
+              ? d.desk_floor
+              : 0);
+
+        const floor = Number.isNaN(Number(floorRaw)) ? 0 : Number(floorRaw);
+        const office = deriveOfficeFromName(name);
+
+        return { name, floor, office };
+      })
+      .filter(Boolean); // quitamos posibles nulls
+
+    const nameSet = new Set(allDesksMeta.map(d => d.name));
+    deskNamesAll = Array.from(nameSet).sort((a, b) =>
+      a.localeCompare(b, "en", { numeric: true })
+    );
+
+
+    // Construir ocupación con ese rango y esos desks
+    buildOccupancyMatrixFromDesks(desks, startISO, endISO);
+
+    renderDeskFilterPanel();
+    renderDeskGrid();
+    wireDeskFilterInteractions();
+  }
+
+
+  // --- Inicialización ---
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const today = new Date();
+    const iso = today.toISOString().split("T")[0];
+    document.getElementById("filterStart").value = iso;
+  });
+
+
+  document.getElementById("applyDateFilter").addEventListener("click", () => {
+    const s = document.getElementById("filterStart").value;
+    const e = document.getElementById("filterEnd").value;
+
+    if (!s || !e) {
+      alert("Please select both dates.");
+      return;
+    }
+
+    if (new Date(e) < new Date(s)) {
+      alert("End date must be after start date.");
+      return;
+    }
+
+    initGridForRange(s, e);
+  });
+</script>
+
+
+</body>
+</html>

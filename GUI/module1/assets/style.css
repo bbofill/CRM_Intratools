@@ -1,0 +1,758 @@
+:root {
+  --crm-red: #c62828;
+  --crm-red-dark: #a61e1e;
+  --crm-red-soft: rgba(198, 40, 40, 0.08);
+  --crm-red-soft-2: rgba(198, 40, 40, 0.14);
+
+  --crm-text: #172033;
+  --crm-muted: #667085;
+
+  --crm-border: rgba(15, 23, 42, 0.1);
+  --crm-border-strong: rgba(15, 23, 42, 0.16);
+
+  --crm-surface: rgba(255, 255, 255, 0.9);
+  --crm-surface-soft: rgba(255, 255, 255, 0.72);
+  --crm-surface-strong: rgba(255, 255, 255, 0.97);
+
+  --crm-shadow-sm: 0 8px 20px rgba(15, 23, 42, 0.06);
+  --crm-shadow-md: 0 14px 34px rgba(15, 23, 42, 0.1);
+  --crm-shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.16);
+
+  --crm-radius: 18px;
+  --crm-radius-sm: 12px;
+
+  --header-height: 64px;
+  --footer-height: 0px;
+
+  --shell-width: 1320px;
+  --shell-gutter: 24px;
+}
+
+/* =========================
+   BASE
+   ========================= */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--crm-text);
+  background-image: url(images/fonsClar.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body.is-loading {
+  cursor: wait !important;
+}
+
+body.is-loading * {
+  cursor: wait !important;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+header {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(var(--shell-width), calc(100% - var(--shell-gutter)));
+  z-index: 1050;
+  min-height: var(--header-height);
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(23, 32, 51, 0.08);
+}
+
+header .container {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+#logo {
+  max-height: 48px;
+  width: auto;
+  display: block;
+  padding: 0;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.06));
+}
+
+#logo:hover {
+  transform: scale(1.01);
+}
+
+header a.position-relative,
+header .btn-outline-secondary {
+  min-height: 42px;
+  padding: 0.5rem 1rem;
+  border-radius: 14px;
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+  color: #111827;
+  font-weight: 600;
+}
+
+header a.position-relative {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+header a.position-relative:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(23, 32, 51, 0.1);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+header a.position-relative img {
+  width: 22px !important;
+  height: 22px;
+  object-fit: contain;
+}
+
+header .btn-outline-secondary {
+  border-color: rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--crm-text);
+}
+
+header .btn-outline-secondary:hover,
+header .btn-outline-secondary:focus {
+  background: #ffffff;
+  color: #111827;
+  border-color: rgba(15, 23, 42, 0.14);
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+
+footer {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(var(--shell-width), calc(100% - var(--shell-gutter)));
+  min-height: var(--footer-height);
+  z-index: 1000;
+  border-radius: 18px;
+  box-shadow: 0 14px 30px rgba(166, 30, 30, 0.18);
+  overflow: hidden;
+}
+
+footer.bg-danger {
+  background: linear-gradient(135deg, #c62828, #a61e1e) !important;
+}
+
+footer .container {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+footer .container {
+  min-height: var(--footer-height);
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  line-height: 1.2;
+}
+
+footer,
+footer span,
+footer small,
+footer div,
+footer p,
+footer a,
+footer #load-info {
+  color: #ffffff !important;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+footer a:hover {
+  opacity: 0.92;
+}
+
+#load-info {
+  white-space: nowrap;
+}
+
+/* =========================
+   PAGE LAYOUT
+   ========================= */
+
+#page-container {
+  padding-top: calc(var(--header-height) + 48px);
+  padding-bottom: calc(var(--footer-height) + 56px);
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+#page-container > .container {
+  max-width: min(var(--shell-width), calc(100% - var(--shell-gutter)));
+}
+
+/* Important:
+   Do NOT wrap the entire page in a white capsule.
+   Only specific functional blocks get cards.
+*/
+
+.resumen-box,
+#form,
+#repeatingReservationForm,
+.filters-panel,
+.table-responsive {
+  background: var(--crm-surface);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow-md);
+  backdrop-filter: blur(8px);
+}
+
+.resumen-box {
+  padding: 1.5rem;
+}
+
+#form {
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.filters-panel {
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+#repeatingReservationForm {
+  margin-top: 20px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--crm-shadow-sm);
+}
+
+#repeatingReservationForm label {
+  margin-top: 10px;
+}
+
+#repeatingReservationForm input[type="date"],
+#repeatingReservationForm input[type="number"],
+#repeatingReservationForm select {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.form-row {
+  margin-bottom: 15px;
+}
+
+.col {
+  margin-bottom: 15px;
+}
+
+/* =========================
+   TYPOGRAPHY
+   ========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  letter-spacing: -0.015em;
+}
+
+h1.text-danger,
+h2.text-danger,
+h3.text-danger {
+  color: var(--crm-red) !important;
+  font-weight: 700;
+}
+
+p {
+  color: var(--crm-muted);
+}
+
+.text-muted,
+.small {
+  color: var(--crm-muted) !important;
+}
+
+label,
+.form-label,
+.form-group {
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+}
+
+/* =========================
+   FORMS
+   ========================= */
+
+.form-control,
+.form-select,
+.input-group-text,
+textarea {
+  min-height: 44px;
+  border-radius: 12px !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  box-shadow: none;
+}
+
+textarea.form-control {
+  min-height: 110px;
+}
+
+.form-control:focus,
+.form-select:focus,
+.btn:focus,
+.btn-close:focus {
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.18) !important;
+  border-color: rgba(220, 53, 69, 0.32) !important;
+}
+
+.input-group-text {
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--crm-muted);
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+
+.btn {
+  border-radius: 12px;
+  font-weight: 600;
+  min-height: 44px;
+  padding-inline: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  text-align: center;
+  line-height: 1.2;
+  vertical-align: middle;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease;
+}
+
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--crm-shadow-sm);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-danger,
+.btn-success,
+.btn-primary,
+.btn-info,
+.btn-warning {
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1);
+}
+
+.btn-danger {
+  background: var(--crm-red) !important;
+  border-color: var(--crm-red) !important;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+  background: var(--crm-red-dark) !important;
+  border-color: var(--crm-red-dark) !important;
+}
+
+.btn-outline-danger {
+  color: var(--crm-red);
+  border-color: rgba(198, 40, 40, 0.45);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.btn-outline-danger:hover {
+  color: #ffffff;
+  background: var(--crm-red);
+  border-color: var(--crm-red);
+}
+
+
+.btn.btn-sm {
+  min-height: 34px;
+  padding: 0.35rem 0.7rem;
+  line-height: 1.2;
+}
+
+
+.table .btn {
+  min-height: 36px;
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  white-space: nowrap;
+}
+
+#repeatReservationBtn:disabled,
+#repeatReservationBtn.disabled {
+  background: rgba(108, 117, 125, 0.18) !important;
+  border-color: rgba(108, 117, 125, 0.28) !important;
+  color: #667085 !important;
+  box-shadow: none !important;
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+#repeatReservationBtn:not(:disabled) {
+  background: rgba(13, 110, 253, 0.92) !important;
+  border-color: rgba(13, 110, 253, 0.92) !important;
+  color: #ffffff !important;
+}
+
+#repeatReservationBtn:not(:disabled)::before {
+  content: "↻ ";
+}
+/* =========================
+   CATEGORY BUTTONS
+   ========================= */
+
+.button-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.button-container a,
+#viewAllReservationsBtn,
+#modifyUserReservationBtn {
+  flex: 1;
+  min-width: 160px;
+  min-height: 44px;
+
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  line-height: 1.2;
+  padding: 0.55rem 1rem;
+  white-space: nowrap;
+}
+
+/* =========================
+   TABLES
+   ========================= */
+
+.table-responsive {
+  overflow: hidden;
+  background: var(--crm-surface-strong);
+  box-shadow: var(--crm-shadow-sm);
+  margin-top: 1rem;
+}
+
+.table {
+  margin-bottom: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.table td,
+.table th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table thead th {
+  border-bottom-width: 1px;
+  background: rgba(248, 249, 250, 0.96) !important;
+  color: #495057;
+  font-size: 0.94rem;
+  font-weight: 700;
+  padding: 0.95rem 0.9rem;
+  vertical-align: middle;
+}
+
+.table-danger th,
+thead.table-danger th {
+  background: rgba(220, 53, 69, 0.08) !important;
+  color: #842029 !important;
+}
+
+.table tbody td {
+  padding: 0.95rem 0.9rem;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background: rgba(220, 53, 69, 0.03);
+}
+
+.table-active {
+  --bs-table-bg: rgba(255, 255, 255, 0.72);
+}
+
+#roomCode {
+  margin-top: 0;
+}
+
+/* Room type color coding.
+   These are used by your JS:
+   classroom -> table-success
+   office -> table-info
+   auditorium -> table-warning
+*/
+
+.table-success {
+  --bs-table-bg: rgba(25, 135, 84, 0.14);
+  --bs-table-striped-bg: rgba(25, 135, 84, 0.18);
+  --bs-table-hover-bg: rgba(25, 135, 84, 0.24);
+  --bs-table-color: var(--crm-text);
+}
+
+.table-info {
+  --bs-table-bg: rgba(13, 202, 240, 0.15);
+  --bs-table-striped-bg: rgba(13, 202, 240, 0.19);
+  --bs-table-hover-bg: rgba(13, 202, 240, 0.25);
+  --bs-table-color: var(--crm-text);
+}
+
+.table-warning {
+  --bs-table-bg: rgba(255, 193, 7, 0.22);
+  --bs-table-striped-bg: rgba(255, 193, 7, 0.27);
+  --bs-table-hover-bg: rgba(255, 193, 7, 0.33);
+  --bs-table-color: var(--crm-text);
+}
+
+.table-secondary {
+  --bs-table-bg: rgba(108, 117, 125, 0.16);
+  --bs-table-striped-bg: rgba(108, 117, 125, 0.2);
+  --bs-table-hover-bg: rgba(108, 117, 125, 0.24);
+  --bs-table-color: var(--crm-text);
+}
+
+.table-light {
+  --bs-table-bg: rgba(248, 249, 250, 0.88);
+  --bs-table-striped-bg: rgba(248, 249, 250, 0.94);
+  --bs-table-hover-bg: rgba(220, 53, 69, 0.04);
+}
+
+/* Occupied rows */
+tr.table-secondary[style*="not-allowed"] {
+  opacity: 0.65 !important;
+}
+
+/* =========================
+   SUMMARY LISTS
+   ========================= */
+
+.list-group {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--crm-shadow-sm);
+}
+
+.list-group-item {
+  border-color: var(--crm-border);
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.9rem 1rem;
+}
+
+/* =========================
+   MODALS
+   ========================= */
+
+.modal-content {
+  background: var(--crm-surface);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow-lg);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+.modal-header,
+.modal-footer {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+.modal-header.bg-danger {
+  background: linear-gradient(135deg, #c62828, #a61e1e) !important;
+}
+
+.modal-title {
+  font-weight: 700;
+}
+
+.modal-body {
+  background: rgba(250, 250, 250, 0.72);
+}
+
+.alert {
+  border-radius: 14px;
+  border-width: 1px;
+}
+
+/* =========================
+   CALENDAR
+   ========================= */
+
+.calendar-icon {
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  padding: 0.55rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.calendar-icon:hover {
+  transform: translateY(-1px) scale(1.03);
+  opacity: 0.92;
+  box-shadow: var(--crm-shadow-sm);
+}
+
+.fc {
+  background: rgba(255, 255, 255, 0.72);
+  border-radius: 16px;
+  padding: 0.75rem;
+}
+
+.fc-daygrid-event {
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 2px 6px;
+}
+
+.fc-daygrid-event .fc-event-title {
+  line-height: 1.25;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 991.98px) {
+  header .container {
+    flex-wrap: wrap;
+    justify-content: center !important;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+  }
+
+  #page-container {
+    padding-top: calc(var(--header-height) + 68px);
+  }
+}
+
+@media (max-width: 767.98px) {
+  :root {
+    --header-height: 116px;
+    --footer-height: 72px;
+  }
+
+  header {
+    top: 10px;
+    width: calc(100% - 16px);
+  }
+
+  footer {
+    bottom: 10px;
+    width: calc(100% - 16px);
+  }
+
+  footer .container {
+    gap: 0.35rem;
+    flex-direction: column;
+    justify-content: center !important;
+    text-align: center;
+  }
+
+  #page-container {
+    padding-top: calc(var(--header-height) + 34px);
+    padding-bottom: calc(var(--footer-height) + 24px);
+  }
+
+  .button-container a {
+    min-width: 100%;
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: 0.8rem 0.7rem;
+  }
+
+  .filters-panel .col-md-2,
+  .filters-panel .col-md-3 {
+    margin-bottom: 0.75rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  header .d-flex.align-items-center.gap-4.ms-3 {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0 !important;
+  }
+
+  #logo {
+    max-height: 40px;
+  }
+}
+
+#dateform {
+  align-items: end;
+}
+
+#dateform .col {
+  min-width: 180px;
+}
+
+#dateform .form-label,
+#dateform .form-group {
+  display: block;
+  min-height: 1.4rem;
+}
+
+input[type="date"],
+input[type="time"] {
+  cursor: pointer;
+}

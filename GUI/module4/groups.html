@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Import data</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}"> 
+  <link rel="stylesheet" href="/assets/css/cropper.min.css?v={{.AppVersion}}" />
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+  <style>
+    .modal-body {
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+    </a>
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+    <a href="index.html" class="btn btn-outline-secondary">← Go back</a>
+  </div>
+  </div>
+</header>
+
+<div id="page-container">
+  <div>
+    <main class="container">
+      <h2>Groups Hub</h2>
+      <div class="button-container mb-3">
+        <a id="AllGroupsBtn" class="btn btn-outline-secondary">All</a>
+        <a id="ProjectGroupsBtn" class="btn btn-info">Projects</a>
+        <a id="SgrGroupsBtn" class="btn btn-success">SGR</a>
+        <a id="NormalGroupsBtn" class="btn btn-primary">Groups</a>
+        <a id="UnitGroupsBtn" class="btn btn-warning">Units</a>
+      </div>
+      <div class="d-flex justify-content-end mb-3">
+        <button id="openAddGroupModalBtn" class="btn btn-success">
+          + Add Group
+        </button>
+      </div>
+      <div id="group-list" class="row row-cols-1 row-cols-md-2 g-4 mt-3"></div>
+    </main>
+  </div>
+</div>
+
+<div class="modal fade" id="groupFormModal" tabindex="-1" aria-labelledby="groupFormModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title" id="groupFormModalLabel">Modify or Add group</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="groupForm" novalidate>
+          <div id="formFieldsContainer" class="row g-3">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" form="groupForm" class="btn btn-primary" id="saveGroupBtn">Save Group</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    window.APP_VERSION = "{{.AppVersion}}";
+</script>
+
+<script type="module" src="./assets/js/groupManager.js?v={{.AppVersion}}"></script>
+<script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+
+
+
+<!-- Footer -->
+<footer class="bg-danger text-light py-3 mt-4">
+  <div class="container d-flex justify-content-between align-items-center small">
+    <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+    <span id="load-info">Calculating load time...</span>
+  </div>
+  <script type="module">
+    import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+    measurePageLoadTime({
+      targetId: 'load-info',
+      precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+    });
+  </script>
+</footer>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Ticketing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/css/tutorialStyles.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+
+</head>
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a href="/main">
+        <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+      </a>
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+      <a href="/main" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+    </div>
+  </header>
+  <div id="page-container">
+    <main class="container">
+      <div class="ticketing-layout">
+        
+        <!-- SIDEBAR -->
+        <nav id="sidebar" class="col-md-3 col-lg-2">
+          <h5 class="mb-4 text-danger fw-bold">Ticketing</h5>
+          <div class="nav flex-column">
+            <a class="nav-link active" href="#" data-section="send">📨 Send new ticket</a>
+            <a class="nav-link" href="#" data-section="myTickets">🔍 My tickets</a>
+            <a class="nav-link" href="#" data-section="admin">⚙️ Administrator area</a>
+          </div>
+        </nav>
+  
+        <!-- CONTENT AREA -->
+        <section id="content-area" class="col-md-9 col-lg-10">
+          
+            <!-- Enviar Ticket -->
+            <div id="section-send" class="content-section">
+                <h3 class="text-danger mb-3">Send new ticket</h3>
+                <form id="ticketForm" method="POST" enctype="multipart/form-data">
+                <!-- Category -->
+                <div class="mb-3">
+                    <label for="ticketCategory" class="form-label">Category</label>
+                    <select id="ticketCategory" name="category" class="form-select" required>
+
+                    </select>
+                </div>
+            
+                <!-- Dynamic Subcategory -->
+                <div class="mb-3 d-none" id="subcategoryContainer">
+                    <label for="ticketSubcategory" class="form-label">Type of issue</label>
+                    <select id="ticketSubcategory" name="subcategory" class="form-select" required>
+                    <!-- Options will be added dynamically -->
+                    </select>
+                </div>
+              <div class="mb-3">
+                <label for="ticketMessage" class="form-label">Description</label>
+                <textarea id="ticketMessage" name="message" rows="4" class="form-control" placeholder="Indicate all relevant information, including your office and office hours if needed."></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="ticketAttachment" class="form-label">Attach file (optional)</label>
+                <input type="file" id="ticketAttachment" name="attachment" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-muted">
+                  If you wish to be notified by email of any status change, please indicate it here:
+                </label>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="notifyByEmail" name="notifyByEmail">
+                  <label class="form-check-label" for="notifyByEmail">
+                    Receive ticket updates by email
+                  </label>
+                </div>
+                <input
+                  type="email"
+                  id="notificationEmail"
+                  name="notificationEmail"
+                  class="form-control"
+                  placeholder="Enter your email address"
+                  disabled
+                >
+              </div>
+              <button type="submit" class="btn btn-danger">Send ticket</button>
+            </form>
+          </div>
+  
+          <!-- Mis Tickets -->
+          <div id="section-myTickets" class="content-section d-none">
+            <h3 class="text-danger mb-3">My tickets</h3>
+            <p class="text-muted">
+              Here you can check the status of the tickets you have submitted and who is managing them.
+            </p>
+            <div class="row g-2 align-items-end mb-3">
+              <div class="col-12 col-md-4">
+                <label for="myTicketsStatusFilter" class="form-label mb-1">Status</label>
+                <select id="myTicketsStatusFilter" class="form-select">
+                  <option value="ALL" selected>All</option>
+                  <option value="OPEN">Open</option>
+                  <option value="IN_PROGRESS">In progress</option>
+                  <option value="WAITING_USER">Waiting user</option>
+                  <option value="RESOLVED">Resolved</option>
+                  <option value="CLOSED">Closed</option>
+                </select>
+              </div>
+            </div>
+            <div id="myTicketsList" class="table-responsive">
+              <table class="table table-bordered table-striped align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Category</th>
+                    <th>Issue</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Assigned to</th>
+                    <th>Last update</th>
+                  </tr>
+                </thead>
+                <tbody id="myTicketsBody">
+                  <!-- User tickets will be dynamically loaded here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+            <!-- Department Administrator Section -->
+            <div id="section-deptAdmin" class="content-section d-none">
+                <h3 class="text-danger mb-3">Department Administrator</h3>
+                <p class="text-muted">
+                Manage unassigned tickets from your departments.  
+                You can assign urgency levels and responsible workers.
+                </p>
+            
+                <div class="table-responsive">
+                <button id="openReassignPage" class="btn btn-secondary mb-3">
+                    Reassign Tickets
+                </button>
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Department</th>
+                        <th>Issue</th>
+                        <th>Description</th>
+                        <th>Submitted by</th>
+                        <th>Date</th>
+                        <th>Urgency</th>
+                        <th>Responsible</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="deptAdminTicketsBody">
+                    <tr><td colspan="9" class="text-center text-muted">Loading...</td></tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+
+            <div id="section-reassign" class="content-section d-none">
+              <h3 class="text-danger mb-3">Reassign Active Tickets</h3>
+              <p class="text-muted">Reassign responsibility for active tickets in your departments.</p>
+
+              <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Department</th>
+                    <th>Issue</th>
+                    <th>Description</th>
+                    <th>Current Worker</th>
+                    <th>New Worker</th>
+                    <th>Save</th>
+                  </tr>
+                </thead>
+                <tbody id="reassignTicketsBody">
+                  <tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Administrator Area -->
+            <div id="section-admin" class="content-section d-none">
+                <h3 class="text-danger mb-3">Administrator area</h3>
+                <p class="text-muted">Manage your departments and assign workers/managers.</p>
+      
+                <!-- Add Department -->
+                <div class="card mb-4 shadow-sm">
+                  <div class="card-body">
+                    <h5 class="text-danger">Add New Department</h5>
+                    <form id="addSectionForm" class="row g-3 mt-2">
+                      <div class="col-md-6">
+                        <input type="text" id="newSectionName" class="form-control" placeholder="Department name..." required>
+                      </div>
+                      <div class="col-md-6">
+                        <button type="submit" class="btn btn-danger">Add</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+      
+                <!-- Table -->
+                <div class="card shadow-sm">
+                  <div class="card-body">
+                    <h5 class="text-danger mb-3">Current Departments</h5>
+                    <div id="sectionsList" class="table-responsive">
+                      <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                          <tr>
+                            <th>Department</th>
+                            <th>Workers (press 👤 to change role)</th>
+                            <th></th>
+                            <th>Downloads</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody id="sectionsTableBody">
+                          <tr><td colspan="5" class="text-center text-muted">No data loaded yet</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+            <!-- Work Area -->
+            <div id="section-workArea" class="content-section d-none">
+                <h3 class="text-danger mb-3">Work area</h3>
+                <p class="text-muted">
+                Here you can view and manage the tickets assigned to you.  
+                You can change their status and optionally notify the user.
+                </p>
+            
+                <div id="workTicketsList" class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Category</th>
+                        <th>Issue</th>
+                        <th>Description</th>
+                        <th>Submitted by</th>
+                        <th>Date</th>
+                        <th>Urgency</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="workTicketsBody">
+                    <!-- Tickets will be loaded here -->
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            
+        </section>
+      </div>
+    </main>
+  </div>
+  
+<script>
+    window.APP_VERSION = "{{.AppVersion}}";
+</script>
+  <script type="module" src="./assets/js/sidebarControl.js?v={{.AppVersion}}"></script>
+  <script type="module" src="./assets/js/ticketCategories.js?v={{.AppVersion}}"></script>
+  <script type="module" src="./assets/js/myTickets.js?v={{.AppVersion}}"></script>
+  <script type="module" src="./assets/js/adminDepartments.js?v={{.AppVersion}}"></script>
+  <script type="module" src="./assets/js/sendTicket.js?v={{.AppVersion}}"></script>
+  <script type="module" src="/assets/js/tutorials/tutorial_module6.js?v={{.AppVersion}}"></script>
+
+
+  <!-- FOOTER -->
+  <footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+      <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+      <span id="load-info">Calculating load time...</span>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script type="module">
+      import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+
+      measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+      });
+  </script>
+  <script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+</html>

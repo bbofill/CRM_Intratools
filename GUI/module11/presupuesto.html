@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CRMIntratools - Budget generator</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#111824;
+      --panel2:#0f1621;
+      --text:#e8eef7;
+      --muted:#a7b3c6;
+      --line:#223046;
+      --accent:#5aa9ff;
+      --danger:#ff5a6a;
+      --ok:#4fe3a4;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    
+    body{
+      margin:0;
+      color:var(--text);
+      font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Noto Sans", Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    .wrap{
+      max-width:1200px; margin:0 auto; padding:18px;
+      display:grid; grid-template-columns: 1.1fr .9fr; gap:16px;
+    }
+    @media (max-width: 980px){
+      .wrap{grid-template-columns:1fr}
+    }
+    .card,
+    .card * {
+      color: var(--text);
+    }
+
+    .card{
+      background:radial-gradient(1200px 600px at 20% 0%, rgba(90,169,255,.10), transparent 40%),
+                 radial-gradient(900px 500px at 90% 40%, rgba(79,227,164,.08), transparent 40%),
+                 var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .card .hd h1, .card .hd h2{
+      margin:0; font-size:16px; letter-spacing:.2px;
+    }
+    .card .bd{ padding:16px; }
+    .grid{ display:grid; gap:10px; }
+    .grid.two{ grid-template-columns:1fr 1fr; }
+    .grid.three{ grid-template-columns:2fr 1fr 1fr; }
+    @media (max-width: 720px){
+      .grid.two, .grid.three{ grid-template-columns:1fr; }
+    }
+    label{ display:block; color:var(--muted); font-size:12px; margin:0 0 6px; }
+    input, textarea, select{
+      width:100%;
+      padding:10px 10px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:var(--panel2);
+      color:var(--text);
+      outline:none;
+    }
+    input:focus, textarea:focus, select:focus{
+      border-color:rgba(90,169,255,.7);
+      box-shadow:0 0 0 3px rgba(90,169,255,.18);
+    }
+    textarea{ min-height:70px; resize:vertical; }
+    .row{ display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; }
+    .row > .grow{ flex:1 1 200px; }
+    .row > .w120{ width:120px; }
+    .row > .w160{ width:160px; }
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; }
+    button{
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      cursor:pointer;
+    }
+    button:hover{ border-color:rgba(255,255,255,.2); }
+    button.primary{
+      border-color:rgba(90,169,255,.6);
+      background:rgba(90,169,255,.18);
+    }
+    button.danger{
+      border-color:rgba(255,90,106,.6);
+      background:rgba(255,90,106,.14);
+    }
+    button.ok{
+      border-color:rgba(79,227,164,.65);
+      background:rgba(79,227,164,.14);
+    }
+    button:disabled{ opacity:.5; cursor:not-allowed; }
+    .muted{ color:var(--muted); }
+    .table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.14);
+    }
+    .table thead th{
+      text-align:left;
+      font-weight:600;
+      color:var(--muted);
+      font-size:12px;
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+    }
+    .table tbody td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(34,48,70,.7);
+      vertical-align:top;
+    }
+    .table tbody tr:last-child td{ border-bottom:none; }
+    .table .num{ text-align:right; white-space:nowrap; }
+    .table .actions{ width:120px; text-align:right; white-space:nowrap; }
+    .pill{
+      display:inline-block;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+    }
+    .totals{
+      display:grid; gap:8px;
+      border-top:1px solid var(--line);
+      padding-top:12px;
+      margin-top:12px;
+    }
+    .totals .line{
+      display:flex; justify-content:space-between; gap:10px;
+    }
+    .totals .line strong{ font-size:16px; }
+    .small{ font-size:12px; }
+
+    @media print{
+      body{ background:#fff; color:#000; }
+      .wrap{ display:block; max-width:none; padding:0; }
+      .card{ box-shadow:none; border:0; border-radius:0; background:#fff; }
+      .no-print{ display:none !important; }
+      .table{ border:1px solid #000; background:#fff; }
+      .table thead th{ color:#000; background:#eee; border-bottom:1px solid #000; }
+      .table tbody td{ border-bottom:1px solid #ccc; }
+      input, textarea, select{ border:1px solid #000; background:#fff; color:#000; }
+      .pill{ border:1px solid #000; background:#fff; color:#000; }
+    }
+  </style>
+</head>
+<body>
+<header class="bg-light">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a href="/main">
+        <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+      </a>
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+      <a href="./index.html" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+    </div>
+  </header>
+
+<main>
+  <div id="page-container">
+  <div class="container">
+  <div class="wrap">
+    <section class="card">
+      <div class="hd">
+        <h1>Presupuesto</h1>
+        <div class="no-print btns">
+          <button class="ok" id="btnPrint">Imprimir / Guardar PDF</button>
+          <button id="btnNew">Nuevo</button>
+        </div>
+      </div>
+
+      <div class="bd">
+        <div class="grid two">
+          <div>
+            <label for="company">Empresa / Profesional</label>
+            <input id="company" placeholder="Nombre, CIF, dirección..." />
+          </div>
+          <div>
+            <label for="client">Cliente</label>
+            <input id="client" placeholder="Nombre / Empresa..." />
+          </div>
+          <div>
+            <label for="title">Título</label>
+            <input id="title" placeholder="Ej: Presupuesto instalación, auditoría..." />
+          </div>
+          <div>
+            <label for="ref">Referencia</label>
+            <input id="ref" placeholder="Ej: 2026-001" />
+          </div>
+        </div>
+
+        <div class="grid two" style="margin-top:10px;">
+          <div>
+            <label for="date">Fecha</label>
+            <input id="date" type="date" />
+          </div>
+          <div>
+            <label for="currency">Moneda</label>
+            <select id="currency">
+              <option value="EUR">EUR (€)</option>
+              <option value="USD">USD ($)</option>
+              <option value="GBP">GBP (£)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;">
+          <div class="row no-print">
+            <div class="grow">
+              <label for="itemDesc">Concepto</label>
+              <input id="itemDesc" placeholder="Ej: Cableado, mano de obra, licencias..." />
+            </div>
+            <div class="w120">
+              <label for="itemQty">Cantidad</label>
+              <input id="itemQty" inputmode="decimal" placeholder="1" />
+            </div>
+            <div class="w160">
+              <label for="itemUnit">Precio unitario (final)</label>
+              <input id="itemUnit" inputmode="decimal" placeholder="0,00" />
+            </div>
+            <div class="w160">
+              <button class="primary" id="btnAdd" style="width:100%;">Añadir / Actualizar</button>
+            </div>
+          </div>
+
+          <div class="muted small no-print" style="margin-top:8px;">
+            Formato números: acepta “12,34” o “12.34”. Enter añade. Doble click en una línea para editar.
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <table class="table" aria-label="Líneas de presupuesto">
+            <thead>
+              <tr>
+                <th>Concepto</th>
+                <th class="num">Cant.</th>
+                <th class="num">Unit. (final)</th>
+                <th class="num">Total</th>
+                <th class="actions no-print">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="itemsTbody"></tbody>
+          </table>
+
+          <div class="totals">
+            <div class="line"><span class="muted">Subtotal</span><span id="subtotal">0</span></div>
+            <div class="line">
+              <span class="muted">Descuento global</span>
+              <span style="display:flex; gap:10px; align-items:center;">
+                <span class="no-print">
+                  <input id="discount" inputmode="decimal" style="width:120px; padding:8px 10px;" placeholder="0" />
+                </span>
+                <span class="pill" id="discountLabel">0%</span>
+              </span>
+            </div>
+            <div class="line"><strong>Total</strong><strong id="grandTotal">0</strong></div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <label for="notes">Notas / condiciones</label>
+            <textarea id="notes" placeholder="Plazos, validez, forma de pago, alcance, etc."></textarea>
+          </div>
+
+          <div class="no-print" style="margin-top:12px;">
+            <div class="btns">
+              <button id="btnExport">Exportar (JSON)</button>
+              <button id="btnImport">Importar (JSON)</button>
+              <input id="importFile" type="file" accept="application/json" style="display:none;" />
+              <button class="danger" id="btnClear">Borrar todo</button>
+            </div>
+            <div class="muted small" style="margin-top:8px;">
+              Se guarda automáticamente en el navegador (localStorage). Funciona offline.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <div class="hd">
+        <h2>Vista rápida</h2>
+        <div class="no-print"><span class="pill" id="itemsCount">0 líneas</span></div>
+      </div>
+      <div class="bd">
+        <div class="grid" style="gap:12px;">
+          <div>
+            <div class="muted small">Empresa</div>
+            <div id="vCompany" style="white-space:pre-wrap;"></div>
+          </div>
+          <div>
+            <div class="muted small">Cliente</div>
+            <div id="vClient"></div>
+          </div>
+          <div class="grid two">
+            <div>
+              <div class="muted small">Título</div>
+              <div id="vTitle"></div>
+            </div>
+            <div>
+              <div class="muted small">Referencia</div>
+              <div id="vRef"></div>
+            </div>
+            <div>
+              <div class="muted small">Fecha</div>
+              <div id="vDate"></div>
+            </div>
+            <div>
+              <div class="muted small">Total</div>
+              <div style="font-weight:700; font-size:18px;" id="vTotal"></div>
+            </div>
+          </div>
+          <div>
+            <div class="muted small">Notas</div>
+            <div id="vNotes" style="white-space:pre-wrap;"></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <template id="rowTpl">
+    <tr>
+      <td class="desc"></td>
+      <td class="num qty"></td>
+      <td class="num unit"></td>
+      <td class="num total"></td>
+      <td class="actions no-print">
+        <button class="btnEdit">Editar</button>
+        <button class="btnDel danger">Borrar</button>
+      </td>
+    </tr>
+  </template>
+  </div>
+  </div>
+</main>
+ <!-- FOOTER -->
+  <footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+      <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+      <span id="load-info">Calculating load time...</span>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script type="module">
+      import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+
+      measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+      });
+  </script>
+  <script type="module">
+    import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+    initNotificationBadge();
+  </script>
+  <script>
+    "use strict";
+
+    function todayISO(){
+      const d = new Date();
+      const z = n => String(n).padStart(2,"0");
+      return d.getFullYear() + "-" + z(d.getMonth()+1) + "-" + z(d.getDate());
+    }
+
+    function parseNumberLoose(v){
+      if (v === null || v === undefined) return NaN;
+      let s = String(v).trim();
+      if (!s) return NaN;
+      s = s.replace(/\s+/g,"");
+      s = s.replace(/€/g,"").replace(/\$/g,"").replace(/£/g,"");
+      s = s.replace(/\.(?=\d{3}(\D|$))/g, "");  // 1.234,56
+      s = s.replace(",", ".");                  // 12,34
+      s = s.replace(/[^\d.+-]/g,"");
+      const n = Number(s);
+      return Number.isFinite(n) ? n : NaN;
+    }
+
+    function clamp(n, min, max){
+      if (!Number.isFinite(n)) return min;
+      return Math.min(max, Math.max(min, n));
+    }
+
+    function fmtMoney(n, currency){
+      const c = currency || "EUR";
+      const safe = Number.isFinite(n) ? n : 0;
+      try{
+        return new Intl.NumberFormat("es-ES", { style:"currency", currency:c }).format(safe);
+      }catch(_){
+        return safe.toFixed(2) + " " + c;
+      }
+    }
+
+    function fmtQty(n){
+      const safe = Number.isFinite(n) ? n : 0;
+      return Number.isInteger(safe) ? String(safe) : safe.toFixed(2);
+    }
+
+    function safeText(el, txt){
+      el.textContent = (txt === null || txt === undefined) ? "" : String(txt);
+    }
+
+    const STORAGE_KEY = "presupuesto_local_v2_sin_iva";
+    const state = {
+      meta: {
+        company: "",
+        client: "",
+        title: "",
+        ref: "",
+        date: todayISO(),
+        currency: "EUR",
+        notes: "",
+        discountPct: 0
+      },
+      items: [],
+      editIndex: -1
+    };
+
+    const el = {
+      company: document.getElementById("company"),
+      client: document.getElementById("client"),
+      title: document.getElementById("title"),
+      ref: document.getElementById("ref"),
+      date: document.getElementById("date"),
+      currency: document.getElementById("currency"),
+      notes: document.getElementById("notes"),
+      discount: document.getElementById("discount"),
+
+      itemDesc: document.getElementById("itemDesc"),
+      itemQty: document.getElementById("itemQty"),
+      itemUnit: document.getElementById("itemUnit"),
+      btnAdd: document.getElementById("btnAdd"),
+
+      tbody: document.getElementById("itemsTbody"),
+      rowTpl: document.getElementById("rowTpl"),
+
+      subtotal: document.getElementById("subtotal"),
+      grandTotal: document.getElementById("grandTotal"),
+      discountLabel: document.getElementById("discountLabel"),
+
+      itemsCount: document.getElementById("itemsCount"),
+
+      vCompany: document.getElementById("vCompany"),
+      vClient: document.getElementById("vClient"),
+      vTitle: document.getElementById("vTitle"),
+      vRef: document.getElementById("vRef"),
+      vDate: document.getElementById("vDate"),
+      vTotal: document.getElementById("vTotal"),
+      vNotes: document.getElementById("vNotes"),
+
+      btnPrint: document.getElementById("btnPrint"),
+      btnNew: document.getElementById("btnNew"),
+      btnExport: document.getElementById("btnExport"),
+      btnImport: document.getElementById("btnImport"),
+      importFile: document.getElementById("importFile"),
+      btnClear: document.getElementById("btnClear")
+    };
+
+    function save(){
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(_){}
+    }
+
+    function load(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return false;
+        const obj = JSON.parse(raw);
+        if(!obj || typeof obj !== "object") return false;
+        if(!obj.meta || !Array.isArray(obj.items)) return false;
+
+        state.meta = {
+          company: String(obj.meta.company ?? ""),
+          client: String(obj.meta.client ?? ""),
+          title: String(obj.meta.title ?? ""),
+          ref: String(obj.meta.ref ?? ""),
+          date: String(obj.meta.date ?? todayISO()),
+          currency: String(obj.meta.currency ?? "EUR"),
+          notes: String(obj.meta.notes ?? ""),
+          discountPct: clamp(Number(obj.meta.discountPct ?? 0), 0, 100)
+        };
+
+        state.items = obj.items.map(it => ({
+          desc: String(it.desc ?? ""),
+          qty: clamp(Number(it.qty ?? 0), 0, 1e9),
+          unit: clamp(Number(it.unit ?? 0), 0, 1e12)
+        }));
+
+        state.editIndex = -1;
+        return true;
+      }catch(_){
+        return false;
+      }
+    }
+
+    function resetState(){
+      state.meta = {
+        company: "",
+        client: "",
+        title: "",
+        ref: "",
+        date: todayISO(),
+        currency: "EUR",
+        notes: "",
+        discountPct: 0
+      };
+      state.items = [];
+      state.editIndex = -1;
+    }
+
+    function compute(){
+      const subtotal = state.items.reduce((acc, it) => acc + (it.qty * it.unit), 0);
+      const discountPct = clamp(state.meta.discountPct, 0, 100);
+      const discountAmount = subtotal * (discountPct/100);
+      const grandTotal = subtotal - discountAmount;
+      return { subtotal, discountPct, discountAmount, grandTotal };
+    }
+
+    function syncFormFromState(){
+      el.company.value = state.meta.company;
+      el.client.value = state.meta.client;
+      el.title.value = state.meta.title;
+      el.ref.value = state.meta.ref;
+      el.date.value = state.meta.date || todayISO();
+      el.currency.value = state.meta.currency || "EUR";
+      el.notes.value = state.meta.notes;
+      el.discount.value = String(state.meta.discountPct || 0);
+
+      safeText(el.vCompany, state.meta.company || "—");
+      safeText(el.vClient, state.meta.client || "—");
+      safeText(el.vTitle, state.meta.title || "—");
+      safeText(el.vRef, state.meta.ref || "—");
+      safeText(el.vDate, state.meta.date || "—");
+      safeText(el.vNotes, state.meta.notes || "—");
+    }
+
+    function renderTable(){
+      el.tbody.innerHTML = "";
+      const currency = state.meta.currency || "EUR";
+
+      state.items.forEach((it, idx) => {
+        const row = el.rowTpl.content.firstElementChild.cloneNode(true);
+        row.dataset.index = String(idx);
+
+        row.querySelector(".desc").textContent = it.desc;
+        row.querySelector(".qty").textContent = fmtQty(it.qty);
+        row.querySelector(".unit").textContent = fmtMoney(it.unit, currency);
+
+        const lineTotal = (it.qty * it.unit);
+        row.querySelector(".total").textContent = fmtMoney(lineTotal, currency);
+
+        const btnEdit = row.querySelector(".btnEdit");
+        const btnDel = row.querySelector(".btnDel");
+        btnEdit.addEventListener("click", () => startEdit(idx));
+        btnDel.addEventListener("click", () => deleteItem(idx));
+        row.addEventListener("dblclick", () => startEdit(idx));
+
+        el.tbody.appendChild(row);
+      });
+
+      el.itemsCount.textContent = state.items.length + (state.items.length === 1 ? " línea" : " líneas");
+    }
+
+    function renderTotals(){
+      const { subtotal, discountPct, grandTotal } = compute();
+      const currency = state.meta.currency || "EUR";
+
+      el.subtotal.textContent = fmtMoney(subtotal, currency);
+      el.discountLabel.textContent = discountPct.toFixed(2) + "%";
+      el.grandTotal.textContent = fmtMoney(grandTotal, currency);
+      el.vTotal.textContent = fmtMoney(grandTotal, currency);
+    }
+
+    function renderAll(){
+      syncFormFromState();
+      renderTable();
+      renderTotals();
+      save();
+    }
+
+    function clearItemInputs(){
+      el.itemDesc.value = "";
+      el.itemQty.value = "";
+      el.itemUnit.value = "";
+      state.editIndex = -1;
+      el.btnAdd.textContent = "Añadir / Actualizar";
+      el.itemDesc.focus();
+    }
+
+    function startEdit(idx){
+      const it = state.items[idx];
+      if(!it) return;
+      state.editIndex = idx;
+      el.itemDesc.value = it.desc;
+      el.itemQty.value = String(it.qty);
+      el.itemUnit.value = String(it.unit);
+      el.btnAdd.textContent = "Actualizar línea";
+      el.itemDesc.focus();
+    }
+
+    function deleteItem(idx){
+      if (idx < 0 || idx >= state.items.length) return;
+      if (state.editIndex === idx) clearItemInputs();
+      state.items.splice(idx, 1);
+      renderAll();
+    }
+
+    function upsertItem(){
+      const desc = el.itemDesc.value.trim();
+      const qty = parseNumberLoose(el.itemQty.value);
+      const unit = parseNumberLoose(el.itemUnit.value);
+
+      if(!desc){
+        alert("Concepto obligatorio.");
+        el.itemDesc.focus();
+        return;
+      }
+
+      const q = clamp(Number.isFinite(qty) ? qty : 1, 0, 1e9);
+      const u = clamp(Number.isFinite(unit) ? unit : 0, 0, 1e12);
+
+      const item = { desc, qty: q, unit: u };
+
+      if(state.editIndex >= 0 && state.editIndex < state.items.length){
+        state.items[state.editIndex] = item;
+      }else{
+        state.items.push(item);
+      }
+
+      clearItemInputs();
+      renderAll();
+    }
+
+    function readMetaFromInputs(){
+      state.meta.company = el.company.value;
+      state.meta.client = el.client.value;
+      state.meta.title = el.title.value;
+      state.meta.ref = el.ref.value;
+      state.meta.date = el.date.value || todayISO();
+      state.meta.currency = el.currency.value || "EUR";
+      state.meta.notes = el.notes.value;
+
+      const d = parseNumberLoose(el.discount.value);
+      state.meta.discountPct = clamp(Number.isFinite(d) ? d : 0, 0, 100);
+    }
+
+    function exportJSON(){
+      readMetaFromInputs();
+      const payload = JSON.stringify(state, null, 2);
+      const blob = new Blob([payload], { type:"application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      const ref = (state.meta.ref || "presupuesto").replace(/[^\w\-]+/g,"_");
+      a.href = url;
+      a.download = ref + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJSONFile(file){
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const obj = JSON.parse(String(reader.result || ""));
+          const tmp = { meta: obj.meta, items: obj.items, editIndex: -1 };
+          const raw = JSON.stringify(tmp);
+          localStorage.setItem(STORAGE_KEY, raw);
+          load();
+          renderAll();
+          clearItemInputs();
+        }catch(_){
+          alert("JSON inválido.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function bind(){
+      ["input","change"].forEach(evt => {
+        el.company.addEventListener(evt, () => { readMetaFromInputs(); renderAll(); });
+        el.client.addEventListener(evt, () => { readMetaFromInputs(); renderAll(); });
+        el.title.addEventListener(evt, () => { readMetaFromInputs(); renderAll(); });
+        el.ref.addEventListener(evt, () => { readMetaFromInputs(); renderAll(); });
+        el.date.addEventListener(evt, () => { readMetaFromInputs(); renderAll(); });
+        el.currency.addEventListener(evt, () => { readMetaFromInputs(); renderAll(); });
+        el.notes.addEventListener(evt, () => { readMetaFromInputs(); renderAll(); });
+        el.discount.addEventListener(evt, () => { readMetaFromInputs(); renderAll(); });
+      });
+
+      el.btnAdd.addEventListener("click", () => upsertItem());
+
+      [el.itemDesc, el.itemQty, el.itemUnit].forEach(inp => {
+        inp.addEventListener("keydown", (e) => {
+          if(e.key === "Enter"){
+            e.preventDefault();
+            upsertItem();
+          }else if(e.key === "Escape"){
+            e.preventDefault();
+            clearItemInputs();
+          }
+        });
+      });
+
+      el.btnPrint.addEventListener("click", () => window.print());
+
+      el.btnNew.addEventListener("click", () => {
+        resetState();
+        renderAll();
+        clearItemInputs();
+      });
+
+      el.btnExport.addEventListener("click", () => exportJSON());
+
+      el.btnImport.addEventListener("click", () => el.importFile.click());
+      el.importFile.addEventListener("change", () => {
+        const f = el.importFile.files && el.importFile.files[0];
+        el.importFile.value = "";
+        if(f) importJSONFile(f);
+      });
+
+      el.btnClear.addEventListener("click", () => {
+        if(!confirm("¿Borrar todo el contenido?")) return;
+        resetState();
+        save();
+        renderAll();
+        clearItemInputs();
+      });
+    }
+
+    (function init(){
+      if(!load()) resetState();
+      if(!state.meta.date) state.meta.date = todayISO();
+      el.date.value = state.meta.date;
+      bind();
+      renderAll();
+      clearItemInputs();
+    })();
+  </script>
+</body>
+</html>
+

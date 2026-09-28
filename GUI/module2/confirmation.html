@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Hot Desks</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}"> 
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools" >
+    </a>
+          <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+    <a href="index.html" class="btn btn-outline-secondary">← Go back</a>
+  </div>
+  </div>
+</header>
+
+<div id="page-container">
+  <div class="container">
+    <div class="resumen-box reservation-summary-layout">
+      <div class="reservation-summary-content">
+        <h2 class="text-danger">Reservation Summary</h2>
+        <div id="resumen"></div>
+        <div id="form-extra" class="mt-4"></div>
+
+        <button id="confirmarBtn" class="btn btn-danger mt-3">
+          Confirm Reservation
+        </button>
+      </div>
+
+      <div class="image-container reservation-map-container">
+        <img id="floorImage" src="" alt="Plano de planta">
+        <div id="pointer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src="./assets/js/getUserEmail.js?v={{.AppVersion}}"></script>
+  <script>
+    // leer reserva
+    const reserva = JSON.parse(sessionStorage.getItem("reservaSeleccionada"));
+ 
+    // carga dinámica resumen
+    document.getElementById("resumen").innerHTML = `
+      <ul class="list-group">
+        <li class="list-group-item"><strong>Office.Desk:</strong> ${reserva.name}</li>
+        <li class="list-group-item"><strong>Floor:</strong> ${reserva.floor}</li>
+        <li class="list-group-item"><strong>From:</strong> ${reserva.startTime}</li>
+        <li class="list-group-item"><strong>Until:</strong> ${reserva.endTime}</li>
+      </ul>
+    `;
+
+    // muestra imagen de la planta correspondiente (se puede mejorar añadiendo un puntero a la posición exacta de la mesa)
+     const floorImages = {
+      0: "assets/images/PlanolPB.png",
+      1: "assets/images/PlanolPlanta1.png",
+      2: "assets/images/PlanolPlanta2.png"
+    };
+
+    const imgSrc = floorImages[reserva.floor];
+    if (imgSrc) {
+      document.getElementById("floorImage").src = imgSrc;
+    } else {
+      document.getElementById("floorImage").style.display = "none";
+    }
+    const pointer = document.getElementById("pointer");
+
+    floorImage.onload = () => {
+    const pointer = document.getElementById("pointer");
+
+    if (reserva.position) {
+      const [x, y] = reserva.position.split(",").map(Number);
+
+      // Ajustamos por si la imagen está escalada
+      const naturalWidth = floorImage.naturalWidth;
+      const naturalHeight = floorImage.naturalHeight;
+      const displayedWidth = floorImage.clientWidth;
+      const displayedHeight = floorImage.clientHeight;
+
+      const scaleX = displayedWidth / naturalWidth;
+      const scaleY = displayedHeight / naturalHeight;
+
+      const adjustedX = x * scaleX;
+      const adjustedY = y * scaleY;
+
+
+      pointer.style.left = `${adjustedX}px`;
+      pointer.style.top = `${adjustedY}px`;
+      pointer.style.display = "block";
+    }
+  };
+    // Formulario email
+    const formExtra = document.getElementById("form-extra");
+    formExtra.innerHTML = `
+        <div class="mb-3">
+          <label class="form-label"><strong>Concept</label>
+          <input type="text" class="form-control" id="concept" required>
+        </div>
+        <div class="form-group">
+            <label for="email" class="form-label"><strong>Enter your email to receive confirmation:</strong></label>
+            <input type="email" class="form-control" id="email" required>
+        </div>
+        `;
+    const emailInput = document.getElementById("email");
+    emailInput.addEventListener("input", () => {
+      if (emailInput.validity.patternMismatch) {
+        emailInput.setCustomValidity("Indicate an email with an accepted domain.");
+      } else {
+        emailInput.setCustomValidity("");
+      }
+    });
+   // Confirmar reserva
+    document.getElementById("confirmarBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      if (!email) {
+        alert("Please, indicate an email.");
+        return;
+      }
+      if (!emailInput.checkValidity()) {
+        emailInput.reportValidity();
+        return;
+      }
+
+      const conceptInput = document.getElementById("concept").value.trim();
+      if (!conceptInput) {
+        alert("Please, indicate a concept.");
+        return;
+      }
+
+      //Longitud máxima
+      if (conceptInput.length > 100) {
+        alert("Concept is too long (max. 100 characters).");
+        return;
+      }
+
+      //Solo caracteres permitidos
+      const conceptRegex = /^[\p{L}\p{N}\s.,;:()\-_'"]*$/u;
+      if (!conceptRegex.test(conceptInput)) {
+        alert("Concept contains invalid characters.");
+        return;
+      }
+
+      //Bloquear HTML o script
+      const lower = conceptInput.toLowerCase();
+      if (lower.includes("<script") || lower.includes("<\/script") || lower.includes("javascript:")) {
+        alert("Concept contains forbidden content.");
+        return;
+      }
+      
+
+      let asistentes = [];
+      const payload = {
+        table_id: reserva.id,
+        concept: conceptInput,
+        start_date: reserva.startTime,
+        end_date: reserva.endTime,
+        email: email,
+        asistentes: asistentes
+      };
+
+      const response = await fetch("/module/proxy/module2/api", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        alert("Successful reservation.");
+        window.location.href = "index.html";
+      } else {
+        alert("Error booking.");
+      }
+  });
+  </script>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+
+  <!-- FOOTER -->
+  <footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+      <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+      <span id="load-info">Calculating load time...</span>
+    </div>
+
+    <script type="module">
+      import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+      
+      measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+      });
+    </script>
+  </footer>
+</body>
+</html>

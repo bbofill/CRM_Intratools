@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Import data</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}"> 
+  <link rel="stylesheet" href="/assets/css/cropper.min.css?v={{.AppVersion}}" />
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+  <style>
+    .modal-body {
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+    </a>
+          <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+    <a href="trainings.html" class="btn btn-outline-secondary">← Go back</a>
+  </div>
+  </div>
+</header>
+
+<div id="page-container">
+    <div>
+      <main class="container">
+        <h2 id="groupHubTitle">Trainings Hub</h2>
+        <div class="d-flex justify-content-end mb-3">
+          <button id="openAddUserModalBtn" class="btn btn-success">
+            + Add user to this training
+          </button>
+        </div>
+        <div id="user-list" class="row row-cols-1 row-cols-md-2 g-4 mt-3"></div>
+      </main>
+    </div>
+  </div>
+
+<!-- Modal -->
+<div class="modal fade" id="editTrainingInfoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="trainingInfoForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Training Info</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        
+        <input type="hidden" id="name" name="name">
+        <input type="hidden" id="surname" name="surname">
+
+        <input type="hidden" id="trainingUserId" name="people_id">
+        <input type="hidden" id="trainingId" name="training_id">
+
+        <div class="mb-3">
+          <label for="trainingDate" class="form-label">Completion date</label>
+          <input type="date" class="form-control" id="trainingDate" name="date">
+        </div>
+
+        <div class="mb-3">
+          <label for="trainingDiploma" class="form-label">Diploma (PDF)</label>
+          <input type="file" class="form-control" id="trainingDiploma" name="diploma" accept=".pdf">
+          <div id="trainingDiplomaPreview" class="mt-2"></div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserToTrainingModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="addUserToTrainingForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add User to Training</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Campo de selección con datalist -->
+        <div class="mb-3">
+          <label for="newUserInput" class="form-label">Select User</label>
+          <input type="text" class="form-control" id="newUserInput" list="userOptions" autocomplete="off">
+          <input type="hidden" id="newUserId" name="people_id">
+          <datalist id="userOptions"></datalist>
+          <div class="invalid-feedback">You must select a valid user from the list.</div>
+        </div>
+
+        <input type="hidden" id="newUserName" name="name">
+        <input type="hidden" id="newUserSurname" name="surname">
+        <!-- Fecha -->
+        <div class="mb-3">
+          <label for="newTrainingDate" class="form-label">Completion date</label>
+          <input type="date" class="form-control" id="newTrainingDate" name="date">
+        </div>
+
+        <!-- Diploma -->
+        <div class="mb-3">
+          <label for="newTrainingDiploma" class="form-label">Diploma (PDF)</label>
+          <input type="file" class="form-control" id="newTrainingDiploma" name="diploma" accept=".pdf">
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Add User</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+    window.APP_VERSION = "{{.AppVersion}}";
+</script>
+<script type="module" src="./assets/js/trainingMembers.js?v={{.AppVersion}}"></script>
+<script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+
+
+
+<!-- Footer -->
+<footer class="bg-danger text-light py-3 mt-4">
+  <div class="container d-flex justify-content-between align-items-center small">
+    <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+    <span id="load-info">Calculating load time...</span>
+  </div>
+  <script type="module">
+    import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+    measurePageLoadTime({
+      targetId: 'load-info',
+      precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+    });
+  </script>
+</footer>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+</html>

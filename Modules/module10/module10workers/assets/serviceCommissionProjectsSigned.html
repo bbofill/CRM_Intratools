@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Service Commission Signed</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f5f7f8;
+            color: #263238;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 30px auto;
+            padding: 30px 26px;
+            max-width: 650px;
+            background-color: #ffffff;
+            border: 1px solid #d8e1e5;
+            border-radius: 10px;
+            box-shadow: 0 2px 7px rgba(28, 43, 51, 0.06);
+        }
+        img {
+            display: block;
+            max-width: 120px;
+            margin: 0 auto 16px;
+        }
+        h1 {
+            margin: 8px 0 14px;
+            text-align: center;
+            color: #2e7d32;
+            font-size: 24px;
+        }
+        p {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .status {
+            margin: 24px 0;
+            padding: 13px 18px;
+            border-left: 5px solid #43a047;
+            background-color: #edf7ed;
+            border-radius: 6px;
+            color: #1b5e20;
+            font-size: 15px;
+        }
+        .summary {
+            margin: 20px 0;
+            padding: 14px 16px;
+            background-color: #f8fafb;
+            border: 1px solid #dbe5e9;
+            border-radius: 6px;
+        }
+        .summary p {
+            margin: 8px 0;
+        }
+        .summary strong {
+            display: inline-block;
+            min-width: 140px;
+            color: #37474f;
+        }
+        .note {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 13px;
+            color: #7a8a91;
+        }
+        .footer {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 13px;
+            color: #607d8b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{.LogoURL}}" alt="CRM Logo">
+        <h1>{{.Title}}</h1>
+
+        <p>Hello <strong>{{.Recipient}}</strong>,</p>
+        <p>{{.Intro}}</p>
+
+        <div class="status">
+            The final signed document is now available in the Service Commissions module.
+        </div>
+
+        <div class="summary">
+            <p><strong>Request:</strong> {{.RequestCode}}</p>
+            <p><strong>Applicant:</strong> {{.Applicant}}</p>
+            <p><strong>Project:</strong> {{.Project}}</p>
+            <p><strong>Destination:</strong> {{.Destination}}</p>
+            <p><strong>Purpose:</strong> {{.Purpose}}</p>
+            <p><strong>Travel dates:</strong> {{.TravelDates}}</p>
+            <p><strong>Signed notice:</strong> {{.GeneratedAt}}</p>
+        </div>
+
+        <p class="note">Please do not reply to this email — this inbox is not monitored.</p>
+
+        <div class="footer">
+            Thank you for using<br>
+            <strong>{{.ModuleName}}</strong>
+        </div>
+    </div>
+</body>
+</html>

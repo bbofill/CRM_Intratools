@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Service Commission Pending Validation</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f6f6f4;
+            color: #2e3436;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 30px auto;
+            padding: 30px 26px;
+            max-width: 650px;
+            background-color: #ffffff;
+            border: 1px solid #ddded8;
+            border-radius: 10px;
+            box-shadow: 0 2px 7px rgba(35, 39, 41, 0.06);
+        }
+        img {
+            display: block;
+            max-width: 120px;
+            margin: 0 auto 16px;
+        }
+        h1 {
+            margin: 8px 0 14px;
+            text-align: center;
+            color: #455a64;
+            font-size: 24px;
+        }
+        p {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .action {
+            margin: 24px 0;
+            padding: 13px 18px;
+            border-left: 5px solid #607d8b;
+            background-color: #eef3f5;
+            border-radius: 6px;
+            color: #263238;
+            font-size: 15px;
+        }
+        .summary {
+            margin: 20px 0;
+            padding: 14px 16px;
+            background-color: #fafafa;
+            border: 1px solid #dedede;
+            border-radius: 6px;
+        }
+        .summary p {
+            margin: 8px 0;
+        }
+        .summary strong {
+            display: inline-block;
+            min-width: 140px;
+            color: #37474f;
+        }
+        .note {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 13px;
+            color: #7a7a72;
+        }
+        .footer {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 13px;
+            color: #6c7478;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{.LogoURL}}" alt="CRM Logo">
+        <h1>{{.Title}}</h1>
+
+        <p>Hello <strong>{{.Recipient}}</strong>,</p>
+        <p>{{.Intro}}</p>
+
+        <div class="action">
+            Please open the service commission in the <strong>Final approvals</strong> section of the Service Commissions module and validate the PDF when everything is correct.
+        </div>
+
+        <div class="summary">
+            <p><strong>Request:</strong> {{.RequestCode}}</p>
+            <p><strong>Applicant:</strong> {{.Applicant}}</p>
+            <p><strong>Project:</strong> {{.Project}}</p>
+            <p><strong>Destination:</strong> {{.Destination}}</p>
+            <p><strong>Purpose:</strong> {{.Purpose}}</p>
+            <p><strong>Travel dates:</strong> {{.TravelDates}}</p>
+            <p><strong>Notice sent:</strong> {{.GeneratedAt}}</p>
+        </div>
+
+        <p class="note">Please do not reply to this email — this inbox is not monitored.</p>
+
+        <div class="footer">
+            Thank you for using<br>
+            <strong>{{.ModuleName}}</strong>
+        </div>
+    </div>
+</body>
+</html>

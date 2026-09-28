@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Hot Desks</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}"> 
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools" >
+    </a>
+          <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+    <a href="modifyReservation.html" class="btn btn-outline-secondary">← Go back</a>
+  </div>
+  </div>
+</header>
+  <div id="page-container">
+    <div class="container">
+      <h2 class="text-danger mb-3">Edit Reservation</h2>
+
+      <div class="alert alert-info" role="alert">
+        You can only shorten or cancel your reservation. If you wish to change any other detail, please cancel this reservation and make a new one.
+      </div>
+
+      <div class="edit-reservation-layout">
+        <form id="editForm" class="edit-reservation-form">
+          <div class="mb-3">
+            <label class="form-label">Office, Desk</label>
+            <input type="text" class="form-control" id="tableName" disabled>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Concept</label>
+            <input type="text" class="form-control" id="concept">
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label class="form-label">Start Date</label>
+              <input type="date" class="form-control" id="startDate" required>
+
+              <label class="form-label mt-2">Start Time</label>
+              <input type="time" class="form-control" id="startTime" required>
+            </div>
+
+            <div class="col">
+              <label class="form-label">End Date</label>
+              <input type="date" class="form-control" id="endDate" required>
+
+              <label class="form-label mt-2">End Time</label>
+              <input type="time" class="form-control" id="endTime" required>
+            </div>
+          </div>
+
+          <div class="edit-reservation-actions mt-3">
+            <button type="button" class="btn btn-outline-danger" id="cancelBtn">
+              Cancel Reservation
+            </button>
+
+            <button type="submit" class="btn btn-danger">
+              Save Changes
+            </button>
+          </div>
+        </form>
+
+        <div class="image-container reservation-map-container edit-reservation-map">
+          <img id="floorImage" src="" alt="Floor plan">
+          <div id="pointer"></div>
+        </div>
+      </div>
+
+    <script>
+      // consultar reserva a modificar
+        const reserva = JSON.parse(sessionStorage.getItem("reservaModificar"));
+
+        // funciones auxiliares para igualar formatos de fechas
+        function toExactDate(isoString) {
+            const [datePart] = isoString.split("T");
+            return datePart;
+            }
+        function toExactTime(isoString) {
+            const [, timePart] = isoString.split("T");
+            const [hour, minute] = timePart.split(":");
+            return `${hour}:${minute}`;
+            }
+        function formatLocalDateTime(date) {
+          const yyyy = date.getFullYear();
+          const mm = String(date.getMonth() + 1).padStart(2, '0');
+          const dd = String(date.getDate()).padStart(2, '0');
+          const hh = String(date.getHours()).padStart(2, '0');
+          const min = String(date.getMinutes()).padStart(2, '0');
+          const ss = String(date.getSeconds()).padStart(2, '0');
+          return `${yyyy}-${mm}-${dd}T${hh}:${min}:${ss}Z`;
+        }
+      
+        //document.getElementById("reservationId").value = reserva.id;
+        document.getElementById("tableName").value = reserva.table_name;
+        document.getElementById("concept").value = reserva.concept;
+        document.getElementById("startDate").value = toExactDate(reserva.start_date);
+        document.getElementById("startTime").value = toExactTime(reserva.start_date);
+        document.getElementById("endDate").value = toExactDate(reserva.end_date);
+        document.getElementById("endTime").value = toExactTime(reserva.end_date);
+      
+        if (toExactDate(reserva.start_date) === toExactDate(reserva.end_date)) {
+          document.getElementById("endDate").setAttribute("disabled", true);
+          document.getElementById("startDate").setAttribute("disabled", true);
+        }
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
+                
+        if (toExactDate(reserva.start_date) === todayStr) {
+          document.getElementById("startDate").setAttribute("disabled", true);
+        }
+      
+        const floorImages = {
+          0: "assets/images/PlanolPB.png",
+          1: "assets/images/PlanolPlanta1.png",
+          2: "assets/images/PlanolPlanta2.png"
+        };
+
+        const floorImage = document.getElementById("floorImage");
+        const pointer = document.getElementById("pointer");
+
+        const floorValue = reserva.floor;
+        const imgSrc = floorImages[floorValue];
+
+        if (imgSrc) {
+          floorImage.src = imgSrc;
+        } else {
+          floorImage.style.display = "none";
+        }
+
+        floorImage.onload = () => {
+          const positionValue =
+            reserva.position ||
+            "";
+
+          if (!positionValue) return;
+
+          const [x, y] = String(positionValue).split(",").map(Number);
+
+          if (Number.isNaN(x) || Number.isNaN(y)) return;
+
+          const scaleX = floorImage.clientWidth / floorImage.naturalWidth;
+          const scaleY = floorImage.clientHeight / floorImage.naturalHeight;
+
+          pointer.style.left = `${x * scaleX}px`;
+          pointer.style.top = `${y * scaleY}px`;
+          pointer.style.display = "block";
+        };
+        // -------------------------------------------------------------
+        // edit reservation
+        document.getElementById("editForm").addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const now = new Date();
+          const date = document.getElementById("endDate").value;
+          const time = document.getElementById("endTime").value;
+          const end_date = `${date} ${time}`;
+          const startDateInput = document.getElementById("startDate").value;
+          const startTimeInput = document.getElementById("startTime").value;
+          const conceptInput = document.getElementById("concept").value;
+          const start_date = `${startDateInput} ${startTimeInput}`;
+      
+
+          const start_date_str = `${document.getElementById("startDate").value}T${document.getElementById("startTime").value}:00Z`;
+          const startDate = new Date(start_date_str);
+          const end_date_str = `${document.getElementById("endDate").value}T${document.getElementById("endTime").value}:00Z`;
+          const endDate = new Date(end_date_str);
+          const proposedEnd = new Date(`${date}T${time}`);
+          const msDiff = startDate - now;
+          const hoursDiff = msDiff / (1000 * 60 * 60);
+
+          if (start_date_str < reserva.start_date) {
+            alert("You cannot advance the reservation's start time.");
+            location.reload() 
+            return;
+          }
+
+          if (hoursDiff < 2) {
+            alert("You can no longer modify this reservation (less than 2 hours remaining).");
+            window.location.href = "index.html";
+          }
+          if (end_date_str > reserva.end_date) {
+            alert("You can only shorten your reservation.");
+            location.reload() 
+            return;
+          }
+
+          if (toExactDate(reserva.start_date) === date && proposedEnd > startDate) {
+            alert("You can only shorten your reservation.");
+            location.reload() 
+            return;
+          }
+
+          if (start_date_str > end_date_str) {
+            alert("End date must be after start date.");
+            location.reload() 
+            return;
+          }
+
+          if (!conceptInput) {
+            alert("Please, indicate a concept.");
+            return;
+          }
+
+          //Longitud máxima
+          if (conceptInput.length > 100) {
+            alert("Concept is too long (max. 100 characters).");
+            return;
+          }
+
+          //Solo caracteres permitidos
+          const conceptRegex = /^[\p{L}\p{N}\s.,;:()\-_'"]*$/u;
+          if (!conceptRegex.test(conceptInput)) {
+            alert("Concept contains invalid characters.");
+            return;
+          }
+
+          //Bloquear HTML o script
+          const lower = conceptInput.toLowerCase();
+          if (lower.includes("<script") || lower.includes("<\/script") || lower.includes("javascript:")) {
+            alert("Concept contains forbidden content.");
+            return;
+          }
+          
+
+          // enviar modificación
+          const payload = {
+            reservation_id: reserva.id,
+            concept: conceptInput,
+            start_date: start_date,
+            end_date: end_date,
+          };
+      
+          const response = await fetch("/module/proxy/module2/api", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+      
+          if (response.ok) {
+            alert("Reservation updated successfully.");
+            window.location.href = "modifyReservation.html";
+          } else {
+            const res = await response.json();
+            alert(res.error || "Error updating reservation.");
+          }
+        });
+      
+        // cancelar reserva
+        document.getElementById("cancelBtn").addEventListener("click", async () => {
+          if (!confirm("Are you sure you want to cancel this reservation?")) return;
+      
+          const response = await fetch("/module/proxy/module2/api", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reservation_id: reserva.id })
+          });
+      
+          if (response.ok) {
+            alert("Reservation cancelled.");
+            window.location.href = "index.html";
+          } else {
+            alert("Error cancelling reservation.");
+          }
+        });
+      </script>
+  <!-- FOOTER -->
+  <footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+      <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+      <span id="load-info">Calculating load time...</span>
+    </div>
+
+    <script type="module">
+      import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+
+      measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+      });
+    </script>
+  </footer>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+
+</html>

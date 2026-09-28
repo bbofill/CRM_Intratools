@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Budget Request Cancelled by Investigator</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 30px auto;
+            padding: 30px 25px;
+            max-width: 600px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 10px;
+            color: #c0392b;
+        }
+        p {
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .status {
+            border-left: 5px solid #c0392b;
+            padding: 12px 18px;
+            margin: 25px 0;
+            font-size: 1.05em;
+            border-radius: 6px;
+            background-color: #fdecea;
+            color: #8a1f17;
+        }
+        .summary {
+            margin: 20px 0;
+            padding: 14px 16px;
+            background-color: #f8f9fb;
+            border: 1px solid #d9e1ea;
+            border-radius: 6px;
+            color: #2f3b45;
+        }
+        .summary p {
+            margin: 8px 0;
+        }
+        .summary strong {
+            display: inline-block;
+            min-width: 155px;
+        }
+        .reason {
+            margin-top: 10px;
+            padding: 12px 14px;
+            background-color: #fff8f7;
+            border: 1px solid #f1c1bb;
+            border-radius: 6px;
+            color: #5c2b27;
+            white-space: pre-line;
+        }
+        .highlight {
+            margin-top: 10px;
+            padding: 12px 14px;
+            background-color: #fff8f7;
+            border: 1px solid #f4c7c3;
+            border-radius: 6px;
+            color: #6a2d27;
+        }
+        .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            display: block;
+            max-width: 120px;
+            margin: 0 auto 15px;
+        }
+        .note {
+            font-size: 13px;
+            color: #999;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://issues.crm.cat/assets/images/crmlogo.jfif" alt="CRM Logo">
+
+        <h1>Budget Request Cancelled by Worker</h1>
+
+        <p>Hello <strong>{{.Name}} {{.Surname}}</strong>,</p>
+
+        <p>
+            We would like to inform you that the following budget request has been <strong>cancelled by the worker</strong> who submitted it.
+        </p>
+
+        <div class="highlight">
+            <strong>{{.ResearcherName}} {{.ResearcherSurname}}</strong> has cancelled the request associated with the project <strong>{{.ProjectName}}</strong>.
+        </div>
+
+        <div class="summary">
+            <p><strong>Worker:</strong> {{.ResearcherName}} {{.ResearcherSurname}}</p>
+            <p><strong>Responsible:</strong> {{.PIName}} {{.PISurname}}</p>
+            <p><strong>Project:</strong> {{.ProjectName}}</p>
+            <p><strong>Request type:</strong> {{.RequestType}}</p>
+            <p><strong>Submitted on:</strong> {{.CreatedAt}}</p>
+            <p><strong>Cancelled on:</strong> {{.UpdatedAt}}</p>
+            <p><strong>Request summary:</strong> {{.RequestSummary}}</p>
+        </div>
+
+        <p>
+            The reason provided for the cancellation is the following:
+        </p>
+
+        <div class="reason">
+            {{.Message}}
+        </div>
+
+        <div class="status">
+            This request is no longer active. Make sure to take it into account for your records and planning.
+        </div>
+
+        <p class="note">
+            Please do not reply to this email — this inbox is not monitored.
+        </p>
+
+        <div class="footer">
+            Thank you for using <br>
+            <strong>CRM Intratools Budgeting</strong>
+        </div>
+    </div>
+</body>
+</html>

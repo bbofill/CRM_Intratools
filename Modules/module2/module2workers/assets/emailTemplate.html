@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reservation Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 600px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #d9534f;
+            text-align: center;
+        }
+        p {
+            line-height: 1.6;
+        }
+        a {
+            display: inline-block;
+            margin-top: 15px;
+            color: #d9534f;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        img {
+            display: block;
+            max-width: 120px;
+            margin: 0 auto 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://issues.crm.cat/assets/images/crmlogo.jfif" alt="Logo CRM"> 
+        <h1>Reservation Confirmed</h1>
+
+        <p>Your reservation for <strong>table {{.Name}}</strong> is confirmed.</p>
+        <p>
+            <strong>From:</strong> {{.StartDate}}<br>
+            <strong>Until:</strong> {{.EndDate}}
+        </p>
+        <p>You'll be able to modify your reservation until two hours before it starts.</p>
+
+        <a href="https://www.crm.cat/">Visit CRM</a>
+
+        <div class="footer">
+            Thank you for using <br>
+            <strong>CRM Hot Desks</strong>
+        </div>
+    </div>
+</body>
+</html>

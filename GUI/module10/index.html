@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Service Commissions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/tutorialStyles.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png">
+</head>
+
+<body>
+  <header class="bg-light border-bottom">
+    <div class="container d-flex justify-content-between align-items-center py-3">
+      <a href="/main" aria-label="Go to CRMIntratools home">
+        <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools">
+      </a>
+
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative" aria-label="Notifications">
+          <img src="/assets/images/bell.png" alt="" style="width: 30px;">
+          <span id="notif-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"></span>
+        </a>
+
+        <a href="/main" class="btn btn-outline-secondary">← Go back</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="page-container">
+    <main class="container service-page">
+      <section class="service-hero service-hero--clean">
+        <div>
+          <span class="service-eyebrow"></span>
+          <h1 class="text-danger mb-2">Service commissions</h1>
+          <p class="text-muted mb-0">
+            Submit travel expenses, register diets by date/time and follow their review status from one workspace.
+          </p>
+        </div>
+      </section>
+
+      <!-- QUICK SUMMARY -->
+      <section class="service-summary-grid" id="serviceSummaryGrid" aria-label="Service commission summary">
+        <article class="service-summary-card service-summary-card--highlight" id="latestStatus">
+          <div class="summary-card-topline">
+            <span>Latest commission</span>
+            <span class="status-badge d-none" id="latestCommissionStatus"></span>
+          </div>
+
+          <h2 id="latestCommissionTravelName">No commissions submitted yet.</h2>
+          <p class="text-muted mb-3" id="latestCommissionMessage">
+            Your latest service commission will appear here once submitted.
+          </p>
+
+          <div class="latest-request-summary compact-summary d-none" id="latestCommissionSummary">
+            <div>
+              <span class="summary-label">Submitted</span>
+              <strong id="latestCommissionSubmitted"></strong>
+            </div>
+            <div>
+              <span class="summary-label">Total</span>
+              <strong id="latestCommissionTotal"></strong>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-sm btn-outline-secondary mt-3 d-none" id="viewFullStatusBtn">
+            View full status
+          </button>
+        </article>
+
+        <article class="service-summary-card" id="pendingReviewSummaryCard">
+          <span class="summary-label">Pending review</span>
+          <strong id="pendingReviewCount">0</strong>
+          <p class="text-muted small mb-0">Submissions waiting for project-team validation.</p>
+        </article>
+
+        <article class="service-summary-card" id="readyToExportSummaryCard">
+          <span class="summary-label">Ready to export</span>
+          <strong id="readyToExportCount">0</strong>
+          <p class="text-muted small mb-0">Approved commissions prepared for finance export.</p>
+        </article>
+      </section>
+
+      <!-- WORKSPACE TABS -->
+      <ul class="nav nav-pills service-workspace-tabs" id="serviceCommissionTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="submit-tab" data-bs-toggle="pill" data-bs-target="#submitPane" type="button" role="tab" aria-controls="submitPane" aria-selected="true">
+            Submit expense
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="my-commissions-tab" data-bs-toggle="pill" data-bs-target="#myCommissionsPane" type="button" role="tab" aria-controls="myCommissionsPane" aria-selected="false">
+            My commissions
+          </button>
+        </li>
+	        <li class="nav-item" role="presentation">
+	          <button class="nav-link" id="project-review-tab" data-bs-toggle="pill" data-bs-target="#projectReviewPane" type="button" role="tab" aria-controls="projectReviewPane" aria-selected="false">
+	            Project review
+	          </button>
+	        </li>
+	        <li class="nav-item d-none" role="presentation">
+	          <button class="nav-link" id="stakeholder-approval-tab" data-bs-toggle="pill" data-bs-target="#stakeholderApprovalPane" type="button" role="tab" aria-controls="stakeholderApprovalPane" aria-selected="false">
+	            Final approvals
+	          </button>
+	        </li>
+	        <li class="nav-item d-none" role="presentation" id="rates-management-tab-item">
+          <button class="nav-link" id="rates-management-tab" data-bs-toggle="pill" data-bs-target="#ratesManagementPane" type="button" role="tab" aria-controls="ratesManagementPane" aria-selected="false">
+            Rates management
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content service-workspace" id="serviceCommissionTabsContent">
+        <!-- SUBMIT EXPENSE -->
+        <section class="tab-pane fade show active" id="submitPane" role="tabpanel" aria-labelledby="submit-tab" tabindex="0">
+          <div class="service-layout service-layout--balanced" id="newCommission">
+            <form id="serviceCommissionForm" class="service-card service-form-card">
+              <div class="section-heading">
+                <div>
+                  <span class="service-step">Step 1</span>
+                  <h5 class="text-danger mb-1">Travel information</h5>
+                  <p class="text-muted mb-0">Choose an approved Budgeting trip or create a manual travel entry.</p>
+                </div>
+              </div>
+
+              <div class="travel-source-box service-inner-box">
+                <div class="travel-choice travel-choice--compact" role="radiogroup" aria-label="Travel source">
+                  <input class="btn-check" type="radio" name="travelSource" id="useExistingTravel" value="existing" checked>
+                  <label class="travel-choice-card" for="useExistingTravel">
+                    <strong>Use existing travel</strong>
+                    <span>Select a trip already registered in Budgeting.</span>
+                  </label>
+
+                  <input class="btn-check" type="radio" name="travelSource" id="createNewTravel" value="new">
+                  <label class="travel-choice-card" for="createNewTravel">
+                    <strong>Create new travel</strong>
+                    <span>Add the travel details manually.</span>
+                  </label>
+                </div>
+
+                <div id="existingTravelBlock" class="travel-block mt-3">
+                  <label for="budgetingTravel" class="form-label">Budgeting travel request</label>
+                  <select class="form-select" id="budgetingTravel" name="budgetingTravelId">
+                    <option value="">Loading available travels...</option>
+                  </select>
+                  <div id="budgetingTravelFeedback" class="form-text">
+                    Only approved travels without an associated service commission are shown.
+                  </div>
+                </div>
+
+                <div id="newTravelBlock" class="travel-block d-none mt-3">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label">From where</label>
+                      <input type="text" class="form-control" name="travel_from_where" placeholder="City / airport / address">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">To where</label>
+                      <input type="text" class="form-control" name="travel_to_where" placeholder="City / airport / address">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="destination" class="form-label">Destination</label>
+                      <input type="text" class="form-control" id="destination" name="destination" placeholder="Institution / university / center">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="travelPurpose" class="form-label">Purpose of travel</label>
+                      <input type="text" class="form-control" id="travelPurpose" name="travelPurpose" placeholder="Briefly describe the reason for the trip">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="startDate" class="form-label">Travel start date</label>
+                      <input type="date" class="form-control" id="startDate" name="startDate">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="endDate" class="form-label">Travel end date</label>
+                      <input type="date" class="form-control" id="endDate" name="endDate">
+                    </div>
+                    <div class="col-md-12">
+                      <label class="form-label">Project</label>
+                      <select class="form-select" name="travel_project">
+                        <option value="">Select...</option>
+                      </select>
+                    </div>
+                    <div class="col-12">
+                      <label for="travelAttendanceCertificate" class="form-label">Attendance certificate</label>
+                      <input
+                        class="form-control"
+                        type="file"
+                        id="travelAttendanceCertificate"
+                        name="travel_attendance_certificate"
+                        accept=".pdf,application/pdf"
+                        multiple
+                        data-max-files="1"
+                      >
+                      <div class="form-text">Upload only PDF files. Maximum file size: 10MB.</div>
+                    <div class="selected-files-list mt-2" data-files-list="travel_attendance_certificate"></div>
+                    </div>
+                    <div data-server-files="travel" class="mt-2"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-divider"></div>
+
+              <div class="expense-section">
+                <div class="expense-section-title section-heading section-heading--inline">
+                  <div>
+                    <span class="service-step">Step 2</span>
+                    <h5 class="text-danger mb-1">Expense details</h5>
+                    <p class="text-muted mb-0">Add one or more expenses and attach the required receipts.</p>
+                  </div>
+
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="addExpenseBtn">
+                    + Add expense
+                  </button>
+                </div>
+
+                <div id="expensesContainer" class="expenses-stack">
+                  <div class="expense-item" data-expense-index="1">
+                    <div class="expense-item-header">
+                      <span class="expense-chip">Expense 1</span>
+                      <button type="button" class="btn btn-sm btn-outline-danger remove-expense-btn d-none">
+                        Remove
+                      </button>
+                    </div>
+
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <label class="form-label" for="expenseType_1">Expense type</label>
+                        <select class="form-select expense-type-select" id="expenseType_1" name="expenses[0][type]" required>
+                          <option value="">Select expense...</option>
+                          <option value="mileage">Mileage</option>
+                          <option value="transport">Transport</option>
+                          <option value="accommodation">Accommodation</option>
+                          <option value="per_diem">Per diem / Diets</option>
+                          <option value="tax">Tourist tax</option>
+                          <option value="registration">Registration</option>
+                          <option value="poster">Poster printing</option>
+                        </select>
+                      </div>
+
+                      <div class="col-md-6 amount-block">
+                        <label class="form-label amount-label" for="amount_1">Amount (EUR)</label>
+                        <input
+                          type="text"
+                          class="form-control amount-input"
+                          id="amount_1"
+                          name="expenses[0][amount]"
+                          inputmode="decimal"
+                          autocomplete="off"
+                          placeholder="0.00"
+                          required
+                        >                      
+                      </div>
+
+                      <div class="col-md-6 transport-method-block d-none">
+                        <label class="form-label" for="transportMethod_1">Means of transport</label>
+                        <select
+                          class="form-select transport-method-input"
+                          id="transportMethod_1"
+                          name="expenses[0][transport_method]"
+                        >
+                          <option value="">Select means...</option>
+                          <option value="plane">Plane</option>
+                          <option value="train">Train</option>
+                          <option value="bus">Bus</option>
+                          <option value="Taxi">Taxi</option>
+                          <option value="Metro">Metro</option>
+                          <option value="public_transport">Public transport</option>
+                          <option value="boat">Boat</option>
+                        </select>
+                      </div>
+
+                      <div class="col-12 per-diem-block d-none">
+                        <div class="row g-3">
+                          <div class="col-md-6">
+                            <label class="form-label" for="departureDate_1">Departure date</label>
+                            <input type="date" class="form-control per-diem-input" id="departureDate_1" name="expenses[0][departure_date]">
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label" for="departureTime_1">Departure time</label>
+                            <input type="time" class="form-control per-diem-input" id="departureTime_1" name="expenses[0][departure_time]">
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label" for="returnDate_1">Return date</label>
+                            <input type="date" class="form-control per-diem-input" id="returnDate_1" name="expenses[0][return_date]">
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label" for="returnTime_1">Return time</label>
+                            <input type="time" class="form-control per-diem-input" id="returnTime_1" name="expenses[0][return_time]">
+                          </div>
+                          <div class="col-12 per-diem-breakfast-block d-none">
+                            <div class="form-check">
+                              <input class="form-check-input per-diem-breakfast-input" type="checkbox" id="breakfastIncluded_1" name="expenses[0][breakfast_included]">
+                              <label class="form-check-label" for="breakfastIncluded_1">
+                                Breakfast was included in the accommodation
+                              </label>
+                            </div>
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label" for="eventMealsCovered_1">Did you attend an event that covered any meals?</label>
+                            <select class="form-select per-diem-event-input" id="eventMealsCovered_1" name="expenses[0][event_meals_covered]">
+                              <option value="no">No</option>
+                              <option value="yes">Yes</option>
+                            </select>
+                          </div>
+                          <div class="col-12 per-diem-event-counts d-none">
+                            <div class="row g-3">
+                              <div class="col-md-6">
+                                <label class="form-label" for="coveredMeals_1">Meals covered</label>
+                                <input type="number" min="0" step="1" class="form-control per-diem-covered-meals-input" id="coveredMeals_1" name="expenses[0][covered_meals]" value="0">
+                              </div>
+                              <div class="col-md-6">
+                                <label class="form-label" for="coveredDinners_1">Dinners covered</label>
+                                <input type="number" min="0" step="1" class="form-control per-diem-covered-dinners-input" id="coveredDinners_1" name="expenses[0][covered_dinners]" value="0">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-12">
+                            <div class="per-diem-breakdown alert alert-light border mb-0" aria-live="polite">
+                              Complete departure and return date/time to calculate per diem allowances.
+                            </div>
+                            <input type="hidden" class="per-diem-breakdown-input" name="expenses[0][per_diem_breakdown]">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <label class="form-label" for="description_1">Description</label>
+                        <textarea class="form-control" id="description_1" name="expenses[0][description]" rows="2" placeholder="Briefly describe the expense and its relation to the travel."></textarea>
+                      </div>
+
+                      <div class="col-12 receipt-block">
+                        <label class="form-label" for="receiptFile_1">Receipt / invoice</label>
+                        <input type="file" class="form-control receipt-input" id="receiptFile_1" name="expenses[0][receipt]" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <div class="form-text receipt-help">Upload the ticket or invoice. For accommodation, upload an invoice whenever possible.</div>
+                      </div>
+
+                      <div class="col-12 payment-proof-block">
+                        <label class="form-label" for="paymentProofFile_1">Payment proof</label>
+                        <input type="file" class="form-control payment-proof-input" id="paymentProofFile_1" name="expenses[0][payment_proof]" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <div class="form-text">Upload the card/bank payment proof or equivalent supporting document.</div>
+                      </div>
+
+                      <div class="col-12 mileage-proof-block d-none">
+                        <label class="form-label" for="mileageProofFile_1">Mileage screenshot</label>
+                        <input type="file" class="form-control mileage-proof-input" id="mileageProofFile_1" name="expenses[0][mileage_proof]" accept=".pdf,.jpg,.jpeg,.png">
+                        <div class="form-text">Upload a screenshot showing the kilometers made during the trip (e.g. Google Maps).</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="service-actions service-actions--sticky">
+                <button type="reset" class="btn btn-outline-secondary">Clear form</button>
+                <button type="submit" class="btn btn-danger">Submit expense</button>
+              </div>
+            </form>
+
+            <aside class="service-side service-side--sticky">
+              <div class="service-card service-info-card  service-info-card--soft">
+                <h5 class="text-danger">Before submitting</h5>
+                <ol class="service-checklist service-checklist--ordered">
+                  <li>Use a Budgeting travel whenever possible.</li>
+                  <li>Submit expenses only after the trip has taken place.</li>
+                  <li>Attach a receipt/invoice and a payment proof for expenses that require them.</li>
+                  <li>For mileage, attach a screenshot showing the kilometers made during the trip.</li>
+                  <li>For accommodation, upload an invoice whenever possible instead of a simple ticket.</li>
+                  <li>For diets, enter departure and return date/time. The amount is calculated from the allowance table.</li>
+                  <li>Use short, clear descriptions.</li>
+                </ol>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- MY COMMISSIONS -->
+        <section class="tab-pane fade" id="myCommissionsPane" role="tabpanel" aria-labelledby="my-commissions-tab" tabindex="0">
+          <div class="service-card previous-commissions-card" id="previousCommissions">
+            <div class="previous-header previous-header--clean">
+              <div>
+                <h5 class="text-danger mb-1">My commissions</h5>
+                <p class="text-muted mb-0">Review previous travel expense submissions and their processing status.</p>
+              </div>
+
+              <div class="previous-filters">
+                <input id="myCommissionSearchInput" type="text" class="form-control" placeholder="Search by code, destination or travel...">
+                <select id="myCommissionStatusFilter" class="form-select">
+                  <option value="">All statuses</option>
+	                  <option value="submitted">Submitted</option>
+	                  <option value="under_review">Under review</option>
+	                  <option value="final_review">Final approvals</option>
+	                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="exported">Exported</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive mt-3">
+              <table class="table table-hover align-middle service-table">
+                <thead class="table-light">
+                  <tr>
+                    <th>Code</th>
+                    <th>Travel</th>
+                    <th>Destination</th>
+                    <th>Submitted</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody id="previousCommissionsBody">
+                  <tr id="previousCommissionsEmptyRow">
+                    <td colspan="7" class="text-center text-muted py-4">
+                      No previous service commissions found.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROJECT REVIEW -->
+        <section class="tab-pane fade" id="projectReviewPane" role="tabpanel" aria-labelledby="project-review-tab" tabindex="0">
+          <div class="service-card project-review-card" id="projectManagementPanel">
+            <div class="previous-header previous-header--clean">
+              <div>
+                <h5 class="text-danger mb-1">Project team review</h5>
+                <p class="text-muted mb-0">Approve expenses, add center costs and export validated commissions.</p>
+              </div>
+
+              <div class="previous-filters project-filters">
+                <input id="projectSearchInput" type="text" class="form-control" placeholder="Search by user, project or code...">
+                <select id="projectStatusFilter" class="form-select">
+                  <option value="">All statuses</option>
+                  <option value="submitted">Submitted</option>
+                  <option value="under_review">Under review</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="exported">Exported</option>
+                </select>
+                <button type="button" class="btn btn-outline-secondary" id="exportSelectedCommissionsBtn">Export selected</button>
+                <button type="button" class="btn btn-danger" id="exportCommissionsBtn">Export approved</button>
+              </div>
+            </div>
+
+            <details class="data-export-panel mt-3" id="serviceCommissionDataExportPanel">
+              <summary>Data exploitation</summary>
+              <div class="data-export-content">
+                <div class="row g-3">
+                  <div class="col-md-3">
+                    <label class="form-label" for="dataExportDateFrom">Signed from</label>
+                    <input type="date" class="form-control" id="dataExportDateFrom">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label" for="dataExportDateTo">Signed to</label>
+                    <input type="date" class="form-control" id="dataExportDateTo">
+                  </div>
+                  <div class="col-md-6">
+                    <span class="form-label d-block">Documents</span>
+                    <div class="data-export-checks">
+                      <label><input class="form-check-input data-export-document" type="checkbox" value="tickets" checked> Tickets</label>
+                      <label><input class="form-check-input data-export-document" type="checkbox" value="payment_proofs" checked> Payment Proofs</label>
+                      <label><input class="form-check-input data-export-document" type="checkbox" value="mileage" checked> Mileage</label>
+                      <label><input class="form-check-input data-export-document" type="checkbox" value="commission_pdf" checked> PDF Service Commission</label>
+                      <label><input class="form-check-input data-export-document" type="checkbox" value="attendance_certificate" checked> Attendance Certificate</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                  <div class="col-lg-6">
+                    <div class="data-export-list-header">
+                      <span>Projects</span>
+                      <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-secondary" id="selectAllDataExportProjects">Select all</button>
+                        <button type="button" class="btn btn-outline-secondary" id="clearDataExportProjects">Clear</button>
+                      </div>
+                    </div>
+                    <div class="data-export-option-list" id="dataExportProjects" role="group" aria-label="Projects"></div>
+                  </div>
+                  <div class="col-lg-6">
+                    <div class="data-export-list-header">
+                      <span>People</span>
+                      <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-secondary" id="selectAllDataExportPeople">Select all</button>
+                        <button type="button" class="btn btn-outline-secondary" id="clearDataExportPeople">Clear</button>
+                      </div>
+                    </div>
+                    <div class="data-export-option-list" id="dataExportPeople" role="group" aria-label="People"></div>
+                  </div>
+                </div>
+
+                <div class="data-export-actions">
+                  <span class="text-muted small" id="dataExportHint">Select filters and document types to download an ordered ZIP.</span>
+                  <button type="button" class="btn btn-danger" id="downloadDataExportBtn">Download ZIP</button>
+                </div>
+              </div>
+            </details>
+
+            <div class="project-kpi-row" aria-label="Project review summary">
+              <div>
+                <span class="summary-label">Pending approval</span>
+                <strong id="projectPendingCount">0</strong>
+              </div>
+              <div>
+                <span class="summary-label">Approved</span>
+                <strong id="projectApprovedCount">0</strong>
+              </div>
+              <div>
+                <span class="summary-label">Rejected</span>
+                <strong id="projectRejectedCount">0</strong>
+              </div>
+              <div>
+                <span class="summary-label">Exported</span>
+                <strong id="projectExportedCount">0</strong>
+              </div>
+            </div>
+
+            <div class="table-responsive mt-3">
+              <table class="table table-hover align-middle service-table">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 36px;"><input class="form-check-input" type="checkbox" id="selectAllProjectCommissions" aria-label="Select all commissions"></th>
+                    <th>Code</th>
+                    <th>User</th>
+                    <th>Project</th>
+                    <th>Destination</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody id="projectCommissionsBody">
+                  <tr id="projectCommissionsEmptyRow">
+                    <td colspan="8" class="text-center text-muted py-4">
+                      No commissions pending project-team review.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+	        </section>
+
+	        <!-- FINAL APPROVALS -->
+	        <section class="tab-pane fade" id="stakeholderApprovalPane" role="tabpanel" aria-labelledby="stakeholder-approval-tab" tabindex="0">
+	          <div class="service-card project-review-card">
+	            <div class="previous-header previous-header--clean">
+	              <div>
+	                <h5 class="text-danger mb-1">Final approvals</h5>
+	                <p class="text-muted mb-0">Validate the generated service commission PDF before the electronic seal is applied.</p>
+	              </div>
+
+	              <div class="previous-filters project-filters">
+	                <input id="stakeholderSearchInput" type="text" class="form-control" placeholder="Search by user, project or code...">
+	                <select id="stakeholderStatusFilter" class="form-select">
+	                  <option value="">All statuses</option>
+	                  <option value="pending">Pending</option>
+	                  <option value="approved">Approved</option>
+	                </select>
+	              </div>
+	            </div>
+
+	            <div class="table-responsive mt-3">
+	              <table class="table table-hover align-middle service-table">
+	                <thead class="table-light">
+	                  <tr>
+	                    <th>Code</th>
+	                    <th>Applicant</th>
+	                    <th>Project</th>
+	                    <th>Role</th>
+	                    <th>Status</th>
+	                    <th>Approved at</th>
+	                    <th class="text-end">Actions</th>
+	                  </tr>
+	                </thead>
+	                <tbody id="stakeholderCommissionsBody">
+	                  <tr>
+	                    <td colspan="7" class="text-center text-muted py-4">No final approvals assigned to you.</td>
+	                  </tr>
+	                </tbody>
+	              </table>
+	            </div>
+	          </div>
+	        </section>
+
+	        <!-- RATES MANAGEMENT -->
+        <section class="tab-pane fade" id="ratesManagementPane" role="tabpanel" aria-labelledby="rates-management-tab" tabindex="0">
+          <div class="service-card project-review-card">
+            <div class="previous-header previous-header--clean">
+              <div>
+                <h5 class="text-danger mb-1">Rates management</h5>
+                <p class="text-muted mb-0">Manage accommodation and per diem price tables by territory and group.</p>
+              </div>
+              <button type="button" class="btn btn-danger" id="addPricingTableBtn">+ Add table</button>
+            </div>
+
+            <div class="table-responsive mt-3">
+              <table class="table table-hover align-middle service-table pricing-table-list">
+                <thead class="table-light">
+                  <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Rows</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="pricingTablesBody">
+                  <tr>
+                    <td colspan="5" class="text-center text-muted py-4">No pricing tables loaded.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- LATEST COMMISSION MODAL -->
+  <div class="modal fade" id="latestCommissionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title text-danger">Latest commission status</h5>
+            <p class="text-muted small mb-0" id="latestCommissionModalSubtitle">No commission selected.</p>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="latestCommissionModalBody">
+          <p class="text-muted mb-0">There is no latest commission available yet.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT REVIEW MODAL -->
+  <div class="modal fade" id="projectCommissionReviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title text-danger" id="projectCommissionReviewTitle">Review commission</h5>
+            <p class="text-muted small mb-0" id="projectCommissionReviewSubtitle">Select a commission to review its expenses.</p>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="review-summary-grid mb-4" id="projectCommissionReviewSummary">
+            <div>
+              <span class="summary-label">Applicant</span>
+              <strong id="reviewApplicantName">-</strong>
+            </div>
+            <div>
+              <span class="summary-label">Researcher category</span>
+              <select class="form-select form-select-sm mt-1" id="reviewResearcherCategory">
+                <option value="0">G1</option>
+                <option value="1">G2</option>
+                <option value="2">G3</option>
+              </select>
+              <div class="text-muted small" id="reviewResearcherCategoryHint"></div>
+            </div>
+            <div>
+              <span class="summary-label">Project</span>
+              <strong id="reviewProjectName">-</strong>
+            </div>
+            <div>
+              <span class="summary-label">Destination</span>
+              <strong id="reviewDestination">-</strong>
+            </div>
+            <div>
+              <span class="summary-label">Related task</span>
+              <input type="text" class="form-control form-control-sm mt-1" id="reviewRelatedTask">
+            </div>
+            <div>
+              <span class="summary-label">Total</span>
+              <strong id="reviewTotalAmount">-</strong>
+            </div>
+          </div>
+
+          <div class="review-summary-grid mb-4 d-none" id="manualTravelReviewSummary"></div>
+
+          <div class="d-flex justify-content-between align-items-center mb-3 gap-3 flex-wrap">
+            <div>
+              <h6 class="mb-1">Expenses</h6>
+              <p class="text-muted small mb-0" id="projectCommissionExpensesHelp">Approve or reject individual user expenses.</p>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle service-table">
+              <thead class="table-light">
+                <tr>
+                  <th>Type</th>
+                  <th>Source</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Receipt</th>
+                  <th class="text-end" id="projectCommissionActionsHeader">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="projectCommissionExpensesBody">
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-4">No expenses loaded.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer" id="projectCommissionReviewFooter">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-outline-secondary review-action-btn" id="previewCommissionPdfBtn">Preview PDF</button>
+          <button type="button" class="btn btn-outline-danger review-action-btn" id="rejectCommissionBtn">Reject commission</button>
+          <button type="button" class="btn btn-danger review-action-btn" id="approveCommissionBtn">Approve commission</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER EXPENSE MODAL -->
+  <div class="modal fade" id="centerExpenseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+      <div class="modal-content">
+        <form id="centerExpenseForm">
+          <div class="modal-header">
+            <div>
+              <h5 class="modal-title text-danger">Add center expense</h5>
+              <p class="text-muted small mb-0">Register costs added by the center or project team.</p>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <input type="hidden" name="commission_id" id="centerExpenseCommissionId">
+
+            <div class="mb-3">
+              <label class="form-label" for="centerExpenseType">Expense type</label>
+              <select class="form-select" id="centerExpenseType" name="expense_type" required>
+                <option value="">Select expense...</option>
+                <option value="management_fee">Management fee</option>
+                <option value="mileage">Mileage</option>
+                <option value="transport">Transport</option>
+                <option value="accommodation">Accommodation</option>
+                <option value="per_diem">Per diem / Diets</option>
+                <option value="tax">Tourist tax</option>
+                <option value="registration">Registration</option>
+                <option value="poster">Poster printing</option>
+              </select>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="centerExpenseAmount">Amount</label>
+                <input
+                  type="text"
+                  class="form-control amount-input"
+                  id="centerExpenseAmount"
+                  name="amount"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="0.00"
+                  required
+                >              
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="centerExpenseCurrency">Currency</label>
+                <input class="form-control" id="centerExpenseCurrency" name="currency" value="EUR" readonly>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <label class="form-label" for="centerExpenseDescription">Description</label>
+              <textarea class="form-control" id="centerExpenseDescription" name="description" rows="3" placeholder="Briefly describe why this center expense is added."></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger">Add expense</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- RATES MANAGEMENT MODAL -->
+  <div class="modal fade" id="pricingTableModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content pricing-table-modal-content">
+        <form id="pricingTableForm" class="pricing-table-form">
+          <div class="modal-header">
+            <div>
+              <h5 class="modal-title text-danger" id="pricingTableModalTitle">Pricing table</h5>
+              <p class="text-muted small mb-0">Define flexible territories and G1/G2/G3 amounts.</p>
+            </div>
+            <button type="button" class="btn-close" id="closePricingTableModalBtn" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <input type="hidden" id="pricingTableId">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <label class="form-label" for="pricingTableTitle">Title</label>
+                <input type="text" class="form-control" id="pricingTableTitle" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="pricingTableCategory">Category</label>
+                <input type="text" class="form-control" id="pricingTableCategory" placeholder="FPI, FI, AGAUR..." required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="pricingTableType">Type</label>
+                <select class="form-select" id="pricingTableType" required>
+                  <option value="accommodation">Accommodation</option>
+                  <option value="per_diem">Per diem</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+              <h6 class="mb-0">Rates</h6>
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="addPricingRowBtn">+ Add territory row</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-sm align-middle service-table pricing-rates-table">
+                <thead class="table-light">
+                  <tr>
+                    <th>Territory</th>
+                    <th>Group</th>
+                    <th class="pricing-meal-column">Meal</th>
+                    <th>Amount</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="pricingRowsBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" id="cancelPricingTableBtn">Cancel</button>
+            <button type="submit" class="btn btn-danger">Save table</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+      <span>&copy; 2026 -
+        <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a>
+      </span>
+      <span id="load-info">Calculating load time...</span>
+    </div>
+  </footer>
+
+  <script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+  <script type="module" src="./assets/js/index.js?v={{.AppVersion}}"></script>
+</body>
+</html>

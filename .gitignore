@@ -1,0 +1,30 @@
+cat << 'EOF' > .gitignore
+# Binarios y ejecutables
+*.bin
+crmintratools.bin
+goevoko
+goEvoko
+
+# Estado interno, uploads y copias de seguridad
+Data/
+Backups/
+Uploads/
+
+# Certificados locales SSL/TLS y claves privadas
+SSLCerts/
+GpgKeys/
+GPGKeys/
+
+# Credenciales y configuración sensible
+Config/
+*.env
+
+# Documentación compilada y librerías externas pesadas
+site/
+GUI/assets/js/pdfjs-dist/
+
+# Entornos virtuales y dependencias
+vendor/
+venv/
+.DS_Store
+EOF

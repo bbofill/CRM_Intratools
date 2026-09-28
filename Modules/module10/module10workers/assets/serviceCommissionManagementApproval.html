@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Service Commission Management Validation</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 30px auto;
+            padding: 30px 26px;
+            max-width: 650px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+        img {
+            display: block;
+            max-width: 120px;
+            margin: 0 auto 16px;
+        }
+        h1 {
+            margin: 8px 0 14px;
+            text-align: center;
+            color: #8a1c1c;
+            font-size: 24px;
+        }
+        p {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .alert {
+            margin: 24px 0;
+            padding: 13px 18px;
+            border-left: 5px solid #b71c1c;
+            background-color: #fdecec;
+            border-radius: 6px;
+            color: #7a1616;
+            font-size: 15px;
+        }
+        .summary {
+            margin: 20px 0;
+            padding: 14px 16px;
+            background-color: #f8f9fb;
+            border: 1px solid #d9e1ea;
+            border-radius: 6px;
+        }
+        .summary p {
+            margin: 8px 0;
+        }
+        .summary strong {
+            display: inline-block;
+            min-width: 140px;
+            color: #2f3b45;
+        }
+        .note {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 13px;
+            color: #999;
+        }
+        .footer {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 13px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{.LogoURL}}" alt="CRM Logo">
+        <h1>{{.Title}}</h1>
+
+        <p>Hello <strong>{{.Recipient}}</strong>,</p>
+        <p>{{.Intro}}</p>
+
+        <div class="alert">
+            This is the final validation step before generating the signed service commission PDF.
+        </div>
+
+        <div class="summary">
+            <p><strong>Request:</strong> {{.RequestCode}}</p>
+            <p><strong>Applicant:</strong> {{.Applicant}}</p>
+            <p><strong>Project:</strong> {{.Project}}</p>
+            <p><strong>Destination:</strong> {{.Destination}}</p>
+            <p><strong>Purpose:</strong> {{.Purpose}}</p>
+            <p><strong>Travel dates:</strong> {{.TravelDates}}</p>
+            <p><strong>Notice sent:</strong> {{.GeneratedAt}}</p>
+        </div>
+
+        <p>You can review the draft document and complete the validation in the Service Commissions module.</p>
+
+        <p class="note">Please do not reply to this email — this inbox is not monitored.</p>
+
+        <div class="footer">
+            Thank you for using<br>
+            <strong>{{.ModuleName}}</strong>
+        </div>
+    </div>
+</body>
+</html>

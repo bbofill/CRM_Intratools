@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Module 0 - ADMINISTRATOR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/custom/modules/module0/modules.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="bg-danger text-white py-3 shadow-sm">
+  <div class="container d-flex justify-content-between align-items-center">
+    <h1 class="h4 mb-0">M0 - Administrator - Modules</h1>
+    <a href="/module/gui/module0/" class="btn btn-outline-light btn-sm">← Go Back</a>
+  </div>
+</header>
+
+  <!-- MAIN -->
+  <main class="container my-4">
+    <div class="tab-content">
+      <div id="tab-users">
+        <div class="table-responsive">
+          <table class="table table-dark table-striped table-bordered table-sm mb-0 align-middle text-center" id="moduleTable">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col" >Module</th>
+                <th scope="col">Actions</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody id="moduleBody"><!-- js fill this tbody --></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+      <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+      <span id="load-info">Calculating load time...</span>
+    </div>
+  </footer>
+
+ 
+  <script src="/assets/js/modules/module0/modules_control.js?v={{.AppVersion}}"></script>
+  <script type="module">
+    import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+    measurePageLoadTime({
+      targetId: 'load-info',
+      precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+    });
+  </script>
+</body>
+</html>

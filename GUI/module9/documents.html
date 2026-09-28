@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>CRMIntratools - Document viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/assets/css/tom-select.css?v={{.AppVersion}}" />
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}" />
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+
+<body>
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools" />
+    </a>
+    <div class="d-flex align-items-center gap-4 ms-3">
+      <a href="/module/gui/module3/notifications.html" class="position-relative">
+        <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+        <span id="notif-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"></span>
+      </a>
+      <a href="./index.html" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<div id="page-container">
+  <div class="container">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+      <div>
+        <h2 id="pageTitle" class="mb-1">Documents</h2>
+        <div id="pageSubtitle" class="text-muted small">Loading modality…</div>
+      </div>
+
+      <!-- admin actions: upload/new doc -->
+      <div id="admin-actions" class="d-none">
+        <button class="btn btn-danger d-flex align-items-center gap-2" id="btnNewDoc">
+          <span class="fw-semibold">+ New document</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <div class="row g-2 align-items-center">
+          <div class="col-12 col-md-6">
+            <input id="searchInput" type="text" class="form-control" placeholder="Search documents (title, tags)..." />
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="d-flex justify-content-md-end gap-2">
+              <select id="sortSelect" class="form-select form-select-sm" style="max-width: 220px;">
+                <option value="newest" selected>Sort: newest</option>
+                <option value="az">Sort: A → Z</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div id="emptyState" class="d-none text-center py-5">
+      <div class="display-6 mb-2">No documents</div>
+      <div class="text-muted">Try changing the search.</div>
+    </div>
+
+    <div id="docGrid" class="row g-3"></div>
+  </div>
+  </div>
+
+  <!-- Modal: Upload Document -->
+<div class="modal fade" id="modalUploadDoc" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Upload PDF document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form id="uploadDocForm">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input id="docTitleInput" name="title" class="form-control" required maxlength="120" placeholder="e.g., Hiring policy 2025">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">PDF file</label>
+            <input id="docFileInput" name="file" type="file" class="form-control" accept="application/pdf,.pdf" required>
+            <div class="form-text">Only PDF files are allowed.</div>
+            <div id="uploadError" class="text-danger small mt-2 d-none"></div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="uploadBtn" type="submit" class="btn btn-danger">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Edit title -->
+<div class="modal fade" id="modalEditTitle" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form id="editTitleForm">
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label">Title</label>
+            <input id="editTitleInput" class="form-control" maxlength="120" required />
+            <div id="editTitleError" class="text-danger small mt-2 d-none"></div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Modality</label>
+            <select id="editModalitySelect" class="form-select" required>
+            <option value="">Select a modality...</option>
+        </select>
+        <div id="editModalityError" class="text-danger small mt-2 d-none"></div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="editTitleSaveBtn" type="submit" class="btn btn-danger">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Confirm delete -->
+<div class="modal fade" id="modalConfirmDelete" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-2">Are you sure you want to delete this document?</div>
+        <div class="text-muted small" id="deleteDocLabel"></div>
+        <div id="deleteDocError" class="text-danger small mt-2 d-none"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button id="deleteDocConfirmBtn" type="button" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</main>
+
+<footer class="bg-danger text-light py-3 mt-4">
+  <div class="container d-flex justify-content-between align-items-center small">
+    <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+    <span id="load-info">Calculating load time...</span>
+  </div>
+</footer>
+
+<script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+
+<script type="module">
+  import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+  measurePageLoadTime({ targetId: 'load-info', precision: 6 });
+</script>
+
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+
+<script type="module">
+  // --- helpers ---
+  function qs(name) {
+    return new URLSearchParams(window.location.search).get(name);
+  }
+  function escapeHtml(str) {
+    return String(str ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  const modalityId = qs("modalityId");
+  const modalityTitle = qs("modalityTitle") || "Documents";
+
+  const pageTitle = document.getElementById("pageTitle");
+  const pageSubtitle = document.getElementById("pageSubtitle");
+  const grid = document.getElementById("docGrid");
+  const emptyState = document.getElementById("emptyState");
+  const searchInput = document.getElementById("searchInput");
+  const sortSelect = document.getElementById("sortSelect");
+
+  pageTitle.textContent = modalityTitle;
+  pageSubtitle.textContent = "Visualize documents for this modality.";
+
+    // --- role / permissions ---
+    let USER_ROLE = "user";
+
+    async function loadUser() {
+      const res = await fetch('/module/proxy/module9/api?action=checkUserInformation');
+      const info = await res.json();
+      USER_ROLE = info.role || "user";
+    }
+
+    async function fetchModalities() {
+      const res = await fetch('/module/proxy/module9/api?action=fetchModalities');
+      const info = await res.json();
+      return Array.isArray(info.data) ? info.data : [];
+    }
+
+    // --- modality caching to edit documents ---
+    let MODALITIES_CACHE = [];              
+    let MODALITIES_BY_ID = new Map();       
+
+    function normalizeModalityName(m) {
+      return m.title;
+    }
+
+    async function ensureModalitiesLoaded() {
+      if (MODALITIES_CACHE.length) return;
+
+      const mods = await fetchModalities();
+      MODALITIES_CACHE = mods.map(m => ({
+        ...m,
+        id: String(m.id),
+        _label: normalizeModalityName(m)
+      }));
+
+      MODALITIES_BY_ID = new Map(MODALITIES_CACHE.map(m => [String(m.id), m]));
+    }
+
+    function fillModalitySelect(selectEl, selectedId = "") {
+      const sel = String(selectedId ?? "");
+      selectEl.innerHTML = `<option value="">Select a modality...</option>`;
+
+      for (const m of MODALITIES_CACHE) {
+        const opt = document.createElement("option");
+        opt.value = String(m.id);
+        opt.textContent = m._label;
+        if (String(m.id) === sel) opt.selected = true;
+        selectEl.appendChild(opt);
+      }
+    }
+
+    const adminActions = document.getElementById("admin-actions");
+    const btnNewDoc = document.getElementById("btnNewDoc");
+
+    await loadUser();
+    const canUpload = ["admin", "manager"].includes(USER_ROLE);
+    if (canUpload) adminActions.classList.remove("d-none");
+
+
+  // fetch general information about document and url
+  async function fetchDocuments(modalityId) {
+    const res = await fetch(`/module/proxy/module9/api?action=fetchDocumentsByModality&modalityId=${encodeURIComponent(modalityId)}`);
+    const payload = await res.json();
+
+    if (payload?.status !== "ok") {
+      console.error("fetchDocuments error:", payload);
+      return [];
+    }
+    return Array.isArray(payload.data) ? payload.data : [];
+  }
+
+  // --- UI model ---
+  let allDocs = [];
+  let query = "";
+
+  function sortDocs(docs) {
+    const mode = sortSelect.value;
+    const copy = [...docs];
+
+    if (mode === "az") {
+      copy.sort((a,b) => String(a.title||"").localeCompare(String(b.title||""), "es"));
+      return copy;
+    }
+
+    // newest: intenta por updatedAt/createdAt/id (fallback)
+    copy.sort((a,b) => {
+      const da = Date.parse(a.updatedAt || a.createdAt || "") || 0;
+      const db = Date.parse(b.updatedAt || b.createdAt || "") || 0;
+      return db - da;
+    });
+    return copy;
+  }
+
+  function applyFilters(docs) {
+    const q = query.trim().toLowerCase();
+    if (!q) return docs;
+
+    return docs.filter(d => {
+      const text = `${d.title || ""} ${(d.tags || []).join(" ")}`.toLowerCase();
+      return text.includes(q);
+    });
+  }
+
+function buildDocCard(doc) {
+  const title = escapeHtml(doc.title || "Untitled document");
+  const updatedAt = doc.updatedAt || "";
+  const href = `/module/gui/module9/pdfViewer.html?docId=${encodeURIComponent(doc.id)}`;
+
+  // Solo admin/manager 
+  const adminBtns = canUpload ? `
+    <div class="doc-actions">
+      <button
+        type="button"
+        class="btn btn-sm btn-light action-btn"
+        title="Edit title"
+        data-action="edit"
+        data-doc-id="${escapeHtml(doc.id)}"
+        data-doc-modality-id="${escapeHtml(doc.modality_id || "")}"
+        data-doc-title="${escapeHtml(doc.title || "")}"
+      >✏️</button>
+
+      <button
+        type="button"
+        class="btn btn-sm btn-light action-btn"
+        title="Delete document"
+        data-action="delete"
+        data-doc-id="${escapeHtml(doc.id)}"
+        data-doc-title="${escapeHtml(doc.title || "")}"
+      >✖</button>
+    </div>
+  ` : "";
+
+  return `
+    <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
+      <a class="text-decoration-none d-block doc-link" href="${href}">
+        <div class="pdf-card h-100 shadow-sm position-relative">
+          ${adminBtns}
+
+          <div class="pdf-cover">
+            <div class="pdf-sheet">
+              <div style="padding:16px;">
+                <div class="text-muted small mb-2">PDF</div>
+                <div style="height:10px;background:rgba(0,0,0,.06);border-radius:999px;margin-bottom:10px;"></div>
+                <div style="height:10px;background:rgba(0,0,0,.06);border-radius:999px;margin-bottom:10px;width:92%;"></div>
+                <div style="height:10px;background:rgba(0,0,0,.06);border-radius:999px;margin-bottom:10px;width:82%;"></div>
+                <div style="height:10px;background:rgba(0,0,0,.06);border-radius:999px;margin-bottom:10px;width:76%;"></div>
+              </div>
+            </div>
+
+            <div class="pdf-titlebar">
+              <p class="title">${title}</p>
+              <p class="meta">
+                ${updatedAt ? `Updated: ${escapeHtml(updatedAt)}` : "Click to open"}
+              </p>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  `;
+}
+
+
+  function render() {
+    const filtered = applyFilters(allDocs);
+    const sorted = sortDocs(filtered);
+
+    emptyState.classList.toggle("d-none", sorted.length !== 0);
+    grid.innerHTML = sorted.map(buildDocCard).join("");
+  }
+
+  searchInput.addEventListener("input", (e) => {
+    query = e.target.value;
+    render();
+  });
+
+  sortSelect.addEventListener("change", render);
+
+  // --- init ---
+  if (!modalityId) {
+    emptyState.classList.remove("d-none");
+    grid.innerHTML = "";
+  } else {
+    allDocs = await fetchDocuments(modalityId);
+    render();
+  }
+
+  // --- Upload modal logic ---
+    const uploadForm = document.getElementById("uploadDocForm");
+    const fileInput = document.getElementById("docFileInput");
+    const titleInput = document.getElementById("docTitleInput");
+    const uploadError = document.getElementById("uploadError");
+    const uploadBtn = document.getElementById("uploadBtn");
+
+    function showUploadError(msg) {
+    uploadError.textContent = msg;
+    uploadError.classList.toggle("d-none", !msg);
+    }
+
+    if (canUpload) {
+    btnNewDoc.addEventListener("click", () => {
+        showUploadError("");
+        uploadForm.reset();
+        const modal = new bootstrap.Modal(document.getElementById("modalUploadDoc"));
+        modal.show();
+    });
+
+    fileInput.addEventListener("change", () => {
+        showUploadError("");
+
+        const f = fileInput.files?.[0];
+        if (!f) return;
+
+        // Validación: extensión + MIME
+        const isPdfByName = f.name.toLowerCase().endsWith(".pdf");
+        const isPdfByMime = f.type === "application/pdf";
+
+        if (!isPdfByName && !isPdfByMime) {
+        fileInput.value = "";
+        showUploadError("Only PDF files are allowed.");
+        }
+    });
+
+    uploadForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        showUploadError("");
+
+        if (!modalityId) {
+            showUploadError("Missing modalityId in URL.");
+            return;
+        }
+
+        const title = String(titleInput.value || "").trim();
+        const file = fileInput.files?.[0];
+
+        if (!title) {
+            showUploadError("Title is required.");
+            return;
+        }
+        if (!file) {
+            showUploadError("PDF file is required.");
+            return;
+        }
+
+        const isPdfByName = file.name.toLowerCase().endsWith(".pdf");
+        const isPdfByMime = file.type === "application/pdf";
+        if (!isPdfByName && !isPdfByMime) {
+            showUploadError("Only PDF files are allowed.");
+            return;
+        }
+
+        // form-data
+        const fd = new FormData();
+        fd.append("title", title);
+        fd.append("modalityId", modalityId);
+        fd.append("file", file);
+
+        // UI lock
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = "Uploading...";
+
+        try {
+        const res = await fetch("/module/proxy/module9/api?action=uploadDocument", {
+            method: "POST",
+            body: fd
+        });
+
+        const payload = await res.json().catch(() => ({}));
+
+        if (!res.ok || payload?.status !== "ok") {
+            console.error("uploadDocument error:", payload);
+            showUploadError(payload?.error || "Upload failed.");
+            return;
+        }
+
+        // success: close modal + refresh list
+        const modalEl = document.getElementById("modalUploadDoc");
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal?.hide();
+
+        allDocs = await fetchDocuments(modalityId);
+        render();
+
+        } catch (err) {
+        console.error(err);
+        showUploadError("Network error while uploading.");
+        } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = "Upload";
+        }
+    });
+
+    } else {
+      btnNewDoc?.addEventListener("click", (e) => e.preventDefault());
+    }
+
+    // --- Edit/Delete actions ---
+    const modalEditTitleEl = document.getElementById("modalEditTitle");
+    const modalConfirmDeleteEl = document.getElementById("modalConfirmDelete");
+
+    const editTitleForm = document.getElementById("editTitleForm");
+    const editTitleInput = document.getElementById("editTitleInput");
+    const editTitleError = document.getElementById("editTitleError");
+    const editTitleSaveBtn = document.getElementById("editTitleSaveBtn");
+
+    const deleteDocLabel = document.getElementById("deleteDocLabel");
+    const deleteDocError = document.getElementById("deleteDocError");
+    const deleteDocConfirmBtn = document.getElementById("deleteDocConfirmBtn");
+
+    let editingDocId = null;
+    let deletingDocId = null;
+
+    function showErr(el, msg){
+      el.textContent = msg || "";
+      el.classList.toggle("d-none", !msg);
+    }
+
+    grid.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+
+      // Evitar que el click burbujee al <a> y abra el PDF
+      e.preventDefault();
+      e.stopPropagation();
+
+      const action = btn.dataset.action;
+      const docId = btn.dataset.docId;
+      const docTitle = btn.dataset.docTitle || "";
+
+      if (action === "edit") {
+        editingDocId = docId;
+        const docModalityId = btn.dataset.docModalityId || "";
+
+        editTitleInput.value = docTitle;
+
+        (async () => {
+          await ensureModalitiesLoaded();
+          fillModalitySelect(editModalitySelect, docModalityId);
+        })();
+
+        showErr(editTitleError, "");
+        showErr(editModalityError, "");
+
+        const modal = new bootstrap.Modal(modalEditTitleEl);
+        modal.show();
+        setTimeout(() => editTitleInput.focus(), 150);
+      }
+
+      if (action === "delete") {
+        deletingDocId = docId;
+        deleteDocLabel.textContent = docTitle ? `Title: ${docTitle}` : "";
+        showErr(deleteDocError, "");
+        const modal = new bootstrap.Modal(modalConfirmDeleteEl);
+        modal.show();
+      }
+    });
+
+    // --- Save edited title ---
+    editTitleForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      showErr(editTitleError, "");
+
+      const newTitle = String(editTitleInput.value || "").trim();
+      if (!newTitle) {
+        showErr(editTitleError, "Title is required.");
+        return;
+      }
+      if (!editingDocId) return;
+
+      editTitleSaveBtn.disabled = true;
+      editTitleSaveBtn.textContent = "Saving...";
+
+      try {
+        const res = await fetch("/module/proxy/module9/api?action=updateDocument", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ docId: editingDocId, title: newTitle, modalityId: editModalitySelect.value || null })
+        });
+
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok || payload?.status !== "ok") {
+          showErr(editTitleError, payload?.error || "Failed to update document.");
+          return;
+        }
+
+        // close modal
+        bootstrap.Modal.getInstance(modalEditTitleEl)?.hide();
+
+        // refresh list
+        allDocs = await fetchDocuments(modalityId);
+        render();
+      } catch (err) {
+        console.error(err);
+        showErr(editTitleError, "Network error while saving.");
+      } finally {
+        editTitleSaveBtn.disabled = false;
+        editTitleSaveBtn.textContent = "Save";
+      }
+    });
+
+    // --- Confirm delete ---
+    deleteDocConfirmBtn.addEventListener("click", async () => {
+      showErr(deleteDocError, "");
+      if (!deletingDocId) return;
+
+      deleteDocConfirmBtn.disabled = true;
+      deleteDocConfirmBtn.textContent = "Deleting...";
+
+      try {
+        const res = await fetch("/module/proxy/module9/api?action=deleteDocument", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ docId: deletingDocId })
+        });
+
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok || payload?.status !== "ok") {
+          showErr(deleteDocError, payload?.error || "Failed to delete document.");
+          return;
+        }
+
+        bootstrap.Modal.getInstance(modalConfirmDeleteEl)?.hide();
+
+        allDocs = await fetchDocuments(modalityId);
+        render();
+      } catch (err) {
+        console.error(err);
+        showErr(deleteDocError, "Network error while deleting.");
+      } finally {
+        deleteDocConfirmBtn.disabled = false;
+        deleteDocConfirmBtn.textContent = "Delete";
+        deletingDocId = null;
+      }
+    });
+
+</script>
+</body>
+</html>

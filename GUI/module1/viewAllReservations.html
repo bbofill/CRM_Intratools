@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Room reservation</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}"> 
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+
+
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools" >
+    </a>
+          <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+    <a href="index.html" class="btn btn-outline-secondary">← Go back</a>
+  </div>
+  </div>
+</header>
+
+<div id="page-container">
+    <div class="container">
+        <h2 class="text-danger">Reservation History</h2>
+        <p>Check all current reservations.</p>
+        <div class="row mb-3 filters-panel">
+          <div class="col-md-2">
+            <label for="filterStart">Start date:</label>
+            <input type="date" id="filterStart" class="form-control">
+          </div>
+          <div class="col-md-2">
+            <label for="filterEnd">End date:</label>
+            <input type="date" id="filterEnd" class="form-control">
+          </div>
+          <div class="col-md-2">
+            <label for="filterType">Room:</label>
+            <select id="filterType" class="form-control">
+              <option value="">All</option>
+              <option value="Sala de reunions">Sala de reunions</option>
+              <option value="Aula petita">Aula petita</option>
+              <option value="POL 1">POL 1</option>
+              <option value="POL 2">POL 2</option>
+              <option value="Auditorium">Auditorium</option>
+              <option value="Oficina 0">Office 0</option>
+              <option value="A1">A1</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="filterEmail">User email:</label>
+            <input type="text" id="filterEmail" class="form-control" placeholder="user@domain.com">
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button class="btn btn-danger me-2 flex-fill" id="applyFilters">Apply Filters</button>
+            <button class="btn btn-outline-secondary flex-fill" id="resetFilters">Reset Filters</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover text-center align-middle">
+            <thead class="table-danger">
+              <tr>
+                <th>Room</th>
+                <th>Concept</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Booker</th>
+                <th>User</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="reservationTableBody" class="table-active">
+              <tr><td colspan="8">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+    </div>
+
+    <!-- Modify Reservation Modal -->
+<div class="modal fade" id="modifyReservationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modify reservation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="alert alert-info small mb-3" id="modifyHint">
+          Change the room and/or dates. Availability is checked automatically.
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Room</label>
+            <select class="form-select" id="modRoomSelect"></select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Concept</label>
+            <input class="form-control" id="modConceptInput" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Start date</label>
+            <input type="date" class="form-control" id="modStartDate" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Start time</label>
+            <input type="time" class="form-control" id="modStartTime" step="300" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">End date</label>
+            <input type="date" class="form-control" id="modEndDate" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">End time</label>
+            <input type="time" class="form-control" id="modEndTime" step="300" />
+          </div>
+
+        </div>
+
+        <hr class="my-3"/>
+
+        <div id="availabilityBox" class="alert alert-secondary mb-0">
+          Waiting for changes to check availability…
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-success" id="saveModifyBtn" disabled>Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+<script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+<script>
+
+  let allReservations = [];
+  let currentModifyReservation = null;
+  let availabilityCheckTimer = null;
+  let lastAvailabilityOk = false;
+  const ROOM_OPTIONS = [
+    {value: 1, label: "Sala de reunions"},
+    {value: 2, label: "Aula petita"},
+    {value: 3, label: "POL 1"},
+    {value: 4, label: "POL 2"},
+    {value: 5, label: "Auditorium"},
+    {value: 6, label: "Office 0"},
+    {value: 7, label: "A1"},
+  ];
+
+  let modifyModalInstance = null;
+
+  let originalModifyData = null;
+
+  function ensureModifyModal() {
+    if (!modifyModalInstance) {
+      modifyModalInstance = new bootstrap.Modal(document.getElementById("modifyReservationModal"));
+    }
+    return modifyModalInstance;
+  }
+
+  function isoToDateAndTime(isoString) {
+    const s = String(isoString);
+
+    const date = s.slice(0, 10);      // YYYY-MM-DD
+    const time = s.slice(11, 16);     // HH:mm
+    return { date, time };
+  }
+
+  function dateAndTimeToISO(dateStr, timeStr) {
+    console.log("Converting to ISO:", { dateStr, timeStr });
+    const d = `${dateStr} ${timeStr}`;
+    return d;
+  }
+
+
+  function setAvailabilityBox(type, text) {
+    const box = document.getElementById("availabilityBox");
+    box.classList.remove("alert-secondary", "alert-success", "alert-danger", "alert-warning");
+    box.classList.add(type);
+    box.textContent = text;
+  }
+
+  function setSaveEnabled(enabled) {
+    const btn = document.getElementById("saveModifyBtn");
+    btn.disabled = !enabled;
+  }
+
+  function populateRoomSelect(selectedRoomId) {
+    const sel = document.getElementById("modRoomSelect");
+    sel.innerHTML = "";
+    ROOM_OPTIONS.forEach(r => {
+      const opt = document.createElement("option");
+      opt.value = String(r.value);
+      opt.textContent = r.label;
+      if (String(r.value) === String(selectedRoomId)) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function validateModifyInputs() {
+    const room = document.getElementById("modRoomSelect").value;
+    const concept = document.getElementById("modConceptInput").value.trim();
+    const startLocal = document.getElementById("modStartDate").value;
+    const startHour = document.getElementById("modStartTime").value;
+    const endLocal = document.getElementById("modEndDate").value;
+    const endHour = document.getElementById("modEndTime").value;
+
+    if (!room || !startLocal || !endLocal || !startHour || !endHour) {
+      setSaveEnabled(false);
+      setAvailabilityBox("alert-secondary", "Fill room, start and end to check availability…");
+      return false;
+    }
+
+    const start = `${startLocal} ${startHour}`;
+    const end = `${endLocal} ${endHour}`;
+
+    if (start == "" || end == "") {
+      setSaveEnabled(false);
+      setAvailabilityBox("alert-danger", "Invalid dates.");
+      return false;
+    }
+
+    if (end <= start) {
+      setSaveEnabled(false);
+      setAvailabilityBox("alert-warning", "End must be after start.");
+      return false;
+    }
+
+    if (!concept) {
+      setSaveEnabled(false);
+      setAvailabilityBox("alert-warning", "Concept cannot be empty.");
+      return false;
+    }
+
+    return true;
+  }
+
+  async function checkAvailabilityLive() {
+    if (availabilityCheckTimer) clearTimeout(availabilityCheckTimer);
+
+    availabilityCheckTimer = setTimeout(async () => {
+      lastAvailabilityOk = false;
+      setSaveEnabled(false);
+
+      if (!currentModifyReservation) return;
+      if (!validateModifyInputs()) return;
+
+      if (isSameAsOriginal()) {
+        lastAvailabilityOk = false;
+        setSaveEnabled(false);
+        return;
+      }
+
+      const room = document.getElementById("modRoomSelect").value;
+      const startISO = `${document.getElementById("modStartDate").value} ${document.getElementById("modStartTime").value}`;
+      const endISO = `${document.getElementById("modEndDate").value} ${document.getElementById("modEndTime").value}`;
+      setAvailabilityBox("alert-secondary", "Checking availability…");
+
+        console.log("Availability check payload:", {
+          excludeReservationId: currentModifyReservation.id,
+          excludeType: typeof currentModifyReservation.id,
+          room,
+          roomType: typeof room,
+          startISO,
+          startISOType: typeof startISO,
+          endISO,
+          endISOType: typeof endISO,
+        });
+
+      try {
+        const resp = await fetch("/module/proxy/module1/api?action=checkAvailability", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            excludeReservationId: currentModifyReservation.id,
+            roomId: room,
+            start_date: startISO,
+            end_date: endISO
+          })
+        });
+
+
+
+        if (!resp.ok) {
+          setAvailabilityBox("alert-danger", "Could not verify availability (server error).");
+          return;
+        }
+
+        const data = await resp.json();
+
+        if (data && data.available === true) {
+          lastAvailabilityOk = true;
+          setAvailabilityBox("alert-success", "✅ Available. You can save changes.");
+          setSaveEnabled(true);
+        } else {
+          const reason = (data && data.reason) ? ` (${data.reason})` : "";
+          setAvailabilityBox("alert-danger", `❌ Not available${reason}`);
+          setSaveEnabled(false);
+        }
+      } catch (e) {
+        setAvailabilityBox("alert-danger", "Could not verify availability (network error).");
+      }
+    }, 350);
+  }
+
+  function openModifyModal(res) {
+    currentModifyReservation = res;
+
+    let selectedRoomId = res.roomId;
+    if (!selectedRoomId && res.name) {
+      const match = ROOM_OPTIONS.find(r => r.label === res.name);
+      selectedRoomId = match ? match.value : "";
+    }
+
+    populateRoomSelect(selectedRoomId);
+    document.getElementById("modConceptInput").value = res.concept || "";
+
+    // Rellenar fechas/horas
+    const s = isoToDateAndTime(res.start_date);
+    document.getElementById("modStartDate").value = s.date;
+    document.getElementById("modStartTime").value = s.time;
+
+    const e = isoToDateAndTime(res.end_date);
+    document.getElementById("modEndDate").value = e.date;
+    document.getElementById("modEndTime").value = e.time;
+
+    // AHORA sí: guardar estado original (ya con valores reales)
+    originalModifyData = {
+      room: String(document.getElementById("modRoomSelect").value),
+      concept: document.getElementById("modConceptInput").value.trim(),
+      startLocal: document.getElementById("modStartDate").value,
+      startHour: document.getElementById("modStartTime").value,
+      endLocal: document.getElementById("modEndDate").value,
+      endHour: document.getElementById("modEndTime").value,
+    };
+
+    lastAvailabilityOk = false;
+    setSaveEnabled(false);
+
+    const roomSel = document.getElementById("modRoomSelect");
+    const conceptInp = document.getElementById("modConceptInput");
+    const startDateInp = document.getElementById("modStartDate");
+    const startTimeInp = document.getElementById("modStartTime");
+    const endDateInp   = document.getElementById("modEndDate");
+    const endTimeInp   = document.getElementById("modEndTime");
+
+    roomSel.onchange = checkAvailabilityLive;
+    conceptInp.oninput = checkAvailabilityLive;
+    startDateInp.oninput = checkAvailabilityLive;
+    startTimeInp.oninput = checkAvailabilityLive;
+    endDateInp.oninput = checkAvailabilityLive;
+    endTimeInp.oninput = checkAvailabilityLive;
+
+    ensureModifyModal().show();
+  }
+
+  function isSameAsOriginal() {
+    if (!originalModifyData) return false;
+
+    const room = String(document.getElementById("modRoomSelect").value);
+    const concept = document.getElementById("modConceptInput").value.trim();
+    const startLocal = document.getElementById("modStartDate").value;
+    const startHour = document.getElementById("modStartTime").value;
+    const endLocal = document.getElementById("modEndDate").value;
+    const endHour = document.getElementById("modEndTime").value;
+
+    return (
+      room === originalModifyData.room &&
+      concept === originalModifyData.concept &&
+      startLocal === originalModifyData.startLocal &&
+      startHour === originalModifyData.startHour &&
+      endLocal === originalModifyData.endLocal &&
+      endHour === originalModifyData.endHour
+    );
+  }
+
+
+  async function saveModification() {
+    if (!currentModifyReservation) return;
+    if (!validateModifyInputs()) return;
+
+    if (!lastAvailabilityOk) {
+      alert("Please ensure the new slot is available before saving.");
+      return;
+    }
+
+    const room = document.getElementById("modRoomSelect").value;
+    const concept = document.getElementById("modConceptInput").value.trim();
+    const startISO = dateAndTimeToISO(
+      document.getElementById("modStartDate").value, 
+      document.getElementById("modStartTime").value);
+
+    const endISO = dateAndTimeToISO(
+      document.getElementById("modEndDate").value,
+      document.getElementById("modEndTime").value
+    );
+
+    setSaveEnabled(false);
+    setAvailabilityBox("alert-secondary", "Saving changes…");
+
+    try {
+      const resp = await fetch("/module/proxy/module1/api?action=updateReservation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          excludeReservationId: currentModifyReservation.id,
+          roomId: room,
+          concept: concept,
+          start_date: startISO,
+          end_date: endISO
+        })
+      });
+
+      if (!resp.ok) {
+        setAvailabilityBox("alert-danger", "Error saving changes.");
+        setSaveEnabled(true);
+        return;
+      }
+
+      setAvailabilityBox("alert-success", "✅ Reservation updated.");
+      ensureModifyModal().hide();
+      currentModifyReservation = null;
+
+      // refresca tabla
+      await fetchReservations();
+    } catch (e) {
+      setAvailabilityBox("alert-danger", "Network error saving changes.");
+      setSaveEnabled(true);
+    }
+  }
+  document.getElementById("saveModifyBtn").addEventListener("click", saveModification);
+
+  //get all reservations
+  async function fetchReservations() {
+    const response = await fetch("/module/proxy/module1/api?action=fetchAllReservations", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    const tbody = document.getElementById("reservationTableBody");
+    tbody.innerHTML = "";
+    if (!response.ok) {
+      tbody.innerHTML = `<tr><td colspan='7'>Unable to load reservations.</td></tr>`;
+      return;
+    }
+    const data = await response.json();
+    allReservations = data.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+    if (!Array.isArray(allReservations) || allReservations.length === 0) {
+      tbody.innerHTML = `<tr><td colspan='7'>No reservations found.</td></tr>`;
+      return;
+    }
+    applyCurrentFilters();
+  }
+  function formatDateTime(isoString) {
+    const [datePart, timePart] = isoString.split("T");
+    const [year, month, day] = datePart.split("-");
+    const [hour, minute] = timePart.split(":");
+    return `${day}-${month}-${year} ${hour}:${minute}`;
+  }
+  //when page reloaded, it filters from today and on
+  function setTodayAsDefaultStart() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    document.getElementById("filterStart").value = todayStr;
+  }
+  //shows reservations
+  function renderReservations(reservations) {
+    const tbody = document.getElementById("reservationTableBody");
+    tbody.innerHTML = "";
+
+    if (reservations.length === 0) {
+      tbody.innerHTML = `<tr><td colspan='8'>No reservations match the filters.</td></tr>`;
+      return;
+    }
+    reservations.forEach(res => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${res.name}</td>
+        <td>${res.concept}</td>
+        <td>${formatDateTime(res.start_date)}</td>
+        <td>${formatDateTime(res.end_date)}</td>
+        <td>${res.email}</td>
+        <td>${res.user_name} ${res.surname}</td>
+        <td><button class="btn btn-outline-success" id="modifyBtn">Modify reservation</button></td>
+        <td><button class="btn btn-outline-danger" id="cancelBtn">Cancel reservation</button></td>
+      `;
+      const cancelBtn = row.querySelector("button#cancelBtn");
+      cancelBtn.addEventListener("click", async () => {
+        if (!confirm("Are you sure you want to cancel this reservation?")) return;
+
+        const response = await fetch("/module/proxy/module1/api", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: res.id })  
+        });
+
+        if (response.ok) {
+          alert("Reservation cancelled.");
+          //get updated reservations
+          fetchReservations();
+        } else {
+          alert("Error cancelling reservation.");
+        }  
+      });
+      const modifyBtn = row.querySelector("button#modifyBtn");
+      modifyBtn.addEventListener("click", () => {
+        // Open modal to allow user to modify the reservation
+        // Modal must verify in real time that the new dates and room are available (fetch to backend) 
+        // After modification, send a PUT request to update the reservation
+        openModifyModal(res);
+      });
+
+      tbody.appendChild(row);
+    });
+  }
+  function applyCurrentFilters() {
+    let start = document.getElementById("filterStart").value;
+
+    if (!start) {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      start = `${yyyy}-${mm}-${dd}`;
+      document.getElementById("filterStart").value = start;
+    }
+    const end = document.getElementById("filterEnd").value;
+    const type = document.getElementById("filterType").value;
+    const email = document.getElementById("filterEmail").value.trim().toLowerCase();
+
+    const startDT = start ? new Date(`${start}T00:00:00`) : null;
+    const endDT   = end   ? new Date(`${end}T23:59:59`)   : null;
+
+    const filtered = allReservations.filter(r => {
+        const rStartDT = new Date(r.start_date);
+        const rEndDT   = new Date(r.end_date);
+
+        const overlaps =
+          (!startDT || rEndDT >= startDT) &&
+          (!endDT   || rStartDT <= endDT);
+
+        return overlaps &&
+          (!type  || r.name === type) &&
+          (!email || r.email.toLowerCase().includes(email));
+      });
+
+  renderReservations(filtered);
+}
+
+  document.getElementById("applyFilters").addEventListener("click", (e) => {
+    e.preventDefault();
+    applyCurrentFilters();
+  });
+
+  //reset filters
+  document.getElementById("resetFilters").addEventListener("click", () => {
+    setTodayAsDefaultStart();
+    document.getElementById("filterEnd").value = "";
+    document.getElementById("filterType").value = "";
+    document.getElementById("filterEmail").value = "";
+    applyCurrentFilters();
+  });
+  //load page
+  window.addEventListener("DOMContentLoaded", () => {
+      const modalEl = document.getElementById("modifyReservationModal");
+      setTodayAsDefaultStart();
+      fetchReservations();
+      modalEl.addEventListener("hidden.bs.modal", () => {
+        location.reload(); // recarga la página al cerrar el modal
+      });
+  });
+
+</script>
+    <!-- FOOTER -->
+    <footer class="bg-danger text-light py-3 mt-4">
+      <div class="container d-flex justify-content-between align-items-center small">
+        <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+        <span id="load-info">Calculating load time...</span>
+      </div>
+      <script type="module">
+        import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+  
+        measurePageLoadTime({
+          targetId: 'load-info',
+          precision: 6,
+        onComplete: (time) => console.log("Load Time:", time + "s")
+        });
+      </script>
+    </footer>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+  </body>
+</html>

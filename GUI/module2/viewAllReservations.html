@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Hot Desks</title>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}"> 
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+
+
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools" >
+    </a>
+      <div class="d-flex align-items-center gap-4 ms-3">
+        <a href="/module/gui/module3/notifications.html" class="position-relative">
+          <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+          <span id="notif-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          </span>
+        </a>
+    <a href="index.html" class="btn btn-outline-secondary">← Go back</a>
+  </div>
+  </div>
+</header>
+
+<div id="page-container">
+    <div class="container">
+        <h2 class="text-danger">Reservation History</h2>
+        <p>Check reservations for every user.</p>
+
+        <!-- Filtros -->
+        <form id="filterForm" class="reservation-history-filters">
+          <!-- Office (texto libre) -->
+          <div class="col-md-3">
+            <label for="filterOffice" class="form-label">Office / Desk</label>
+            <input type="text" id="filterOffice" class="form-control" placeholder="Type office name">
+          </div>
+          <!-- Worker (texto libre) -->
+          <div class="col-md-3">
+            <label for="filterWorker" class="form-label">Worker</label>
+            <input type="text" id="filterWorker" class="form-control" placeholder="Type worker name">
+          </div>
+
+          <!-- Concept (select) -->
+          <div class="col-md-2">
+            <label for="filterConcept" class="form-label">Concept</label>
+            <select id="filterConcept" class="form-select">
+              <option value="">All</option>
+              <option value="assigned">Assigned work desk</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
+
+          <!-- Host (texto libre) -->
+          <div class="col-md-3">
+            <label for="filterHost" class="form-label">Host</label>
+            <input type="text" id="filterHost" class="form-control" placeholder="Type host">
+          </div>
+
+          <!-- Role (select fijo) -->
+          <div class="col-md-2">
+            <label for="filterRole" class="form-label">Role</label>
+            <select id="filterRole" class="form-select">
+              <option value="">All</option>
+              <option value="visitor">Visitor</option>
+              <option value="speaker">Speaker</option>
+              <option value="lecturer">Lecturer</option>
+            </select>
+          </div>
+
+          <!-- Program (texto libre) -->
+          <div class="col-md-4">
+            <label for="filterProgram" class="form-label">Program</label>
+            <input type="text" id="filterProgram" class="form-control" placeholder="Type program">
+          </div>
+
+          <!-- Start date -->
+          <div class="col-md-2">
+            <label for="filterStartDate" class="form-label">Start date (from)</label>
+            <input type="date" id="filterStartDate" class="form-control">
+          </div>
+
+          <!-- End date -->
+          <div class="col-md-2">
+            <label for="filterEndDate" class="form-label">End date (to)</label>
+            <input type="date" id="filterEndDate" class="form-control">
+          </div>
+
+          <!-- Botón reset -->
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="button" id="resetFilters" class="btn btn-outline-secondary w-100">
+              Clear filters
+            </button>
+          </div>
+        </form>
+
+      <div class="table-responsive">
+        <table class="table table-hover text-center">
+        <thead class="table-danger">
+            <tr>
+            <th>Office.Desk</th>
+            <th>Person</th>
+            <th>Concept</th>
+            <th>Host</th>
+            <th>Role</th>
+            <th>Program</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+
+            </tr>
+        </thead>
+        <tbody id="reservationTableBody" class="table-active">
+            <tr><td colspan="5">Loading...</td></tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+
+</div>
+<script>
+  let allReservations = [];
+
+  function formatDateTime(isoString) {
+    const [datePart, timePart] = isoString.split("T");
+    const [year, month, day] = datePart.split("-");
+    const [hour, minute] = timePart.split(":");
+    return `${day}-${month}-${year} ${hour}:${minute}`;
+  }
+
+  function renderTable(reservations) {
+    const tbody = document.getElementById("reservationTableBody");
+    tbody.innerHTML = "";
+
+    if (!Array.isArray(reservations) || reservations.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8">No reservations found.</td></tr>`;
+      return;
+    }
+
+    reservations.forEach(res => {
+      if (res.worker === null && (res.role === null || res.host === null || res.program === null)) {
+        return; 
+      }
+
+      console.log(res);
+      const row = document.createElement("tr");
+      const conceptDisplay = (res.concept === null) ? "Assigned work desk" : res.concept;
+
+      row.innerHTML = `
+        <td>${res.table_name}</td>
+        <td>${
+          (res.worker && res.worker.trim().length > 0)
+            ? res.worker
+            : (res.guest_name || "NA")
+        }</td>
+        <td>${conceptDisplay}</td>
+        <td>${res.host || "NA"}</td>
+        <td>${res.role || "NA"}</td>
+        <td>${res.program || "NA"}</td>
+        <td>${formatDateTime(res.start_date)}</td>
+        <td>${formatDateTime(res.end_date)}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function applyFilters() {
+    const officeFilter   = document.getElementById("filterOffice").value.trim().toLowerCase();
+    const workerFilter   = document.getElementById("filterWorker").value.trim().toLowerCase();
+    const conceptFilter  = document.getElementById("filterConcept").value; // "", "assigned", "others"
+    const hostFilter     = document.getElementById("filterHost").value.trim().toLowerCase();
+    const roleFilter     = document.getElementById("filterRole").value;    // "", "visitor", ...
+    const programFilter  = document.getElementById("filterProgram").value.trim().toLowerCase();
+    const startDateStr   = document.getElementById("filterStartDate").value; // yyyy-mm-dd o ""
+    const endDateStr     = document.getElementById("filterEndDate").value;   // yyyy-mm-dd o ""
+
+    let startDate = null;
+    let endDate = null;
+
+    if (startDateStr) {
+      startDate = new Date(startDateStr + "T00:00:00");
+    }
+    if (endDateStr) {
+      endDate = new Date(endDateStr + "T23:59:59");
+    }
+
+    const filtered = allReservations.filter(res => {
+
+      // Office / Desk (table_name)
+      if (officeFilter) {
+        const officeRaw = res.table_name || "";
+        const office = officeRaw.toLowerCase();
+
+        // Si el filtro es solo números, interpretamos que quiere la oficina "6", "16", etc. exacta
+        if (/^\d+$/.test(officeFilter)) {
+          // buscamos el primer bloque numérico al inicio del nombre, p.ej. "6.01", "16.02"
+          const match = officeRaw.match(/^(\d+)/);
+          const officeNum = match ? match[1] : null;
+
+          if (officeNum !== officeFilter) {
+            return false;
+          }
+        } else {
+          // si es texto libre, seguimos como antes (contiene)
+          if (!office.includes(officeFilter)) {
+            return false;
+          }
+        }
+      }
+
+
+      // Worker (texto contiene)
+      if (workerFilter) {
+        const worker = (res.worker || "").toLowerCase();
+        if (!worker.includes(workerFilter)) return false;
+      }
+
+      // Concept (select assigned / others)
+      if (conceptFilter === "assigned") {
+        // Assigned work desk = concept null
+        if (res.concept !== null && res.concept !== "") return false;
+      } else if (conceptFilter === "others") {
+        if (res.concept === null || res.concept === "") return false;
+      }
+
+      // Host
+      if (hostFilter) {
+        const host = (res.host || "").toLowerCase();
+        if (!host.includes(hostFilter)) return false;
+      }
+
+      // Role (exacto)
+      if (roleFilter) {
+        if ((res.role || "").toLowerCase() !== roleFilter.toLowerCase()) return false;
+      }
+
+      // Program
+      if (programFilter) {
+        const program = (res.program || "").toLowerCase();
+        if (!program.includes(programFilter)) return false;
+      }
+
+      // Fechas
+      const resStart = new Date(res.start_date);
+      const resEnd   = new Date(res.end_date);
+
+      if (startDate && resEnd < startDate) return false; 
+      if (endDate && resStart > endDate) return false;
+
+      return true;
+    });
+
+    renderTable(filtered);
+  }
+
+  async function fetchReservations() {
+    const tbody = document.getElementById("reservationTableBody");
+    tbody.innerHTML = `<tr><td colspan="8">Loading...</td></tr>`;
+
+    const response = await fetch("/module/proxy/module2/api?action=fetchAllReservations", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    if (!response.ok) {
+      tbody.innerHTML = `<tr><td colspan="8">Unable to load reservations.</td></tr>`;
+      return;
+    }
+
+    const reservations = await response.json();
+    allReservations = Array.isArray(reservations) ? reservations : [];
+
+    applyFilters(); // pinta aplicando filtros actuales 
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm   = String(today.getMonth() + 1).padStart(2, "0");
+    const dd   = String(today.getDate()).padStart(2, "0");
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+    const startInput = document.getElementById("filterStartDate");
+    if (startInput) startInput.value = todayStr;
+
+
+    fetchReservations();
+
+    // Reaplicar filtros cuando cambie cualquier campo
+    const filterIds = [
+      "filterOffice",
+      "filterWorker",
+      "filterConcept",
+      "filterHost",
+      "filterRole",
+      "filterProgram",
+      "filterStartDate",
+      "filterEndDate"
+    ];
+
+    filterIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const eventName = (el.tagName === "SELECT" || el.type === "date") ? "change" : "input";
+      el.addEventListener(eventName, applyFilters);
+    });
+
+    // Botón reset
+    document.getElementById("resetFilters").addEventListener("click", () => {
+      document.getElementById("filterForm").reset();
+      if (startInput) startInput.value = todayStr;
+      applyFilters();
+    });
+  });
+</script>
+
+    <!-- FOOTER -->
+    <footer class="bg-danger text-light py-3 mt-4">
+      <div class="container d-flex justify-content-between align-items-center small">
+        <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+        <span id="load-info">Calculating load time...</span>
+      </div>
+      <script type="module">
+        import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+  
+        measurePageLoadTime({
+          targetId: 'load-info',
+          precision: 6,
+        onComplete: (time) => console.log("Load Time:", time + "s")
+        });
+      </script>
+    </footer>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket Assigned to You</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 30px auto;
+            padding: 30px 25px;
+            max-width: 600px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        p {
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        /* HIGH URGENCY - rojo */
+        .high {
+            border-left-color: #dc3545 !important;
+            background-color: #fdeaea !important;
+            color: #b21f2d !important;
+        }
+
+        /* MEDIUM URGENCY - naranja */
+        .medium {
+            border-left-color: #fd7e14 !important;
+            background-color: #fff4e5 !important;
+            color: #cc5a00 !important;
+        }
+
+        /* LOW URGENCY - verde */
+        .low {
+            border-left-color: #198754 !important;
+            background-color: #e9f7f0 !important;
+            color: #146c43 !important;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #0d6efd;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 22px;
+            border-radius: 6px;
+            margin-top: 25px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+        .btn:hover {
+            background-color: #0b5ed7;
+        }
+        .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            display: block;
+            max-width: 120px;
+            margin: 0 auto 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://issues.crm.cat/assets/images/crmlogo.jfif" alt="CRM Logo">
+        <h1>New Ticket Assigned to You</h1>
+
+        <p>Hello {{.UserName}},</p>
+
+        <p>
+            A new ticket (<strong>#{{.TicketID}}</strong>) has been assigned to you.
+            Please review the details below and proceed with the resolution. You can
+            update its status directly from the CRMIntratools Ticketing Service to
+            inform the affected person that you are currently working on a solution.
+        </p>
+        
+
+        <div class="status {{.UrgencyClass}}">
+            <strong>Urgency:</strong> {{.Urgency}}<br>
+            <strong>Department:</strong> {{.Department}}<br>
+            <strong>Issue:</strong> {{.Issue}}<br>
+            <strong>Description:</strong> {{.Description}}<br>
+            <strong>Created on:</strong> {{.CreationDate}}<br>
+            <strong>Created by:</strong> {{.CreatedBy}}
+        </div>
+
+        <p style="font-size: 13px; color: #999; text-align: center;">
+            Please do not reply to this email — this inbox is not monitored.
+        </p>
+
+        <div class="footer">
+            Thank you for your work,<br>
+            <strong>CRM Ticketing</strong>
+        </div>
+    </div>
+</body>
+</html>

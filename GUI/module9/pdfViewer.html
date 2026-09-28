@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>CRMIntratools - Document viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}" />
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+
+<body class="no-select">
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center py-2">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools" />
+    </a>
+    <div class="d-flex align-items-center gap-3">
+      <a href="/module/gui/module3/notifications.html" class="position-relative">
+        <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+        <span id="notif-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"></span>
+      </a>
+      <a id="backBtn" href="javascript:history.back()" class="btn btn-outline-secondary">← Go back</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<div id="page-container">
+  <div class="container">
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+    <div>
+      <h2 id="docTitle" class="mb-1">Document</h2>
+      <div id="docSubtitle" class="text-muted small">Loading…</div>
+    </div>
+  </div>
+
+  <div class="viewer-shell">
+    <aside class="sidebar d-none d-lg-block">
+      <div class="px-3 py-2 border-bottom">
+        <div class="fw-semibold">Pages</div>
+        <div class="muted">Click to navigate</div>
+      </div>
+      <div id="thumbs" class="thumbs"></div>
+    </aside>
+
+    <section class="stage">
+      <div class="toolbar">
+        <button id="prevBtn" class="btn btn-sm btn-outline-secondary">←</button>
+        <button id="nextBtn" class="btn btn-sm btn-outline-secondary">→</button>
+
+        <div class="input-group input-group-sm" style="max-width: 160px;">
+          <span class="input-group-text">Page</span>
+          <input id="pageInput" class="form-control" type="number" min="1" value="1">
+          <span class="input-group-text" id="pageCount">/ ?</span>
+        </div>
+
+        <div class="spacer"></div>
+
+        <button id="zoomOutBtn" class="btn btn-sm btn-outline-secondary">−</button>
+        <button id="zoomInBtn" class="btn btn-sm btn-outline-secondary">+</button>
+        <span id="zoomLabel" class="muted" style="min-width:70px; text-align:right;">100%</span>
+      </div>
+
+      <div id="pagewrap" class="pagewrap">
+        <div class="pagecard">
+          <div id="pdfLoading" class="pdf-loading">
+            <div class="spinner-border" role="status" aria-hidden="true"></div>
+            <div class="mt-2 small text-muted">Rendering page…</div>
+          </div>
+          <canvas id="pdfCanvas" class="pdf-canvas is-hidden"></canvas>
+        </div>
+      </div>
+    </section>
+  </div>
+  </div>
+  </div>
+</main>
+
+<footer class="bg-danger text-light py-3 mt-4">
+  <div class="container d-flex justify-content-between align-items-center small">
+    <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+    <span id="load-info">Viewer</span>
+  </div>
+</footer>
+
+<script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+
+<!-- pdf.js -->
+
+<script type="module">
+  import * as pdfjsLib from "/assets/js/pdfjs-dist/build/pdf.min.mjs?v={{.AppVersion}}";
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/js/pdfjs-dist/build/pdf.worker.min.mjs?v={{.AppVersion}}";
+
+  function qs(name) { return new URLSearchParams(window.location.search).get(name); }
+
+  const docId = qs("docId");
+
+  let currentUsername = "";
+
+  async function loadUser() {
+      const res = await fetch('/module/proxy/module9/api?action=checkUserInformation');
+      const info = await res.json();
+      currentUsername = info.username || "";
+  }
+
+  await loadUser();
+
+  const pathRes = await fetch(`/module/proxy/module9/api?action=getPath&docId=${encodeURIComponent(docId)}`);
+  const pathPayload = await pathRes.json();
+
+  const title = pathPayload.title; 
+  const titleEl = document.getElementById("docTitle");
+  const subEl = document.getElementById("docSubtitle");
+
+  const canvas = document.getElementById("pdfCanvas");
+  const ctx = canvas.getContext("2d", { alpha: false });
+
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const pageInput = document.getElementById("pageInput");
+  const pageCount = document.getElementById("pageCount");
+
+  const zoomOutBtn = document.getElementById("zoomOutBtn");
+  const zoomInBtn = document.getElementById("zoomInBtn");
+  const zoomLabel = document.getElementById("zoomLabel");
+
+  const thumbsEl = document.getElementById("thumbs");
+  const pagewrap = document.getElementById("pagewrap");
+
+  const loadingEl = document.getElementById("pdfLoading");
+
+
+  // Best-effort: bloquear click derecho + Ctrl+S / Cmd+S / Ctrl+P
+  document.addEventListener("contextmenu", (e) => e.preventDefault());
+  document.addEventListener("keydown", (e) => {
+    const key = e.key?.toLowerCase();
+    const ctrl = e.ctrlKey || e.metaKey;
+    if (ctrl && (key === "s" || key === "p")) {
+      e.preventDefault();
+    }
+  });
+
+  if (!docId) {
+    titleEl.textContent = "Missing docId";
+    subEl.textContent = "No document specified.";
+    prevBtn.disabled = nextBtn.disabled = true;
+    pageInput.disabled = true;
+    zoomInBtn.disabled = zoomOutBtn.disabled = true;
+    throw new Error("Missing docId");
+  }
+
+
+  const realPath = pathPayload.filePath; 
+  const pdfUrl = `/module/proxy/module9/Uploads?file=${encodeURIComponent(realPath)}`;
+
+  let pdf = null;
+  let currentPage = 1;
+  let rendering = false;
+  let pendingPage = null;
+
+  const ZOOM_MIN = 0.5;
+  const ZOOM_MAX = 2.0;
+  const ZOOM_STEP = 0.1;
+
+  let zoom = 1.0;
+
+
+  function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+  async function renderPage(pageNum) {
+    if (!pdf) return;
+
+    loadingEl?.classList.remove("d-none"); 
+    canvas.classList.add("is-hidden");     
+
+    currentPage = clamp(pageNum, 1, pdf.numPages);
+    pageInput.value = currentPage;
+
+    const page = await pdf.getPage(currentPage);
+
+    const wrapWidth = pagewrap.clientWidth - 48;
+    const baseViewport = page.getViewport({ scale: 1 });
+    const fitScale = wrapWidth / baseViewport.width;
+    const viewport = page.getViewport({ scale: fitScale * zoom });
+
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+
+    rendering = true;
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    drawWatermark(`CRMIntratools - ${currentUsername}`);
+    rendering = false;
+
+    highlightThumb(currentPage);
+
+    canvas.classList.remove("is-hidden");
+    loadingEl?.classList.add("d-none");
+  }
+
+
+  function queueRender(pageNum) {
+    if (rendering) {
+      pendingPage = pageNum;
+      return;
+    }
+    renderPage(pageNum).then(() => {
+      if (pendingPage != null) {
+        const p = pendingPage;
+        pendingPage = null;
+        queueRender(p);
+      }
+    });
+  }
+
+    function updateZoomLabel() {
+        const pct = Math.round(zoom * 100);
+        zoomLabel.textContent = `${pct}%`;
+
+        zoomOutBtn.disabled = zoom <= ZOOM_MIN + 1e-9;
+        zoomInBtn.disabled = zoom >= ZOOM_MAX - 1e-9;
+    }
+
+
+  function highlightThumb(pageNum) {
+    if (!thumbsEl) return;
+    thumbsEl.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
+    const el = thumbsEl.querySelector(`.thumb[data-page="${pageNum}"]`);
+    if (el) el.classList.add("active");
+  }
+
+  function drawWatermark(text) {
+    ctx.save();
+
+    const fontSize = Math.floor(canvas.width / 20);
+    ctx.font = `${fontSize}px Arial`;
+    ctx.fillStyle = "rgba(150, 0, 0, 0.08)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.rotate(-Math.PI / 6);
+
+    const stepX = 700;
+    const stepY = 200;
+
+    for (let x = -canvas.width; x < canvas.width * 2; x += stepX) {
+      for (let y = -canvas.height; y < canvas.height * 2; y += stepY) {
+        ctx.fillText(text, x, y);
+      }
+    }
+
+    ctx.restore();
+  }
+
+
+  async function buildThumbs() {
+    if (!thumbsEl) return;
+    thumbsEl.innerHTML = "";
+
+    const maxThumbs = Math.min(pdf.numPages, 30); 
+    for (let p = 1; p <= maxThumbs; p++) {
+      const wrap = document.createElement("div");
+      wrap.className = "thumb";
+      wrap.dataset.page = String(p);
+
+      const c = document.createElement("canvas");
+      const tctx = c.getContext("2d", { alpha: false });
+      const label = document.createElement("div");
+      label.className = "tlabel";
+      label.textContent = `Page ${p}`;
+
+      wrap.appendChild(c);
+      wrap.appendChild(label);
+      wrap.addEventListener("click", () => queueRender(p));
+
+      thumbsEl.appendChild(wrap);
+
+      // Render thumb (muy pequeño)
+      const page = await pdf.getPage(p);
+      const viewport = page.getViewport({ scale: 0.22 });
+      c.width = Math.floor(viewport.width);
+      c.height = Math.floor(viewport.height);
+      await page.render({ canvasContext: tctx, viewport }).promise;
+    }
+
+    highlightThumb(currentPage);
+  }
+
+  // Events
+  prevBtn.addEventListener("click", () => queueRender(currentPage - 1));
+  nextBtn.addEventListener("click", () => queueRender(currentPage + 1));
+
+  pageInput.addEventListener("change", () => {
+    const v = parseInt(pageInput.value, 10);
+    if (Number.isFinite(v)) queueRender(v);
+  });
+
+    zoomOutBtn.addEventListener("click", () => {
+        zoom = clamp(zoom - ZOOM_STEP, ZOOM_MIN, ZOOM_MAX);
+        updateZoomLabel();
+        queueRender(currentPage);
+    });
+
+    zoomInBtn.addEventListener("click", () => {
+        zoom = clamp(zoom + ZOOM_STEP, ZOOM_MIN, ZOOM_MAX);
+        updateZoomLabel();
+        queueRender(currentPage);
+    });
+
+
+  window.addEventListener("resize", () => queueRender(currentPage));
+
+  // Init
+  titleEl.textContent = `${title}`;
+  subEl.textContent = "Loading PDF…";
+  updateZoomLabel();
+
+  try {
+    const loadingTask = pdfjsLib.getDocument({
+      url: pdfUrl,
+      withCredentials: true
+    });
+
+    pdf = await loadingTask.promise;
+    pageCount.textContent = `/ ${pdf.numPages}`;
+    subEl.textContent = `Pages: ${pdf.numPages}`;
+
+    await buildThumbs();
+    queueRender(1);
+
+  } catch (err) {
+    console.error(err);
+    titleEl.textContent = "Unable to open document";
+    subEl.textContent = "The document could not be loaded.";
+  }
+</script>
+</body>
+</html>

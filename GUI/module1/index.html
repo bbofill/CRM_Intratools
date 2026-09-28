@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRMIntratools - Room reservation</title>
+  <link rel="stylesheet" href="/assets/css/tutorialStyles.css?v={{.AppVersion}}">
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v={{.AppVersion}}"> 
+  <link rel="stylesheet" href="assets/style.css?v={{.AppVersion}}">
+  <link rel="shortcut icon" href="/assets/images/headerLogo.png" />
+</head>
+
+<body>
+<!-- HEADER -->
+<header class="bg-light">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="/main">
+      <img id="logo" src="assets/images/logo.png" alt="Logo CRMIntratools" >
+    </a>
+    <div class="d-flex align-items-center gap-4 ms-3">
+      <a href="/module/gui/module3/notifications.html" class="position-relative">
+        <img src="/assets/images/bell.png" alt="Notifications" style="width: 30px;">
+        <span id="notif-count"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+        </span>
+      </a>
+      <a href="/main" class="btn btn-outline-secondary">← Go back</a>
+  </div>
+  </div>
+</header>
+<div id="page-container">
+  <div class="container">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <h1 class="text-danger mb-0">Room reservation</h1>
+    
+      <img
+        id="openCalendarBtn"
+        src="assets/images/calendar.png"
+        alt="View reservations calendar"
+        title="View reservations calendar"
+        class="calendar-icon"
+      />
+    </div>
+    
+    <p><strong>Please note:</strong> all reservations will be reviewed and must have a justified reason.</p>
+    <form method="POST" action="/module/proxy/module1/api" id="form" autocomplete="off">
+      <div id="dateform" class="row">
+        <div class="col">
+          <label for="StartDate" class="form-group">From:</label>
+          <input type="date" id="StartDate" name="StartDate" class="form-control">
+        </div>
+        <div class="col">
+          <label for="StartTime" class="form-label">Start time:</label>
+          <input type="time" id="StartTime" name="StartTime" class="form-control" step="300">
+        </div>
+        <div class="col">
+          <label for="EndDate" class="form-group">Until: </label>
+          <input type="date" id="EndDate" name="EndDate" class="form-control">
+        </div>
+        <div class="col">
+          <label for="EndTime" class="form-label">End time:</label>
+          <input type="time" id="EndTime" name="EndTime" class="form-control" step="300">
+        </div>
+      </div>
+
+     <!-- Button to trigger repeating reservations -->
+      <button id="repeatReservationBtn" type="button" class="btn btn-info" disabled>Set up Repeating Reservation</button>
+
+      <!-- Repeating Reservation Form -->
+      <div id="repeatingReservationForm" style="display:none; margin-top:20px;">
+        <label for="frequency">Frequency:</label>
+        <select id="frequency" class="form-control">
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+        <br>
+        <!-- Weekly options -->
+        <div id="weeklyOptions" style="display:none;">
+          <label>Select days of the week:</label><br>
+          <input type="checkbox" id="monday" /> Monday
+          <input type="checkbox" id="tuesday" /> Tuesday
+          <input type="checkbox" id="wednesday" /> Wednesday
+          <input type="checkbox" id="thursday" /> Thursday
+          <input type="checkbox" id="friday" /> Friday
+          <br><br>
+          <label for="weeklyEndDate">Until:</label>
+          <input type="date" id="weeklyEndDate" class="form-control" />
+        </div>
+
+        <!-- Monthly options -->
+        <div id="monthlyOptions" style="display:none;">
+          <label for="monthType">Repeat by:</label><br>
+          <input type="radio" name="monthRepeatType" id="monthByDay" checked /> Day of the month (e.g. every 21st)
+          <input type="radio" name="monthRepeatType" id="monthByWeek" /> Day of the week (e.g. every third Friday.) <span class="text-muted small">
+            Note: when selecting a date in the 5th week of a month, the repetition will
+            only apply to months that contain a 5th week.
+            </span>
+
+          <br><br>
+          <label for="monthlyEndDate">Until:</label>
+          <input type="date" id="monthlyEndDate" class="form-control" />
+        </div>
+
+        <!-- Yearly options -->
+        <div id="yearlyOptions" style="display:none;">
+          <label for="yearlyType">Repeat by:</label><br>
+          <input type="radio" name="yearlyRepeatType" id="yearlyByDay" checked /> Day of the year (e.g. every 21st of November)
+          <input type="radio" name="yearlyRepeatType" id="yearlyByWeekday" /> Weekday of the month (e.g. every third Friday of November) <span class="text-muted small">
+            Note: when selecting a date in the 5th week of a month, the repetition will
+            only apply to months that contain a 5th week.
+            </span>
+
+          <br><br>
+          <label for="yearlyEndDate">Until:</label>
+          <input type="date" id="yearlyEndDate" class="form-control" />
+        </div>
+
+        <br>
+        <button id="searchRoomsBtn" type="button" class="btn btn-primary" style="display: none;">
+          Search Rooms
+        </button>
+      </div>
+    </form>
+  
+    <h3 id="availableTitle" class="text-danger">Available rooms</h3>
+  
+    <div class="button-container">
+      <a id="ClassroomsBtn" class="btn btn-success" style="display: none;">Classrooms</a>
+      <a id="OfficesBtn" class="btn btn-info" style="display: none;">Offices</a>
+      <a id="AuditoriumBtn" class="btn btn-warning" style="display: none;">Auditorium</a>
+    </div>
+
+    <div class="table-responsive">
+      <table id="roomCode" class="table text-center align-middle table-hover">
+        <thead class="table-danger">
+          <tr>
+            <th>Room</th>
+            <th>Code</th>
+            <th>Category</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody class="table-active"></tbody>
+      </table>
+    </div>
+    <br>
+    <a id="viewAllReservationsBtn" href="viewAllReservations.html" class="btn btn-danger" style="display: none;">View All Reservations</a>
+    <a id="modifyUserReservationBtn" href="modifyReservation.html" class="btn btn-outline-danger" style="display: none;">Modify Reservation</a>
+  </div>
+</div>
+
+<div class="modal fade" id="calendarModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Room reservations calendar</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="reservationCalendar"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/bootstrap.bundle.min.js?v={{.AppVersion}}"></script>
+<script src="/assets/js/index.global.min.js?v={{.AppVersion}}"></script>
+
+<script type="module" src="./assets/js/repeatingReservations.js?v={{.AppVersion}}"></script>
+<script type="module" src="./assets/js/reservationCalendar.js?v={{.AppVersion}}"></script>
+<script>
+  let userRole = null;
+  let currentCategory = null;
+  let isRepeating = false;
+  
+  window.addEventListener("DOMContentLoaded", () => {
+    
+    fetch('/module/proxy/module1/api?action=checkRole', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+      userRole = data.role;
+      //access to functionalities depending the role
+      if (userRole === 'admin' || userRole === 'manager' || userRole === 'support') {
+        document.getElementById('ClassroomsBtn').style.display = 'inline-block';
+        document.getElementById('OfficesBtn').style.display = 'inline-block';
+        document.getElementById('AuditoriumBtn').style.display = 'inline-block';
+        document.getElementById('viewAllReservationsBtn').style.display = 'inline-block';
+        document.getElementById('modifyUserReservationBtn').style.display = 'inline-block';
+      } else {
+        document.getElementById('modifyUserReservationBtn').style.display = 'inline-block';
+        currentCategory = "office";
+      }
+  
+      //normal users have limited dates and hours
+      if (userRole !== 'admin' && userRole !== 'manager' && userRole !== 'support') {
+        ["StartDate", "EndDate"].forEach(id => {
+          document.getElementById(id).addEventListener("change", (e) => {
+            const date = new Date(e.target.value);
+            const month = date.getMonth();
+            const day = date.getDay();
+            if (month === 7) {
+              alert("CRM is closed in August. Please refer to administration if you need to make this reservation.");
+              e.target.value = "";
+            } else if (day === 0 || day === 6) {
+              alert("CRM is closed on weekends. Please refer to administration if you need to make this reservation.");
+              e.target.value = "";
+            }
+          });
+        });
+        ["StartTime", "EndTime"].forEach(id => {
+          document.getElementById(id).addEventListener("change", (e) => {
+            const value = e.target.value;
+            if (!value) return;
+            const [hour, minute] = value.split(":").map(Number);
+            const time = hour + minute / 60;
+            if (time < 9 || time > 17) {
+              alert("Reservation hours are from 09:00 to 17:00. Please refer to administration if you need to make this reservation.");
+              e.target.value = "";
+            }
+          });
+        });
+      }
+  
+      //recharge rooms for every change of data entry
+      ["StartDate", "StartTime", "EndDate", "EndTime"].forEach(id => {
+        document.getElementById(id).addEventListener("change", loadRooms);
+      });
+  
+      document.getElementById("ClassroomsBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        toggleCategory("classroom");
+      });
+      document.getElementById("OfficesBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        toggleCategory("office");
+      });
+      document.getElementById("AuditoriumBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        toggleCategory("auditorium");
+      });
+
+    // Disable dynamic room search when repetition is selected
+    document.getElementById("repeatReservationBtn").addEventListener("click", () => {
+      isRepeating = !isRepeating;
+
+      // If repeating, disable the dynamic search (but keep the input fields active)
+      if (isRepeating) {
+      // hide the table of rooms
+        document.getElementById("availableTitle").style.display= "none";
+        document.getElementById("roomCode").style.display = "none";
+        
+        // Show the "Search Rooms" button
+        document.getElementById("searchRoomsBtn").style.display = "inline-block";
+        
+        // Stop dynamic room loading
+        ["StartDate", "StartTime", "EndDate", "EndTime"].forEach(id => {
+          document.getElementById(id).removeEventListener("change", loadRooms); // Disable dynamic search
+        });
+
+        // Detect and mark weekday based on StartDate
+        const date = new Date(startDate);
+        const weekday = date.getDay(); // 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri
+
+        // Clear previous selections first
+        const weeklyCheckboxes = document.querySelectorAll("#weeklyOptions input[type='checkbox']");
+        weeklyCheckboxes.forEach(cb => cb.checked = false);
+
+        // Map JS weekday -> checkbox ID
+        const dayMap = {
+          1: "monday",
+          2: "tuesday",
+          3: "wednesday",
+          4: "thursday",
+          5: "friday"
+        };
+
+        // Default select only if weekday Mon–Fri
+        if (dayMap[weekday]) {
+          document.getElementById(dayMap[weekday]).checked = true;
+        }
+      } else {
+        // If repetition is deactivated, show the table of rooms
+        document.getElementById("availableTitle").style.display= "block";
+        document.getElementById("roomCode").style.display = "table"; // Show the table again
+        
+        // Hide the manual search button
+        document.getElementById("searchRoomsBtn").style.display = "none";
+        
+        // Reactivate dynamic search
+        ["StartDate", "StartTime", "EndDate", "EndTime"].forEach(id => {
+          document.getElementById(id).addEventListener("change", loadRooms); // Reactivate dynamic search
+        });
+
+        // Load rooms dynamically again
+        loadRooms();
+      }
+      });
+      document.getElementById("searchRoomsBtn").addEventListener("click", loadRoomsRepeated);
+
+    
+      loadRooms(); 
+
+      //block past dates
+      const today = new Date();
+      const minDate = formatDate(today);
+      const startDateInput = document.getElementById("StartDate");
+      const endDateInput = document.getElementById("EndDate");
+      startDateInput.setAttribute("min", minDate);
+      endDateInput.setAttribute("min", minDate);
+    })
+    .catch(error => console.error('Error checking role:', error));
+  });
+  
+  //function to activate/disactivate category buttons
+  function toggleCategory(category) {
+    currentCategory = (currentCategory === category) ? null : category;
+    loadRooms();
+  }
+
+  //format date in the correct way
+  function formatDate(date) {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+  }
+
+  function stripTZ(iso) {
+  return iso
+    .replace('T', ' ')
+    .replace('Z', '')
+    .slice(0, 16); // yyyy-mm-dd hh:mm
+}
+
+  //returns available rooms 
+  function loadRooms() {
+    const startDate = document.getElementById("StartDate").value;
+    const startTime = document.getElementById("StartTime").value;
+    const endDate = document.getElementById("EndDate").value;
+    const endTime = document.getElementById("EndTime").value;
+  
+    const tbody = document.querySelector("#roomCode tbody");
+    tbody.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
+  
+    //starts loading once all the data is filled
+    if (!startDate || !startTime || !endDate || !endTime) {
+      tbody.innerHTML = "<tr><td colspan='4'>Please select a valid time range.</td></tr>";
+      return;
+    }
+  
+    //checks correct time-range
+    const start = new Date(`${startDate}T${startTime}`);
+    const end = new Date(`${endDate}T${endTime}`);
+    if (start >= end) {
+      alert("Start time must be before end time.");
+      tbody.innerHTML = "<tr><td colspan='4'>Invalid time range.</td></tr>";
+      return;
+    }
+  
+    //sends petition to backend
+    const payload = {
+      StartTime: `${startDate}T${startTime}`,
+      EndTime: `${endDate}T${endTime}`
+    };
+    fetch('/module/proxy/module1/api?action=getAvailable', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+      const available = data.rooms || [];
+      const occupied = data.occupiedRooms || [];
+  
+      //shows available rooms for each user
+      tbody.innerHTML = "";
+
+      available.forEach(m => {
+        if (userRole !== 'admin' && userRole !== 'manager' && userRole !== 'support' && m.category !== 'office') return;
+        if ((userRole === 'admin' || userRole === 'manager' || userRole === 'support') && currentCategory && m.category !== currentCategory) return;
+  
+        const fila = document.createElement("tr");
+        switch (m.category) {
+          case "classroom": fila.classList.add("table-success"); break;
+          case "office": fila.classList.add("table-info"); break;
+          case "auditorium": fila.classList.add("table-warning"); break;
+          default: fila.classList.add("table-light");
+        }
+        fila.innerHTML = `
+          <td>${m.name}</td>
+          <td>${m.uab_code}</td>
+          <td>${m.category}</td>
+          <td>
+            <button class="btn btn-danger reservar-btn" data-id="${m.id}">Book</button>
+          </td>`;
+          //saves selected reservation and opens confirmation window
+        fila.querySelector(".reservar-btn").addEventListener("click", () => {
+          const reserva = {
+            id: m.id,
+            name: m.name,
+            code: m.uab_code,
+            startTime: data.startTime,
+            endTime: data.endTime
+          };
+          sessionStorage.setItem("reservaSeleccionada", JSON.stringify(reserva));
+          window.location.href = "confirmation.html";
+        });
+        tbody.appendChild(fila);
+      });
+
+      occupied.forEach(entry => {
+            console.log("Occupied room:", entry);
+        const m = entry.room;
+        const r = entry.reservations[0]; 
+
+        if (userRole !== 'admin' && userRole !== 'manager' && userRole !== 'support' && m.category !== 'office') return;
+        if ((userRole === 'admin' || userRole === 'manager' || userRole === 'support') && currentCategory && m.category !== currentCategory) return;
+
+        const tr = document.createElement("tr");
+
+        tr.classList.add("table-secondary");
+        tr.style.opacity = "0.5";
+        tr.style.cursor = "not-allowed";
+
+        tr.title =
+          `Occupied: ${r.concept || "Unknown reason"}\n` +
+          `By: ${r.email}\n` +
+          `From: ${stripTZ(r.start_date)} Until: ${stripTZ(r.end_date)}`;
+
+
+        tr.innerHTML = `
+          <td>${m.name}</td>
+          <td>${m.uab_code}</td>
+          <td>${m.category}</td>
+          <td><span class="text-danger fw-bold">OCCUPIED</span></td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+  
+    })
+    .catch(error => {
+      console.error('Error loading rooms:', error);
+      tbody.innerHTML = "<tr><td colspan='4'>Error loading rooms.</td></tr>";
+    });
+
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    tooltipTriggerList.map(function (el) {
+      return new bootstrap.Tooltip(el);
+    });
+  }
+
+  async function loadRoomsRepeated() {
+  console.log("Searching rooms for repeating reservation...");
+
+  const startDate = document.getElementById("StartDate").value;
+  const startTime = document.getElementById("StartTime").value;
+  const endDate = document.getElementById("EndDate").value;
+  const endTime = document.getElementById("EndTime").value;
+  const frequency = document.getElementById("frequency").value;
+
+  const payload = {
+    startTime: `${startDate}T${startTime}`,
+    endTime: `${endDate}T${endTime}`,
+    frequency,
+  };
+
+  if (frequency === "weekly") {
+    payload.weekdays = [
+      document.getElementById("monday").checked ? 1 : null,
+      document.getElementById("tuesday").checked ? 2 : null,
+      document.getElementById("wednesday").checked ? 3 : null,
+      document.getElementById("thursday").checked ? 4 : null,
+      document.getElementById("friday").checked ? 5 : null,
+    ].filter(Boolean);
+    payload.end_repetition = document.getElementById("weeklyEndDate").value;
+  } else if (frequency === "monthly") {
+    payload.repeat_by = document.getElementById("monthByDay").checked ? "month_day" : "month_weekday";
+    payload.end_repetition = document.getElementById("monthlyEndDate").value;
+  } else if (frequency === "yearly") {
+    payload.repeat_by = document.getElementById("yearlyByDay").checked ? "year_day" : "year_weekday";
+    payload.end_repetition = document.getElementById("yearlyEndDate").value;
+  }
+
+  const tbody = document.querySelector("#roomCode tbody");
+
+  const res = await fetch("/module/proxy/module1/api?action=getAvailableRepeated", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+
+  document.getElementById("availableTitle").style.display= "block";
+  document.getElementById("roomCode").style.display="table";
+
+  const available = data.rooms || [];
+  const occupied = data.occupiedRooms || [];
+
+  tbody.innerHTML = "";
+  data.rooms.forEach(room => {
+    if (userRole !== 'admin' && userRole !== 'manager' && userRole !== 'support' && room.category !== 'office') return;
+    if ((userRole === 'admin' || userRole === 'manager' || userRole === 'support') && currentCategory && room.category !== currentCategory) return;
+
+    const tr = document.createElement("tr");
+    switch (room.category) {
+      case "classroom": tr.classList.add("table-success"); break;
+      case "office": tr.classList.add("table-info"); break;
+      case "auditorium": tr.classList.add("table-warning"); break;
+      default: tr.classList.add("table-light");
+    }
+    tr.innerHTML = `
+      <td>${room.name}</td>
+      <td>${room.uab_code}</td>
+      <td>${room.category}</td>
+      <td><button class="btn btn-danger reservar-btn" data-id="${room.id}">Book</button></td>
+    `;
+
+    tr.querySelector(".reservar-btn").addEventListener("click", () => {
+      sessionStorage.setItem("reservaRepetida", JSON.stringify({
+        id: room.id,
+        name: room.name,
+        code: room.uab_code,
+        frequency: payload.frequency,
+        occurrences: data.occurrences
+      }));
+      window.location.href = "confirmationRepeated.html";
+    });
+
+    tbody.appendChild(tr);
+  });
+  occupied.forEach(entry => {
+    console.log("Occupied room:", entry);
+    const m = entry.room;
+    const r = entry.reservations[0]; 
+
+    if (userRole !== 'admin' && userRole !== 'manager' && userRole !== 'support' && m.category !== 'office') return;
+    if ((userRole === 'admin' || userRole === 'manager' || userRole === 'support') && currentCategory && m.category !== currentCategory) return;
+
+    const tr = document.createElement("tr");
+
+    tr.classList.add("table-secondary");
+    tr.style.opacity = "0.5";
+    tr.style.cursor = "not-allowed";
+
+    tr.title =
+      `Occupied: ${r.concept || "Unknown reason"}\n` +
+      `By: ${r.email}\n` +
+      `From: ${stripTZ(r.start_date)} Until: ${stripTZ(r.end_date)}`;
+
+
+    tr.innerHTML = `
+      <td>${m.name}</td>
+      <td>${m.uab_code}</td>
+      <td>${m.category}</td>
+      <td><span class="text-danger fw-bold">OCCUPIED</span></td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+</script>
+  <footer class="bg-danger text-light py-3 mt-4">
+    <div class="container d-flex justify-content-between align-items-center small">
+      <span>&copy; 2026 - <a class="text-white text-decoration-none" href="https://www.crm.cat">Centre de Recerca Matemàtica</a></span>
+      <span id="load-info">Calculating load time...</span>
+    </div>
+    <script type="module">  
+      import { measurePageLoadTime } from '/assets/js/checkLoadTime.js?v={{.AppVersion}}';
+      
+      measurePageLoadTime({
+        targetId: 'load-info',
+        precision: 6,
+      onComplete: (time) => console.log("Load Time:", time + "s")
+      });
+    </script>
+  </footer>
+<script type="module">
+  import { initNotificationBadge } from "/assets/js/notificationUtils.js?v={{.AppVersion}}";
+  initNotificationBadge();
+</script>
+<script type="module" src="/assets/js/tutorials/tutorial_module1.js?v={{.AppVersion}}"></script>
+
+
+</body>
+</html>
