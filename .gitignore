@@ -1,5 +1,5 @@
 cat << 'EOF' > .gitignore
-# Binarios y ejecutables
+# Binarios y ejecutables compilados
 *.bin
 crmintratools.bin
 goevoko
@@ -9,6 +9,8 @@ goEvoko
 Data/
 Backups/
 Uploads/
+*.sqlite-wal
+*.sqlite-shm
 
 # Certificados locales SSL/TLS y claves privadas
 SSLCerts/
@@ -18,14 +20,20 @@ GPGKeys/
 # Credenciales y configuración sensible
 Config/
 *.env
+.env
+!.env.example
+
+# Logs y auditoría
+*.log
 
 # Documentación compilada y librerías externas pesadas
 site/
 GUI/assets/js/pdfjs-dist/
 
-# Entornos virtuales y dependencias
+# Entornos virtuales, dependencias y cachés
 vendor/
 venv/
+__pycache__/
+*.py[cod]
 .DS_Store
-EOFGUI/templates/auth.html
-GUI/templates/auth.html
+.vscode/
